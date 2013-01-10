@@ -1,0 +1,9 @@
+Ext.define('motioncalc.store.GlobalSettings', {
+    extend: 'Ext.data.Store',
+//	requires: 'Ext.data.proxy.LocalStorage',
+    config: {
+	storeId:'_GlobalSettings',
+	model: 'motioncalc.model.GlobalSettings',
+	autoLoad: true
+    }
+});

@@ -1,0 +1,14 @@
+Ext.define('motioncalc.store.GlobalSettings', {
+    extend: 'Ext.data.Store',
+
+    config: {
+        fields: ['id', 'value'],
+        data: [
+            { id: 'Units', value: 'unitscard' },
+            { id: 'Inertia', value: 'inertiacard' },
+            { id: 'Materials Density', value: 'materialscard' },
+            { id: 'About tigerBaby',      value: 'aboutcard' },
+            { id: 'Settings',      value: 'settingscard' }
+        ]
+    }
+});
