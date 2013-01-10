@@ -69,9 +69,75 @@ Ext.define('motioncalc.view.GlobalSettings', {
 					setGlobalSetting('SignificantDigits',newValue);
 				    }
 		                    },
-			    }
-
-			],
+			    },
+			    {
+				xtype: 'selectfield',
+				name : 'density',
+				label: 'Density',
+				options: fillUnits('Density'),
+				listeners:{
+					initialize:function(){
+						this.setValue(motioncalc.app.density);
+					},
+				change: function(selectbox,newValue,oldValue)
+				    {
+					if(newValue === oldValue)return;        
+					motioncalc.app.density = newValue;
+					setGlobalSetting('Density',newValue);
+				    }
+		                    },
+			    },
+			    {
+				xtype: 'selectfield',
+				name : 'mass',
+				label: 'Mass',
+				options: fillUnits('Mass'),
+				listeners:{
+					initialize:function(){
+						this.setValue(motioncalc.app.mass);
+					},
+				change: function(selectbox,newValue,oldValue)
+				    {
+					if(newValue === oldValue)return;        
+					motioncalc.app.mass = newValue;
+					setGlobalSetting('Mass',newValue);
+				    }
+		                    },
+			    },
+			    {
+				xtype: 'selectfield',
+				name : 'linearDistance',
+				label: 'Linear Distance',
+				options: fillUnits('Linear distance'),
+				listeners:{
+					initialize:function(){
+						this.setValue(motioncalc.app.linearDistance);
+					},
+				change: function(selectbox,newValue,oldValue)
+				    {
+					if(newValue === oldValue)return;        
+					motioncalc.app.linearDistance = newValue;
+					setGlobalSetting('LinearDistance',newValue);
+				    }
+		                    },
+			    },
+			    {
+				xtype: 'selectfield',
+				name : 'inertia',
+				label: 'Inertia',
+				options: fillUnits('Inertia'),
+				listeners:{
+					initialize:function(){
+						this.setValue(motioncalc.app.inertia);
+					},
+				change: function(selectbox,newValue,oldValue)
+				    {
+					if(newValue === oldValue)return;        
+					motioncalc.app.inertia = newValue;
+					setGlobalSetting('Inertia',newValue);
+				    }
+		                    },
+			    }			],
 		    }
 		]
 	}
