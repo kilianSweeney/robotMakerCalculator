@@ -3,8 +3,6 @@ Ext.define('motioncalc.view.HomeIcons', {
     xtype: 'homeicons',
     requires: [
         'Ext.dataview.List',
-//        'motioncalc.view.About',
-//        'motioncalc.view.Bookmarks'
     ],
 
     config: {
@@ -15,13 +13,7 @@ Ext.define('motioncalc.view.HomeIcons', {
             xtype: 'list',
             itemTpl: '{title}',
             store: 'HomeIcons',
-//            listeners: {
-//                itemtap: function(list, index, item, record) {
-//                    this.up('morecard').push({
-//                        xtype: record.data.xtype
-//                    });
-//                }
-//            }
+
         }]
     }
 });

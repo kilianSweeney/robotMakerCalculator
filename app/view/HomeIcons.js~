@@ -8,10 +8,10 @@ Ext.define('motioncalc.view.HomeIcons', {
     ],
 
     config: {
-        iconCls: 'more',
-        title: 'More',
+        iconCls: 'home',
+        title: 'Home',
         items: [{
-            title: 'More',
+            title: 'Home',
             xtype: 'list',
             itemTpl: '{title}',
             store: 'HomeIcons',

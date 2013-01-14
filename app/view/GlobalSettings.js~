@@ -3,7 +3,8 @@ Ext.define('motioncalc.view.GlobalSettings', {
 	xtype: 'globalsettingscard',
 	requires: [
 		'Ext.form.FieldSet',
-		'Ext.field.Select'
+		'Ext.field.Select',
+		'motioncalc.util.Conversions'
 		],
 	controllers: ['GlobalSettings'],
 	config: {
@@ -38,23 +39,6 @@ Ext.define('motioncalc.view.GlobalSettings', {
 			    },
 			    {
 				xtype: 'selectfield',
-				name : 'scientificNotation',
-				label: 'Scientific Notation',
-				options: [{text:'On',value:'true'},{text:'Off',value:'false'}],
-				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.scientificNotation);
-					},
-				change: function(selectbox,newValue,oldValue)
-				    {
-					if(newValue === oldValue)return;        
-					motioncalc.app.scientificNotation = newValue;
-					setGlobalSetting('ScientificNotation',newValue);
-				    }
-		                    },
-			    },
-			    {
-				xtype: 'selectfield',
 				name : 'significantDigits',
 				label: 'Significant Digits',
 				options: [{text:'1',value:'1'},{text:'2',value:'2'},{text:'3',value:'3'},{text:'4',value:'4'},{text:'5',value:'5'},{text:'6',value:'6'},{text:'7',value:'7'}],
@@ -74,7 +58,8 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				xtype: 'selectfield',
 				name : 'density',
 				label: 'Density',
-				options: fillUnits('Density'),
+				id: '_density',
+//				options: fillUnits('Density'),
 				listeners:{
 					initialize:function(){
 						this.setValue(motioncalc.app.density);
@@ -91,7 +76,8 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				xtype: 'selectfield',
 				name : 'mass',
 				label: 'Mass',
-				options: fillUnits('Mass'),
+				id: '_mass',
+//				options: fillUnits('Mass'),
 				listeners:{
 					initialize:function(){
 						this.setValue(motioncalc.app.mass);
@@ -108,7 +94,8 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				xtype: 'selectfield',
 				name : 'linearDistance',
 				label: 'Linear Distance',
-				options: fillUnits('Linear distance'),
+				id: 'linear-distance',
+//				options: fillUnits('Linear distance'),
 				listeners:{
 					initialize:function(){
 						this.setValue(motioncalc.app.linearDistance);
@@ -120,9 +107,34 @@ Ext.define('motioncalc.view.GlobalSettings', {
 					setGlobalSetting('LinearDistance',newValue);
 				    }
 		                    },
+			    },
+			    {
+				xtype: 'selectfield',
+				name : 'inertia',
+				label: 'Inertia',
+				id: '_inertia',
+//				options: fillUnits('Inertia'),
+				listeners:{
+					initialize:function(){
+						this.setValue(motioncalc.app.inertia);
+					},
+				change: function(selectbox,newValue,oldValue)
+				    {
+					if(newValue === oldValue)return;        
+					motioncalc.app.inertia = newValue;
+					setGlobalSetting('Inertia',newValue);
+				    }
+		                    },
 			    }			],
 		    }
 		]
+	},
+	onReady: function(){
+			Ext.ComponentQuery.query('#_mass')[0].setOptions(conversionFunctions.fillUnits('Mass'));
+			Ext.ComponentQuery.query('#linear-distance')[0].setOptions(conversionFunctions.fillUnits('Linear Distance'));
+			Ext.ComponentQuery.query('#_inertia')[0].setOptions(conversionFunctions.fillUnits('Inertia'));
+			Ext.ComponentQuery.query('#_density')[0].setOptions(conversionFunctions.fillUnits('Density'));
+
 	}
 });
 
