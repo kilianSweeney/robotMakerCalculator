@@ -24,7 +24,7 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				xtype: 'selectfield',
 				name : 'decimalStyle',
 				label: 'Decimal Style',
-				options: [{text:'1',value:'1'},{text:'2',value:'2'}],
+				options: [{text:'US',value:'1'},{text:'EUR',value:'2'}],
 				listeners:{
 					initialize:function(){
 						this.setValue(motioncalc.app.decimalStyle);
@@ -129,11 +129,11 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		    }
 		]
 	},
-	onReady: function(){
-			Ext.ComponentQuery.query('#_mass')[0].setOptions(conversionFunctions.fillUnits('Mass'));
-			Ext.ComponentQuery.query('#linear-distance')[0].setOptions(conversionFunctions.fillUnits('Linear Distance'));
-			Ext.ComponentQuery.query('#_inertia')[0].setOptions(conversionFunctions.fillUnits('Inertia'));
-			Ext.ComponentQuery.query('#_density')[0].setOptions(conversionFunctions.fillUnits('Density'));
+	initialize: function(){
+			Ext.ComponentQuery.query('#_mass')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass'));
+			Ext.ComponentQuery.query('#linear-distance')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance'));
+			Ext.ComponentQuery.query('#_inertia')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia'));
+			Ext.ComponentQuery.query('#_density')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Density'));
 
 	}
 });

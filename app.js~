@@ -16,6 +16,7 @@ Ext.application({
     views: ['Main'],
     stores: ['HomeIcons','GlobalSettings','Conversions'],
     models: ['GlobalSettings'],
+mainView: Ext.create('motioncalc.view.Main'),
 
 //global vars
 decimalStyle: 1,
@@ -49,12 +50,12 @@ conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 	//set global vars
 	var decimalStyle, significantDigits,density,mass,linearDistance,inertia;
 //	motioncalc.app.conversionFunctions = Ext.create('motioncalc.util.Conversions');
-	decimalStyle = getGlobalSetting('DecimalStyle');
-	significantDigits = getGlobalSetting('SignificantDigits');
-	density = getGlobalSetting('Density');
-	mass = getGlobalSetting('Mass');
-	linearDistance = getGlobalSetting('LinearDistance');
-	inertia = getGlobalSetting('inertia');
+	decimalStyle = motioncalc.app.getGlobalSetting('DecimalStyle');
+	significantDigits = motioncalc.app.getGlobalSetting('SignificantDigits');
+	density = motioncalc.app.getGlobalSetting('Density');
+	mass = motioncalc.app.getGlobalSetting('Mass');
+	linearDistance = motioncalc.app.getGlobalSetting('LinearDistance');
+	inertia = motioncalc.app.getGlobalSetting('inertia');
 	motioncalc.app.decimalStyle=decimalStyle===null?motioncalc.app.decimalStyle:decimalStyle;
 	motioncalc.app.significantDigits=significantDigits===null?motioncalc.app.significantDigits:significantDigits;
 	motioncalc.app.density=density===null?motioncalc.app.density:density;
@@ -63,7 +64,7 @@ conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 	motioncalc.app.inertia=inertia===null?motioncalc.app.inertia:inertia;
 
         // Initialize the main view
-        Ext.Viewport.add(Ext.create('motioncalc.view.Main'));
+	Ext.Viewport.add(motioncalc.app.mainView);
     },
 
     onUpdated: function() {
