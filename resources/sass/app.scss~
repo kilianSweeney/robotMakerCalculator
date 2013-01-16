@@ -1,4 +1,20 @@
+$base-color: #37FDFC;
+$active-color: #F4F776;
+$base-gradient: 'glossy';
+html,body { background-color:#37FDFC!important; }
 @import 'sencha-touch/default/all';
+
+
+.x-tab-active .x-button-icon {
+  background-color: #F4F776!important;
+  background-image:none!important;
+}
+
+
+.x-button-label,
+.x-title { color: #36648B!important; }
+.x-toolbar-dark.x-docked-top { border-bottom-color: #36648B!important; }
+
 
 // You may remove any of the following modules that you
 // do not use in order to create a smaller css file.
@@ -18,3 +34,4 @@
 
 // Your custom code goes here...
 @include pictos-iconmask('sign_leftright');
+@include pictos-iconmask('settings3');

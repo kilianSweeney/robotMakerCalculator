@@ -3,6 +3,7 @@ Ext.define('motioncalc.view.Main', {
     requires: [
         'motioncalc.view.HomeIcons',
         'motioncalc.view.Units',
+        'motioncalc.view.Inertia',
 	'motioncalc.view.GlobalSettings'
     ],
 
@@ -16,6 +17,7 @@ Ext.define('motioncalc.view.Main', {
         items: [
             { xtype: 'homeicons' },
             { xtype: 'unitscard' },
+            { xtype: 'inertiacard' },
             { xtype: 'globalsettingscard' }
         ]
     }

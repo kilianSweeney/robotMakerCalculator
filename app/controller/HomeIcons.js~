@@ -1,11 +1,6 @@
 Ext.define('motioncalc.controller.HomeIcons', {
 	extend : 'Ext.app.Controller',
 	config: {
-		  	stores : ['HomeIcons'],
-	},
-control: {
-	'employeeList': {
-	activate: 'onActivate',
-	itemtap: 'onSelectEmployee'
+		  	stores : ['HomeIcons']
 	}
 }

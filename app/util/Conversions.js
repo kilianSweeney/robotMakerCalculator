@@ -71,7 +71,6 @@ Ext.define('motioncalc.util.Conversions', {
 		});
 		var returnValue = (sngBase-store.getAt(intX).get('plusFactor'))/store.getAt(intX).get('xFactor');
 		returnValue = forDisplay ? this.getValue(returnValue):returnValue;
-	//	console.log(returnValue + ' from unitsConvert');
 		return returnValue;
 
 	},

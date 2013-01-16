@@ -15,7 +15,8 @@ Ext.define('motioncalc.view.Main', {
         },
         items: [
             { xtype: 'homeicons' },
-            { xtype: 'unitscard' }
+            { xtype: 'unitscard' },
+            { xtype: 'globalsettingscard' }
         ]
     }
 });

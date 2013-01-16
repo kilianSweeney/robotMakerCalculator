@@ -10,6 +10,7 @@ Ext.define('motioncalc.view.GlobalSettings', {
 	config: {
 		iconCls: 'settings3',
 		title: 'Settings',
+		isEnabled: false,
 		items: [
 		    {
 			docked: 'top',
@@ -97,14 +98,16 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				id: 'linear-distance',
 //				options: fillUnits('Linear distance'),
 				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.linearDistance);
-					},
+//					initialize:function(){
+//						this.setValue(motioncalc.app.linearDistance);
+//					},
 				change: function(selectbox,newValue,oldValue)
 				    {
-					if(newValue === oldValue)return;        
-					motioncalc.app.linearDistance = newValue;
-					motioncalc.app.setGlobalSetting('LinearDistance',newValue);
+					if(motioncalc.view.GlobalSettings.isEnabled){
+						if(newValue === oldValue)return;        
+						motioncalc.app.linearDistance = newValue;
+						motioncalc.app.setGlobalSetting('LinearDistance',newValue);
+					}
 				    }
 		                    },
 			    },
@@ -131,10 +134,11 @@ Ext.define('motioncalc.view.GlobalSettings', {
 	},
 	initialize: function(){
 			Ext.ComponentQuery.query('#_mass')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass'));
-			Ext.ComponentQuery.query('#linear-distance')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('LinearDistance'));
+			Ext.ComponentQuery.query('#linear-distance')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance'));
+			Ext.ComponentQuery.query('#linear-distance')[0].setValue(motioncalc.app.linearDistance);
 			Ext.ComponentQuery.query('#_inertia')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia'));
 			Ext.ComponentQuery.query('#_density')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Density'));
-
+			motioncalc.view.GlobalSettings.isEnabled = true;
 	}
 });
 
