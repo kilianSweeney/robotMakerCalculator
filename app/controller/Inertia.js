@@ -18,6 +18,14 @@ Ext.define('motioncalc.controller.Inertia', {
 		}
 	},
 	onActivate: function(){
+		//unit testing
+		console.log('motioncalc.app.inertiaFunctions.eqnTetraIxx: ' + motioncalc.app.inertiaFunctions.eqnTetraIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnRodIxx: ' + motioncalc.app.inertiaFunctions.eqnRodIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnParallelIxx: ' + motioncalc.app.inertiaFunctions.eqnParallelIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnCylinderIxx: ' + motioncalc.app.inertiaFunctions.eqnCylinderIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnSphereIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnSphereShellIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereShellIxx('Ixx'));
+		console.log(Ext.getCmp('isMass').get('value')==1);
 		function setLabel(item,unit){
 			var tmpLbl,index;		
 			unit = unit == null?motioncalc.app.linearDistance:unit;

@@ -18,6 +18,13 @@ Ext.define('motioncalc.controller.Inertia', {
 		}
 	},
 	onActivate: function(){
+		//unit testing
+		console.log('motioncalc.app.inertiaFunctions.eqnTetraIxx: ' + motioncalc.app.inertiaFunctions.eqnTetraIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnRodIxx: ' + motioncalc.app.inertiaFunctions.eqnRodIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnParallelIxx: ' + motioncalc.app.inertiaFunctions.eqnParallelIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnCylinderIxx: ' + motioncalc.app.inertiaFunctions.eqnCylinderIxx('Ixx'));
+		console.log('motioncalc.app.inertiaFunctions.eqnSphereIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereIxx('Ixx'));
+		console.log(Ext.getCmp('isMass').get('value')==1);
 		function setLabel(item,unit){
 			var tmpLbl,index;		
 			unit = unit == null?motioncalc.app.linearDistance:unit;
@@ -28,8 +35,8 @@ Ext.define('motioncalc.controller.Inertia', {
 		}
 		
 		this.setInertiaScreen();
-		Ext.ComponentQuery.query('#inertiaDensity')[0].setLabel(this,motioncalc.app.density);
-		Ext.ComponentQuery.query('#inertiaMass')[0].setLabel(this,motioncalc.app.mass);
+		setLabel(Ext.getCmp('inertiaDensity'),motioncalc.app.density);
+		setLabel(Ext.getCmp('inertiaMass'),motioncalc.app.mass);
 		Ext.Array.each(Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]'),function(){
 			setLabel(this,null);
 		});

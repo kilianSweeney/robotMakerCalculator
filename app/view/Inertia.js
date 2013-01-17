@@ -5,6 +5,7 @@ Ext.define('motioncalc.view.Inertia', {
     requires: [
         'Ext.form.FieldSet',
 	'Ext.field.Number',
+	'Ext.field.Hidden',
 	'motioncalc.util.Conversions'
     ],
 	
@@ -17,6 +18,12 @@ Ext.define('motioncalc.view.Inertia', {
                 xtype: 'toolbar',
                 title: 'Inertia'
             },
+	    {
+		xtype: 'hiddenfield',
+		name : 'isMass',
+		id: 'isMass',
+		value: 1
+	    },
 	    {
 		xtype: 'selectfield',
 		name : 'inertiaShape',

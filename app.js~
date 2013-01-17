@@ -10,12 +10,14 @@ Ext.application({
 
     requires: [
         'Ext.MessageBox',
-	'motioncalc.util.Conversions'
+	'motioncalc.util.Conversions',
+	'motioncalc.util.Inertia'
     ],
 
     views: ['Main'],
     stores: ['HomeIcons','GlobalSettings','Conversions'],
     models: ['GlobalSettings'],
+	controllers: ['Inertia'],
 mainView: null,
 
 //global vars
@@ -26,7 +28,7 @@ mass: 'carat',
 linearDistance: 'angstrom',
 inertia: 'gm-cm²',
 conversionFunctions: Ext.create('motioncalc.util.Conversions'),
-
+inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
     icon: {
         '57': 'resources/icons/Icon.png',
         '72': 'resources/icons/Icon~ipad.png',

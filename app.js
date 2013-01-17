@@ -10,7 +10,8 @@ Ext.application({
 
     requires: [
         'Ext.MessageBox',
-	'motioncalc.util.Conversions'
+	'motioncalc.util.Conversions',
+	'motioncalc.util.Inertia'
     ],
 
     views: ['Main'],
@@ -26,8 +27,14 @@ density: 'g/cm³',
 mass: 'carat',
 linearDistance: 'angstrom',
 inertia: 'gm-cm²',
-conversionFunctions: Ext.create('motioncalc.util.Conversions'),
+LDBASEUNITS : "m",
+DENSITYBASEUNITS : "kg/m³",
+MASSBASEUNITS : "kg",
+INERTIABASEUNITS : "kg-m²",
+PI : 3.141593,
 
+conversionFunctions: Ext.create('motioncalc.util.Conversions'),
+inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
     icon: {
         '57': 'resources/icons/Icon.png',
         '72': 'resources/icons/Icon~ipad.png',
