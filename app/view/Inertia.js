@@ -25,6 +25,12 @@ Ext.define('motioncalc.view.Inertia', {
 		value: 1
 	    },
 	    {
+		xtype: 'hiddenfield',
+		name : 'inertiaActive',
+		id: 'inertiaActive',
+		value: 0
+	    },
+	    {
 		xtype: 'selectfield',
 		name : 'inertiaShape',
 		label: 'Shape',
@@ -37,6 +43,7 @@ Ext.define('motioncalc.view.Inertia', {
 		value: 0,
 		id: 'inertiaDensity',
 		label: 'Density',
+		readonly: true
 	    },
 	    {
 		xtype: 'numberfield',
@@ -44,6 +51,7 @@ Ext.define('motioncalc.view.Inertia', {
 		value: 0,
 		id: 'inertiaMass',
 		label: 'Mass',
+		readonly: false
 	    },
 	    {
 		xtype: 'numberfield',
@@ -95,15 +103,15 @@ Ext.define('motioncalc.view.Inertia', {
 		dataType: 'linear-distance',
 		id: 'radius',
 		label: 'Radius',
+	    },
+	    {
+		xtype: 'textfield',
+		name : 'inertiaAnswer',
+		id: 'inertiaAnswer',
+		value: 0,
+		label: '=',
+		readOnly: true,
 	    }
-//	    {
-//		xtype: 'textfield',
-//		name : 'unitsAnswer',
-//		id: 'unitsAnswer',
-//		value: 0,
-//		label: '=',
-//		readOnly: true,
-//	    }
         ]
     }
 });

@@ -28,15 +28,15 @@ Ext.define('motioncalc.view.Units', {
 		change: function(selectbox,newValue,oldValue)
 		    {
 			global_measurementTypeChange = true;
-			Ext.ComponentQuery.query('#unitsFrom')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
+			Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
 			global_measurementTypeChange = true;
-			Ext.ComponentQuery.query('#unitsTo')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
+			Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
 		    }
                	}
 	    },
 	    {
 		xtype: 'selectfield',
-		name : 'unit',
+		name : 'unitsFrom',
 		id: 'unitsFrom',
 		label: 'Unit',
 		dataType: 'unit-types',
@@ -44,7 +44,7 @@ Ext.define('motioncalc.view.Units', {
             },
 	    {
 		xtype: 'numberfield',
-		name : 'amount',
+		name : 'unitsAmount',
 		value: 0,
 		id: 'unitsAmount',
 		label: 'Amount',
@@ -75,23 +75,23 @@ Ext.define('motioncalc.view.Units', {
 				return;
 			}
 			var unitsAmount,unitsAnswer,unitsFrom,unitsTo,returnedValue;
-			unitsAmount = Ext.ComponentQuery.query('#unitsAmount')[0];
-			unitsAnswer = Ext.ComponentQuery.query('#unitsAnswer')[0];
+			unitsAmount = Ext.getCmp('unitsAmount');
+			unitsAnswer = Ext.getCmp('unitsAnswer');
 			if(unitsAmount.get('value')==0){
 				unitsAnswer.set('value',0);
 				return;
 			}
-			unitsFrom = Ext.ComponentQuery.query('#unitsFrom')[0];
-			unitsTo = Ext.ComponentQuery.query('#unitsTo')[0];
-			unitsType = Ext.ComponentQuery.query('#unitsType')[0];
+			unitsFrom = Ext.getCmp('unitsFrom');
+			unitsTo = Ext.getCmp('unitsTo');
+			unitsType = Ext.getCmp('unitsType');
 			returnedValue = motioncalc.app.conversionFunctions.unitsConvert(unitsAmount.get('value'),unitsFrom.get('value'),unitsTo.get('value'),unitsType.get('value'),true);
 			unitsAnswer.set('value',returnedValue);
 //			console.log(unitsAnswer.get('value') +' | '+returnedValue);
 		}
 
-		Ext.ComponentQuery.query('#unitsType')[0].setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
-		Ext.ComponentQuery.query('#unitsTo')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
-		Ext.ComponentQuery.query('#unitsFrom')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
+		Ext.getCmp('unitsType').setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
+		Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
+		Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
 
 
 		Ext.Array.each(Ext.ComponentQuery.query('selectfield[dataType="unit-types"]'),function(){
@@ -100,10 +100,11 @@ Ext.define('motioncalc.view.Units', {
 				});
 		});
 
-		Ext.Array.each(Ext.ComponentQuery.query('#unitsAmount'),function(){
-				this.on({
-					change: function(){sendToUnitsConvert();}
-				});
+		Ext.getCmp('unitsAmount').on({
+			blur: function(){sendToUnitsConvert();}
+		});
+		this.on({
+			activate: function(){sendToUnitsConvert();}
 		});
 
 	}
