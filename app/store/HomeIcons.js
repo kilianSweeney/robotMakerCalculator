@@ -6,7 +6,7 @@ Ext.define('motioncalc.store.HomeIcons', {
         data: [
             { title: 'Units', xtype: 'unitscard', id: 'UnitsCard' },
             { title: 'Inertia', xtype: 'inertiacard', id: 'InertiaCard' },
-            { title: 'Materials Density', xtype: 'materialscard', id: 'MaterialsCard' },
+            { title: 'Material Densities', xtype: 'materialscard', id: 'MaterialsCard' },
             { title: 'About tigerBaby',      xtype: 'aboutcard', id: 'AboutCard' },
             { title: 'Settings',      xtype: 'settingscard', id: 'SettingsCard' }
         ]

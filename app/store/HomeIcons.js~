@@ -4,11 +4,11 @@ Ext.define('motioncalc.store.HomeIcons', {
     config: {
         fields: ['title', 'xtype'],
         data: [
-            { title: 'Units', xtype: 'unitscard' },
-            { title: 'Inertia', xtype: 'inertiacard' },
-            { title: 'Materials Density', xtype: 'materialscard' },
-            { title: 'About tigerBaby',      xtype: 'aboutcard' },
-            { title: 'Settings',      xtype: 'settingscard' }
+            { title: 'Units', xtype: 'unitscard', id: 'UnitsCard' },
+            { title: 'Inertia', xtype: 'inertiacard', id: 'InertiaCard' },
+            { title: 'Materials Density', xtype: 'materialscard', id: 'MaterialsCard' },
+            { title: 'About tigerBaby',      xtype: 'aboutcard', id: 'AboutCard' },
+            { title: 'Settings',      xtype: 'settingscard', id: 'SettingsCard' }
         ]
     }
 });

@@ -62096,6 +62096,82 @@ Ext.define('Ext.picker.Picker', {
 /**
  * @aside guide forms
  *
+ * Hidden fields allow you to easily inject additional data into a {@link Ext.form.Panel form} without displaying
+ * additional fields on the screen. This is often useful for sending dynamic or previously collected data back to the
+ * server in the same request as the normal form submission. For example, here is how we might set up a form to send
+ * back a hidden userId field:
+ *
+ *     @example
+ *     var form = Ext.create('Ext.form.Panel', {
+ *         fullscreen: true,
+ *         items: [
+ *             {
+ *                 xtype: 'fieldset',
+ *                 title: 'Enter your name',
+ *                 items: [
+ *                     {
+ *                         xtype: 'hiddenfield',
+ *                         name: 'userId',
+ *                         value: 123
+ *                     },
+ *                     {
+ *                         xtype: 'checkboxfield',
+ *                         label: 'Enable notifications',
+ *                         name: 'notifications'
+ *                     }
+ *                 ]
+ *             }
+ *         ]
+ *     });
+ *
+ * In the form above we created two fields - a hidden field and a {@link Ext.field.Checkbox check box field}. Only the
+ * check box will be visible, but both fields will be submitted. Hidden fields cannot be tabbed to - they are removed
+ * from the tab index so when your user taps the next/previous field buttons the hidden field is skipped over.
+ *
+ * It's easy to read and update the value of a hidden field within a form. Using the example above, we can get a
+ * reference to the hidden field and then set it to a new value in 2 lines of code:
+ *
+ *     var userId = form.down('hiddenfield')[0];
+ *     userId.setValue(1234);
+ */
+Ext.define('Ext.field.Hidden', {
+    extend: 'Ext.field.Text',
+    alternateClassName: 'Ext.form.Hidden',
+    xtype: 'hiddenfield',
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        component: {
+            xtype: 'input',
+            type : 'hidden'
+        },
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        ui: 'hidden',
+
+        /**
+         * @cfg hidden
+         * @hide
+         */
+        hidden: true,
+
+        /**
+         * @cfg {Number} tabIndex
+         * @hide
+         */
+        tabIndex: -1
+    }
+});
+
+/**
+ * @aside guide forms
+ *
  * The Number field creates an HTML5 number input and is usually created inside a form. Because it creates an HTML
  * number input field, most browsers will show a specialized virtual keyboard for entering numbers. The Number field
  * only accepts numerical input and also provides additional spinner UI that increases or decreases the current value
@@ -67358,6 +67434,8 @@ Ext.define('motioncalc.view.Inertia', {
     requires: [
         'Ext.form.FieldSet',
 	'Ext.field.Number',
+	'Ext.field.Hidden',
+	'Ext.Button',
 	'motioncalc.util.Conversions'
     ],
 	
@@ -67368,8 +67446,43 @@ Ext.define('motioncalc.view.Inertia', {
             {
                 docked: 'top',
                 xtype: 'toolbar',
-                title: 'Inertia'
+                title: 'Inertia',
+		items: [
+			{xtype: 'spacer'},
+			{
+				xtype:'button', 
+				name:'buttonMaterials', 
+				id:'buttonMaterials', 
+				text:'materials',
+				disabled:true
+			}
+		]
             },
+	    {
+		xtype: 'hiddenfield',
+		name : 'isMass',
+		id: 'isMass',
+		value: 1
+	    },
+	    {
+		xtype: 'hiddenfield',
+		name : 'inertiaActive',
+		id: 'inertiaActive',
+		value: 0
+	    },
+	    {
+		xtype: 'hiddenfield',
+		name : 'inertiaMaterialsClickCount',
+		id: 'inertiaMaterialsClickCount',
+		value: 0
+	    },
+	    {
+		xtype: 'selectfield',
+		name : 'inertiaMaterials',
+		id: 'inertiaMaterials',
+		options: [{value:"cylinder",text:"Cylinder"},{value:"parallelepiped",text:"Parallelepiped"},{value:"sphericalShell",text:"Spherical Shell"},{value:"sphere",text:"Sphere"},{value:"slenderRod",text:"Slender Rod"},{value:"tetrahedron",text:"Tetrahedron"}],
+		hidden: true
+	    },
 	    {
 		xtype: 'selectfield',
 		name : 'inertiaShape',
@@ -67383,6 +67496,7 @@ Ext.define('motioncalc.view.Inertia', {
 		value: 0,
 		id: 'inertiaDensity',
 		label: 'Density',
+		readonly: true
 	    },
 	    {
 		xtype: 'numberfield',
@@ -67390,6 +67504,7 @@ Ext.define('motioncalc.view.Inertia', {
 		value: 0,
 		id: 'inertiaMass',
 		label: 'Mass',
+		readonly: false
 	    },
 	    {
 		xtype: 'numberfield',
@@ -67441,15 +67556,15 @@ Ext.define('motioncalc.view.Inertia', {
 		dataType: 'linear-distance',
 		id: 'radius',
 		label: 'Radius',
+	    },
+	    {
+		xtype: 'textfield',
+		name : 'inertiaAnswer',
+		id: 'inertiaAnswer',
+		value: 0,
+		label: '=',
+		readOnly: true,
 	    }
-//	    {
-//		xtype: 'textfield',
-//		name : 'unitsAnswer',
-//		id: 'unitsAnswer',
-//		value: 0,
-//		label: '=',
-//		readOnly: true,
-//	    }
         ]
     }
 });
@@ -67462,34 +67577,95 @@ Ext.define('motioncalc.controller.Inertia', {
 		refs : {
 			density: '#inertiaDensity',
 			mass: '#inertiaMass',
+			materials: '#inertiaMaterials',
 			shape: '#inertiaShape',
-			inertiaView: '#inertiaID'
+			inertiaView: '#inertiaID',
+			numberFields: 'numberfield',
+			buttonMaterials: '#buttonMaterials'
 		},
 		control: {
+			materials: {
+				change: function(){
+					var materialDensity,density;
+					materialDensity = Ext.getCmp('inertiaMaterials').getValue();
+					if(materialDensity == null || materialDensity == 0)return;
+					materialDensity = motioncalc.app.conversionFunctions.unitsConvert(materialDensity,motioncalc.app.DENSITYBASEUNITS,motioncalc.app.density,'Density');
+					density = Ext.getCmp('inertiaDensity');
+					if(density.getValue() == materialDensity)return;
+					density.setValue(materialDensity);
+					this.setInertiaScreen(false,false);
+				}
+			},
 			shape: {
-				change: 'setInertiaScreen'
+				change: function(){this.setInertiaScreen(true,false)}
+			},
+			numberFields: {
+				blur: function(){this.setInertiaScreen(false,false)}
 			},
 			inertiaView: {
 				activate: 'onActivate'
+			},
+			buttonMaterials: {
+				tap: function(){this.showMaterials();}
 			}
 		}
 	},
 	onActivate: function(){
+		//unit testing
+//		console.log('motioncalc.app.inertiaFunctions.eqnTetraIxx: ' + motioncalc.app.inertiaFunctions.eqnTetraIxx('Ixx'));
+//		console.log('motioncalc.app.inertiaFunctions.eqnRodIxx: ' + motioncalc.app.inertiaFunctions.eqnRodIxx('Ixx'));
+//		console.log('motioncalc.app.inertiaFunctions.eqnParallelIxx: ' + motioncalc.app.inertiaFunctions.eqnParallelIxx('Ixx'));
+//		console.log('motioncalc.app.inertiaFunctions.eqnCylinderIxx: ' + motioncalc.app.inertiaFunctions.eqnCylinderIxx('Ixx'));
+//		console.log('motioncalc.app.inertiaFunctions.eqnSphereIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereIxx('Ixx'));
+//		console.log('motioncalc.app.inertiaFunctions.eqnSphereShellIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereShellIxx('Ixx'));
+//		console.log(Ext.getCmp('isMass').get('value')==1);
+
 		function setLabel(item,unit){
-			var tmpLbl,index;		
-			unit = unit == null?motioncalc.app.linearDistance:unit;
+			var tmpLbl,tmpLblSuffix,checkBox,checkBoxChecked,index;		
 			tmpLbl = item.get('label');
-			index = tmpLbl.indexOf('(')-1;
+			index = tmpLbl.indexOf('<')-1;
 			if(index>0)tmpLbl = tmpLbl.substring(0,index);
-			item.setLabel(tmpLbl + ' <span style="font-size:smaller;">(' + unit + ')</span>');
+			checkBox = '';
+			if(unit == null){
+				unit = motioncalc.app.linearDistance;
+				
+			}
+			else {
+				checkBoxChecked = tmpLbl.indexOf('Density')>-1?'':'checked';				
+				checkBox = '<input id="'+ tmpLbl +'-checkbox" onclick="motioncalc.app.getController(\'Inertia\').switchIsMass(this,\'' + tmpLbl + '\');" type="checkbox" '+ checkBoxChecked + ' />';
+			}
+			tmpLblSuffix = ' <span style="font-size:smaller;">(' + unit + ')</span>' + checkBox;
+			
+			item.setLabel(tmpLbl + tmpLblSuffix);
 		}
-		
-		this.setInertiaScreen();
+		var inertiaActive,firstActive;
+		firstActive = false;
+		inertiaActive = Ext.getCmp('inertiaActive');
+		if(inertiaActive.getValue()==0){
+			inertiaActive.setValue(1);
+			firstActive = true;
+		}
+		this.setInertiaScreen(firstActive);
 		setLabel(Ext.getCmp('inertiaDensity'),motioncalc.app.density);
 		setLabel(Ext.getCmp('inertiaMass'),motioncalc.app.mass);
 		Ext.Array.each(Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]'),function(){
 			setLabel(this,null);
 		});
+	},
+	populateMaterialDensity: function(storeID,returnArray){
+		var store;
+		returnArray = returnArray == null ? [] : returnArray;
+		store = Ext.getStore(storeID);
+		store.each(function(){
+			returnArray.push({text:this.get('name'),value:this.get('density')});
+		});
+		returnArray.unshift({text:'-- Select One -- ',value:0});
+		return returnArray;
+	},
+	showMaterials: function(){
+		var materialArray;
+		materialArray = this.populateMaterialDensity('_MaterialDensities',null);
+		Ext.getCmp('inertiaMaterials').setOptions(materialArray).setValue(0).showPicker();
 	},
 	hideShowInertiaItems: function(items){
 		var allItems = Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]');
@@ -67498,45 +67674,122 @@ Ext.define('motioncalc.controller.Inertia', {
 			else this.hide();
 		});				
 	},
-	setInertiaScreen: function(){
-		var shape,items;
-		items = [];
-		shape = Ext.ComponentQuery.query('#inertiaShape')[0].get('value');
-		switch(shape)
-		{
-			case 'cylinder':
-	//			setInertiaDefaults(shape,1);
-				items.push(Ext.getCmp('inertiaLength'));
-				items.push(Ext.getCmp('outsideDiameter'));
-				items.push(Ext.getCmp('insideDiameter'));
-				break;
-			case 'parallelepiped':
-	//			setInertiaDefaults(shape,1);
-				items.push(Ext.getCmp('inertiaHeight'));
-				items.push(Ext.getCmp('inertiaLength'));
-				items.push(Ext.getCmp('inertiaWidth'));
-
-				break;
-			case 'sphericalShell':
-	//			setInertiaDefaults(shape,2);
-				items.push(Ext.getCmp('radius'));
-				break;
-			case 'sphere':
-	//			setInertiaDefaults(shape,1);
-				items.push(Ext.getCmp('radius'));
-				break;
-			case 'slenderRod':
-	//			setInertiaDefaults(shape,2);
-				items.push(Ext.getCmp('inertiaLength'));
-				break;
-			case 'tetrahedron':
-	//			setInertiaDefaults(shape,2);
-				items.push(Ext.getCmp('inertiaHeight'));
-				items.push(Ext.getCmp('inertiaLength'));
-				items.push(Ext.getCmp('inertiaWidth'));
-				break;				
+	setInertiaAnswer : function(answers){
+		var returnString,cFunctions,itemCount,mass;
+		cFunctions = motioncalc.app.conversionFunctions;
+		returnString='';
+		mass = null;
+		itemCount = answers.length;
+		for(var i = 0; i < itemCount; i++){
+//			console.log(answers[i][0]+'|'+answers[i][1]);
+			if(answers[i][1]!==null){
+				returnString += answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' | ' ;
+				if(answers[i][0].indexOf('Mass') > -1 && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
+			}
 		}
-		this.hideShowInertiaItems(items);
+		returnString = returnString.substring(0,(returnString.length-3));
+		Ext.getCmp('inertiaAnswer').setValue(returnString);
+		if(mass !== null){
+			Ext.getCmp('inertiaMass').set('value',mass);
+//			console.log(Ext.getCmp('inertiaMass').get('value')+'|'+mass);
+		}
+	},
+	switchIsMass: function(item,label){
+	//	console.log('orginal isMass: ' + Ext.getCmp('isMass').getValue());
+		var otherLabel,otherItem,isMassValue;
+		if(label == 'Density'){
+			otherLabel = 'Mass';
+			isMassValue = item.checked ? 0 : 1;
+		}
+		else{
+			otherLabel = 'Density';
+			isMassValue = item.checked ? 1 : 0;
+		};
+		this.changeDensityMass(isMassValue == 1);
+		otherItem = Ext.getDom(otherLabel + '-checkbox')
+		if(item.checked)otherItem.checked=false
+		else otherItem.checked=true;
+		Ext.getCmp('isMass').setValue(isMassValue);
+	//	console.log(Ext.getCmp('isMass').getValue());
+	},
+	changeDensityMass: function(isMass){
+		var mass,density;
+		mass = Ext.getCmp('inertiaMass');
+		density = Ext.getCmp('inertiaDensity');
+		if(isMass){
+			mass.setReadOnly(false);
+			Ext.getCmp('buttonMaterials').setDisabled(true);
+			density.setReadOnly(true);
+			density.setValue(0);
+			
+		}
+		else {
+			density.setReadOnly(false);
+			Ext.getCmp('buttonMaterials').setDisabled(false);
+			mass.setReadOnly(true);
+			mass.setValue(0);
+		}
+		this.setInertiaAnswer(motioncalc.app.inertiaFunctions.inertiaCalc());
+	},
+	setInertiaScreen: function(adjustForShape,firstLaunched){
+		if(adjustForShape || firstLaunched){
+			Ext.getCmp('inertiaDensity').show();
+			if(Ext.get('Mass-checkbox') !== null)Ext.get('Mass-checkbox').show();
+			var shape,items,mass,isMass;
+			isMass = true;
+			items = [];
+			shape = Ext.ComponentQuery.query('#inertiaShape')[0].get('value');
+			switch(shape)
+			{
+				case 'cylinder':
+		//			setInertiaDefaults(shape,1);
+					items.push(Ext.getCmp('inertiaLength'));
+					items.push(Ext.getCmp('outsideDiameter'));
+					items.push(Ext.getCmp('insideDiameter'));
+					isMass = (Ext.getCmp('isMass').getValue()==1);
+					break;
+				case 'parallelepiped':
+		//			setInertiaDefaults(shape,1);
+					items.push(Ext.getCmp('inertiaHeight'));
+					items.push(Ext.getCmp('inertiaLength'));
+					items.push(Ext.getCmp('inertiaWidth'));
+					isMass = (Ext.getCmp('isMass').getValue()==1);
+					break;
+				case 'sphericalShell':
+		//			setInertiaDefaults(shape,2);
+					items.push(Ext.getCmp('radius'));
+					Ext.getCmp('inertiaDensity').hide();
+					Ext.get('Mass-checkbox').hide();
+					isMass = true;
+					break;
+				case 'sphere':
+		//			setInertiaDefaults(shape,1);
+					items.push(Ext.getCmp('radius'));
+					isMass = (Ext.getCmp('isMass').getValue()==1);
+					break;
+				case 'slenderRod':
+		//			setInertiaDefaults(shape,2);
+					items.push(Ext.getCmp('inertiaLength'));
+					Ext.getCmp('inertiaDensity').hide();
+					Ext.get('Mass-checkbox').hide();
+					isMass = true;
+					break;
+				case 'tetrahedron':
+		//			setInertiaDefaults(shape,2);
+					items.push(Ext.getCmp('inertiaHeight'));
+					items.push(Ext.getCmp('inertiaLength'));
+					items.push(Ext.getCmp('inertiaWidth'));
+					Ext.getCmp('inertiaDensity').hide();
+					Ext.get('Mass-checkbox').hide();
+					isMass = true;
+					break;				
+			}
+			this.changeDensityMass(isMass);
+			this.hideShowInertiaItems(items);
+		}
+		else{ this.setInertiaAnswer(motioncalc.app.inertiaFunctions.inertiaCalc());
+		}
+
 	}
 });
 
@@ -67548,6 +67801,18 @@ Ext.define('motioncalc.model.GlobalSettings', {
 		proxy: {
 		    type: 'localstorage',
 		    id  : '_GlobalSettings'
+		}
+	}
+});
+
+Ext.define('motioncalc.model.MaterialDensities', {
+	extend: 'Ext.data.Model',
+	requires: 'Ext.data.proxy.LocalStorage',
+	config: {
+		fields: ['name', 'density'],
+		proxy: {
+		    type: 'localstorage',
+		    id  : '_MaterialDensities'
 		}
 	}
 });
@@ -67582,15 +67847,15 @@ Ext.define('motioncalc.view.Units', {
 		change: function(selectbox,newValue,oldValue)
 		    {
 			global_measurementTypeChange = true;
-			Ext.ComponentQuery.query('#unitsFrom')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
+			Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
 			global_measurementTypeChange = true;
-			Ext.ComponentQuery.query('#unitsTo')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
+			Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
 		    }
                	}
 	    },
 	    {
 		xtype: 'selectfield',
-		name : 'unit',
+		name : 'unitsFrom',
 		id: 'unitsFrom',
 		label: 'Unit',
 		dataType: 'unit-types',
@@ -67598,7 +67863,7 @@ Ext.define('motioncalc.view.Units', {
             },
 	    {
 		xtype: 'numberfield',
-		name : 'amount',
+		name : 'unitsAmount',
 		value: 0,
 		id: 'unitsAmount',
 		label: 'Amount',
@@ -67629,23 +67894,23 @@ Ext.define('motioncalc.view.Units', {
 				return;
 			}
 			var unitsAmount,unitsAnswer,unitsFrom,unitsTo,returnedValue;
-			unitsAmount = Ext.ComponentQuery.query('#unitsAmount')[0];
-			unitsAnswer = Ext.ComponentQuery.query('#unitsAnswer')[0];
+			unitsAmount = Ext.getCmp('unitsAmount');
+			unitsAnswer = Ext.getCmp('unitsAnswer');
 			if(unitsAmount.get('value')==0){
 				unitsAnswer.set('value',0);
 				return;
 			}
-			unitsFrom = Ext.ComponentQuery.query('#unitsFrom')[0];
-			unitsTo = Ext.ComponentQuery.query('#unitsTo')[0];
-			unitsType = Ext.ComponentQuery.query('#unitsType')[0];
+			unitsFrom = Ext.getCmp('unitsFrom');
+			unitsTo = Ext.getCmp('unitsTo');
+			unitsType = Ext.getCmp('unitsType');
 			returnedValue = motioncalc.app.conversionFunctions.unitsConvert(unitsAmount.get('value'),unitsFrom.get('value'),unitsTo.get('value'),unitsType.get('value'),true);
 			unitsAnswer.set('value',returnedValue);
 //			console.log(unitsAnswer.get('value') +' | '+returnedValue);
 		}
 
-		Ext.ComponentQuery.query('#unitsType')[0].setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
-		Ext.ComponentQuery.query('#unitsTo')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
-		Ext.ComponentQuery.query('#unitsFrom')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
+		Ext.getCmp('unitsType').setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
+		Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
+		Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
 
 
 		Ext.Array.each(Ext.ComponentQuery.query('selectfield[dataType="unit-types"]'),function(){
@@ -67654,10 +67919,11 @@ Ext.define('motioncalc.view.Units', {
 				});
 		});
 
-		Ext.Array.each(Ext.ComponentQuery.query('#unitsAmount'),function(){
-				this.on({
-					change: function(){sendToUnitsConvert();}
-				});
+		Ext.getCmp('unitsAmount').on({
+			blur: function(){sendToUnitsConvert();}
+		});
+		this.on({
+			activate: function(){sendToUnitsConvert();}
 		});
 
 	}
@@ -67671,7 +67937,7 @@ Ext.define('motioncalc.store.HomeIcons', {
         data: [
             { title: 'Units', xtype: 'unitscard', id: 'UnitsCard' },
             { title: 'Inertia', xtype: 'inertiacard', id: 'InertiaCard' },
-            { title: 'Materials Density', xtype: 'materialscard', id: 'MaterialsCard' },
+            { title: 'Material Densities', xtype: 'materialscard', id: 'MaterialsCard' },
             { title: 'About tigerBaby',      xtype: 'aboutcard', id: 'AboutCard' },
             { title: 'Settings',      xtype: 'settingscard', id: 'SettingsCard' }
         ]
@@ -68647,6 +68913,24 @@ Ext.define('motioncalc.store.Conversions', {
 });
 
 
+Ext.define('motioncalc.store.MaterialDensities', {
+	extend: 'Ext.data.Store',
+
+	config: {
+		storeId:'_MaterialDensities',
+		model: 'motioncalc.model.MaterialDensities',
+		autoLoad: true,
+		fields: ['name','density'],
+		sorters: [{
+			property: 'name',
+			direction: 'ASC'
+		}],
+		data: [
+			{name: 'Alcohol, ethyl',density: 788.5}, { name:  'Alcohol, methyl', density: 790.9}, { name:  'Aluminum', density: 2643}, { name:  'Aluminum alloy 3003', density: 2730}, { name:  'Aluminum alloy 360', density: 2640}, { name:  'Aluminum bronze', density: 7800}, { name:  'Antimonial lead', density: 10900}, { name:  'Asphalt', density: 720.8}, { name:  'Beryllium copper 25', density: 8230}, { name:  'Brick, common red', density: 1922.2}, { name:  'Carbon', density: 2146.5}, { name:  'Cast gray iron', density: 7200}, { name:  'CO2', density: 2}, { name:  'Coal, anthracite', density: 1506}, { name:  'Concrete, gravel', density: 2403}, { name:  'Copper', density: 8682}, { name:  'Copper, electrolytic', density: 8940}, { name:  'Cork', density: 240.3}, { name:  'Crude oil', density: 881}, { name:  'Cupronickel 30%', density: 8940}, { name:  'Cupronickel 55-45', density: 8900}, { name:  'Delrin', density: 1561}, { name:  'Earth-dry, excavated', density: 1249}, { name:  'Flour, wheat', density: 592.7}, { name:  'Glass, window', density: 2579}, { name:  'Gold, 24 Kt', density: 19320}, { name:  'Granite, solid', density: 2691}, { name:  'Gravel, dry loose', density: 1521.8}, { name:  'Ice', density: 919.5}, { name:  'Lexan', density: 1198}, { name:  'Malleable iron', density: 7300}, { name:  'Nickel (commercial)', density: 8890}, { name:  'Nylon, type 6', density: 1190}, { name:  'O2', density: 1.4}, { name:  'Oak, red', density: 704.8}, { name:  'Pine, Sothrn. yellow', density: 720.8}, { name:  'Pine, white', density: 416.5}, { name:  'Plain carbon steel', density: 7860}, { name:  'Platinum', density: 21452}, { name:  'Pure water', density: 999.6}, { name:  'PVC', density: 1439}, { name:  'Red brass 85%', density: 8750}, { name:  'Rubber, hard', density: 1190}, { name:  'Salt water', density: 1026.5}, { name:  'Salt, cake', density: 1442}, { name:  'Sand, dry', density: 1601.8}, { name:  'Silver', density: 10491}, { name:  'Solder 50-50', density: 8890}, { name:  'Steel, rolled', density: 7930}, { name:  'Sugar, granulated', density: 849}, { name:  'Titanium (commercial)', density: 4500}, { name:  'Yellow brass', density: 8470}, { name:  'Zinc (commercial)', density: 7140}, { name:  'Zirconium (commercial)', density: 6500}
+		]
+	}
+});
+
 Ext.define('motioncalc.view.HomeIcons', {
 	extend: 'Ext.navigation.View',
 	xtype: 'homeicons',
@@ -68826,6 +69110,7 @@ Ext.define('motioncalc.view.Main', {
     ],
 
     config: {
+	title: 'Robot Maker Calculator',
         tabBar: {
             docked: 'bottom',
             layout: {
@@ -68841,19 +69126,284 @@ Ext.define('motioncalc.view.Main', {
     }
 });
 
+Ext.define('motioncalc.util.Inertia', {
+	config: {
+		name: 'Inertia'
+	},
+inertiaCalc: function(){
+	var shape,Ixx,Iyy,Izz,IxxPrime,IyyPrime,mass,returnArray;
+	Ixx = null;
+	Iyy = null;
+	Izz = null;
+	IxxPrime = null;
+	IyyPrime = null;
+	mass = null;
+	shape = Ext.ComponentQuery.query('#inertiaShape')[0].get('value');
+	switch(shape)
+	{
+		case 'sphere':
+			Ixx = this.eqnSphereIxx('Ixx');
+			Iyy = this.eqnSphereIxx('Iyy');
+			Izz = this.eqnSphereIxx('Izz');
+			mass = this.eqnSphereIxx('mass');
+			break;
+		case 'sphericalShell':
+			Ixx = this.eqnSphereShellIxx('Ixx');
+			Iyy = this.eqnSphereShellIxx('Iyy');
+			Izz = this.eqnSphereShellIxx('Izz');
+			break;	
+		case 'cylinder':
+			Ixx = this.eqnCylinderIxx('Ixx');
+			Iyy = this.eqnCylinderIxx('Iyy');
+			Izz = this.eqnCylinderIxx('Izz');
+			IxxPrime = this.eqnCylinderIxx('IxxPrime');
+			IyyPrime = this.eqnCylinderIxx('IyyPrime');
+			mass = this.eqnCylinderIxx('mass');
+			break;				
+		case 'parallelepiped':
+			Ixx = this.eqnParallelIxx('Ixx');
+			Iyy = this.eqnParallelIxx('Iyy');
+			Izz = this.eqnParallelIxx('Izz');
+			IxxPrime = this.eqnParallelIxx('IxxPrime');
+			IyyPrime = this.eqnParallelIxx('IyyPrime');
+			mass = this.eqnCylinderIxx('mass');
+			break;
+		case 'slenderRod':
+			Ixx = this.eqnRodIxx('Ixx');
+			Iyy = this.eqnRodIxx('Iyy');
+			IxxPrime = this.eqnRodIxx('IxxPrime');
+			IyyPrime = this.eqnRodIxx('IyyPrime');
+			break;
+		case 'tetrahedron':
+			Ixx = this.eqnTetraIxx('Ixx');
+			Iyy = this.eqnTetraIxx('Iyy');
+			Izz = this.eqnTetraIxx('Izz');
+			break;
+	}
+	returnArray = [];
+	returnArray.push(['Ixx',Ixx]);
+	returnArray.push(['Iyy',Iyy]);
+	returnArray.push(['Izz',Izz]);
+	returnArray.push(['IxxPrime',IxxPrime]);
+	returnArray.push(['IyyPrime',IyyPrime]);
+	returnArray.push(['Mass',mass]);
+	return returnArray;
+},
+eqnTetraIxx: function(field){
+	var sngL;
+	var sngW;
+	var sngH;
+	var sngMass;
+	var Ixx;
+	sngL = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaLength').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+	sngW = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaWidth').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+	sngH = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaHeight').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+	sngMass = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaMass').get('value'), motioncalc.app.mass,motioncalc.app.MASSBASEUNITS, 'Mass');
+	switch(field)
+	{
+		case 'Ixx':
+			//sngI = sngMass / 10# * (sngH ^ 2 + sngL ^ 2)
+			Ixx=(sngMass/10) * (Math.pow(sngH,2)+Math.pow(sngL,2));
+			break;
+		case 'Iyy':
+			//sngI = sngMass / 10# * (sngW ^ 2 + sngL ^ 2)
+			Ixx=(sngMass/10) * (Math.pow(sngW,2)+Math.pow(sngL,2));
+			break;
+		case 'Izz':
+			//sngI = sngMass / 10# * (sngH ^ 2 + sngW ^ 2)
+			Ixx=(sngMass/10) * (Math.pow(sngH,2)+Math.pow(sngW,2));
+			break;
+		default:
+			Ixx=0;
+			break;
+
+	}
+	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
+},
+
+eqnRodIxx: function(field){
+	var sngL;
+	var sngMass;
+	var Ixx;
+	sngL = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaLength').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+	sngMass = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaMass').get('value'), motioncalc.app.mass,motioncalc.app.MASSBASEUNITS, 'Mass');
+	switch(field)
+	{
+		case 'Ixx':
+			//sngI = sngMass * sngL ^ 2 / 3#
+			Ixx=sngMass * (Math.pow(sngL,2)/12);
+			break;
+		case 'Iyy':
+			//sngI = sngMass * sngL ^ 2 / 3#
+			Ixx=sngMass * (Math.pow(sngL,2)/12);
+			break;
+		case 'IxxPrime':
+			//sngI = sngMass * sngL ^ 2 / 3#
+			Ixx=sngMass * (Math.pow(sngL,2)/3);
+			break;
+		case 'IyyPrime':
+			//sngI = sngMass * sngL ^ 2 / 3#
+			Ixx=sngMass * (Math.pow(sngL,2)/3);
+			break;
+		default:
+			Ixx=0;
+			break;
+
+	}
+	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
+},
+
+eqnParallelIxx: function(field){
+	var sngL;
+	var sngW;
+	var sngH;
+	var sngDensity;
+	var sngMass;
+	var Ixx;	
+	sngL = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaLength').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+	sngW = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaWidth').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+	sngH = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaHeight').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+
+	if (Ext.getCmp('isMass').value==1){
+		sngMass = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaMass').get('value'), motioncalc.app.mass,motioncalc.app.MASSBASEUNITS, 'Mass');
+	}
+	else{
+		sngDensity = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaDensity').getValue(), motioncalc.app.density, motioncalc.app.DENSITYBASEUNITS,'Density');
+		sngMass = sngDensity * sngW * sngH * sngL;
+	}
+	
+	switch(field)
+	{
+		case 'Ixx':
+			//sngI = sngMass * ((sngH ^ 2 + sngL ^ 2) / 12#)
+			Ixx=sngMass * ((Math.pow(sngH,2)+Math.pow(sngL,2))/12);
+//			Ext.getCmp('inertiaMass').set('value',motioncalc.app.conversionFunctions.unitsConvert(sngMass, motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass'));
+			break;
+		case 'Iyy':
+			//sngI = sngMass * ((sngW ^ 2 + sngL ^ 2) / 12#)
+			Ixx=sngMass * ((Math.pow(sngW,2)+Math.pow(sngL,2))/12);
+			break;
+		case 'Izz':
+			//sngI = sngMass * ((sngH ^ 2 + sngW ^ 2) / 12#)
+			Ixx=sngMass * ((Math.pow(sngH,2)+Math.pow(sngW,2))/12);
+			break;
+		case 'IxxPrime':
+			//sngI = sngMass / 12# * sngW ^ 2 + sngMass / 3# * sngL ^ 2
+			Ixx=(sngMass/12) * (Math.pow(sngW,2)) +((sngMass/3)*Math.pow(sngL,2));
+			break;
+		case 'IyyPrime':
+			//sngI = sngMass / 12# * sngH ^ 2 + sngMass / 3# * sngL ^ 2
+			Ixx=(sngMass/12) * (Math.pow(sngH,2)) +((sngMass/3)*Math.pow(sngL,2));
+		case 'mass':
+			return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');	
+	}
+								
+	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
+
+},
+
+eqnCylinderIxx: function(field){
+	var sngL;
+	var sngOR;
+	var sngIR;
+	var sngDensity;
+	var sngMass;
+	var Ixx;	
+	sngL = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaLength').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+	sngOR = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('outsideDiameter').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance') / 2;
+	sngIR = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('insideDiameter').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance') / 2;
+
+	if (Ext.getCmp('isMass').get('value')==1){
+		sngMass = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaMass').get('value'), motioncalc.app.mass,motioncalc.app.MASSBASEUNITS, 'Mass');
+	}
+	else{
+		sngDensity = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaDensity').getValue(), motioncalc.app.density, motioncalc.app.DENSITYBASEUNITS,'Density');
+//		console.log(Ext.getCmp('inertiaDensity').getValue() + '|' + motioncalc.app.density + '|' + motioncalc.app.DENSITYBASEUNITS);
+		sngMass=sngDensity * motioncalc.app.PI * (Math.pow(sngOR,2)-Math.pow(sngIR,2)) * sngL;
+//		console.log(sngDensity + '|' + motioncalc.app.PI + '|' + (Math.pow(sngOR,2)-Math.pow(sngIR,2)) + '|' + sngL);
+	}	
+	switch(field)
+	{
+		case 'Ixx':
+			//sngI = sngMass * ((sngOR ^ 2 + sngIR ^ 2) / 4# + sngL ^ 2 / 12#)
+			Ixx=sngMass * ((Math.pow(sngOR,2)+Math.pow(sngIR,2))/4+Math.pow(sngL,2)/12);
+//			console.log(sngMass + '|' + motioncalc.app.MASSBASEUNITS + '|' + motioncalc.app.mass);
+//			Ext.getCmp('inertiaMass').set('value',motioncalc.app.conversionFunctions.unitsConvert(sngMass, motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass'));
+			break;
+		case 'Iyy':
+			//sngI = sngMass * ((sngOR ^ 2 + sngIR ^ 2) / 4# + sngL ^ 2 / 12#)
+			Ixx=sngMass * ((Math.pow(sngOR,2)+Math.pow(sngIR,2))/4+Math.pow(sngL,2)/12);
+			break;
+		case 'Izz':
+			Ixx=(sngMass / 2) * (Math.pow(sngOR,2)+Math.pow(sngIR,2));
+			break;
+		case 'IxxPrime':
+			//sngI = sngMass / 3# * sngL ^ 2 + sngMass / 4# * (sngOR ^ 2 + sngIR ^ 2)
+			Ixx=(sngMass / 3 * Math.pow(sngL,2))+sngMass/4 * (Math.pow(sngOR,2) + Math.pow(sngIR,2));
+			break;
+		case 'IyyPrime':
+			//sngI = sngMass / 3# * sngL ^ 2 + sngMass / 4# * (sngOR ^ 2 + sngIR ^ 2)
+			Ixx=(sngMass / 3 * Math.pow(sngL,2))+sngMass/4 * (Math.pow(sngOR,2) + Math.pow(sngIR,2));
+			break;
+		case 'mass':
+			//sngI = sngMass / 3# * sngL ^ 2 + sngMass / 4# * (sngOR ^ 2 + sngIR ^ 2)
+			return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');	
+	}
+	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
+
+},
+
+eqnSphereIxx: function(field){
+	// returns inertia about xx axis for a spherical solid in inertia base units
+	var sngI;
+	var sngR;
+	var sngMass;
+	var sngDensity;
+	sngR = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('radius').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+
+	if (Ext.getCmp('isMass').get('value')==1){
+		sngMass = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaMass').get('value'), motioncalc.app.mass,motioncalc.app.MASSBASEUNITS, 'Mass');
+	}
+	else{
+		sngDensity = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaDensity').getValue(), motioncalc.app.density, motioncalc.app.DENSITYBASEUNITS,'Density');
+		sngMass=sngDensity * motioncalc.app.PI * Math.pow(sngR,3) * 4 / 3;
+//		Ext.getCmp('inertiaMass').set('value',motioncalc.app.conversionFunctions.unitsConvert(sngMass, motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass'));
+	}
+	if(field == 'mass')return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');
+	else {
+		var Ixx=sngMass * 2 / 5 * Math.pow(sngR,2);
+		return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
+	}
+
+},
+
+eqnSphereShellIxx: function(field){
+	//returns inertia about xx axis for a spherical shell in inertia base units
+	var sngI;
+	var sngR;
+	var sngMass;
+	sngR = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('radius').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
+	sngMass = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaMass').get('value'), motioncalc.app.mass,motioncalc.app.MASSBASEUNITS, 'Mass');
+	var Ixx = sngMass * 2 / 3 * Math.pow(sngR, 2);
+	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
+}	
+
+});
+
 
 Ext.application({
     name: 'motioncalc',
 
     requires: [
         'Ext.MessageBox',
-	'motioncalc.util.Conversions'
+	'motioncalc.util.Conversions',
+	'motioncalc.util.Inertia'
     ],
 
     views: ['Main'],
-    stores: ['HomeIcons','GlobalSettings','Conversions'],
-    models: ['GlobalSettings'],
-	controllers: ['Inertia'],
+    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities'],
+    models: ['GlobalSettings','MaterialDensities'],
+    controllers: ['Inertia'],
 mainView: null,
 
 //global vars
@@ -68863,8 +69413,14 @@ density: 'g/cm³',
 mass: 'carat',
 linearDistance: 'angstrom',
 inertia: 'gm-cm²',
-conversionFunctions: Ext.create('motioncalc.util.Conversions'),
+LDBASEUNITS : "m",
+DENSITYBASEUNITS : "kg/m³",
+MASSBASEUNITS : "kg",
+INERTIABASEUNITS : "kg-m²",
+PI : 3.141593,
 
+conversionFunctions: Ext.create('motioncalc.util.Conversions'),
+inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
     icon: {
         '57': 'resources/icons/Icon.png',
         '72': 'resources/icons/Icon~ipad.png',
@@ -68884,10 +69440,9 @@ conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 
     launch: function() {
         // Destroy the #appLoadingIndicator element
-//        Ext.fly('appLoadingIndicator').destroy();
+        Ext.fly('appLoadingIndicator').destroy();
 	//set global vars
 	var decimalStyle, significantDigits,density,mass,linearDistance,inertia;
-//	motioncalc.app.conversionFunctions = Ext.create('motioncalc.util.Conversions');
 	decimalStyle = motioncalc.app.getGlobalSetting('DecimalStyle');
 	significantDigits = motioncalc.app.getGlobalSetting('SignificantDigits');
 	density = motioncalc.app.getGlobalSetting('Density');

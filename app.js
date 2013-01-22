@@ -15,9 +15,9 @@ Ext.application({
     ],
 
     views: ['Main'],
-    stores: ['HomeIcons','GlobalSettings','Conversions'],
-    models: ['GlobalSettings'],
-	controllers: ['Inertia'],
+    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities'],
+    models: ['GlobalSettings','MaterialDensities'],
+    controllers: ['Inertia'],
 mainView: null,
 
 //global vars
@@ -54,10 +54,9 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 
     launch: function() {
         // Destroy the #appLoadingIndicator element
-//        Ext.fly('appLoadingIndicator').destroy();
+        Ext.fly('appLoadingIndicator').destroy();
 	//set global vars
 	var decimalStyle, significantDigits,density,mass,linearDistance,inertia;
-//	motioncalc.app.conversionFunctions = Ext.create('motioncalc.util.Conversions');
 	decimalStyle = motioncalc.app.getGlobalSetting('DecimalStyle');
 	significantDigits = motioncalc.app.getGlobalSetting('SignificantDigits');
 	density = motioncalc.app.getGlobalSetting('Density');

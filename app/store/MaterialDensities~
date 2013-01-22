@@ -1,0 +1,11 @@
+Ext.define('motioncalc.store.MaterialDensities', {
+	extend: 'Ext.data.Store',
+
+	config: {
+		storeId:'_MaterialDensities',
+		fields: ['name','density'],
+		data: [
+			{name: 'Alcohol, ethyl',density: 788.5},
+		]
+	}
+});

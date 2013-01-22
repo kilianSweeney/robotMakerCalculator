@@ -5,11 +5,25 @@ Ext.define('motioncalc.controller.Inertia', {
 		refs : {
 			density: '#inertiaDensity',
 			mass: '#inertiaMass',
+			materials: '#inertiaMaterials',
 			shape: '#inertiaShape',
 			inertiaView: '#inertiaID',
-			numberFields: 'numberfield'
+			numberFields: 'numberfield',
+			buttonMaterials: '#buttonMaterials'
 		},
 		control: {
+			materials: {
+				change: function(){
+					var materialDensity,density;
+					materialDensity = Ext.getCmp('inertiaMaterials').getValue();
+					if(materialDensity == null || materialDensity == 0)return;
+					materialDensity = motioncalc.app.conversionFunctions.unitsConvert(materialDensity,motioncalc.app.DENSITYBASEUNITS,motioncalc.app.density,'Density');
+					density = Ext.getCmp('inertiaDensity');
+					if(density.getValue() == materialDensity)return;
+					density.setValue(materialDensity);
+					this.setInertiaScreen(false,false);
+				}
+			},
 			shape: {
 				change: function(){this.setInertiaScreen(true,false)}
 			},
@@ -18,6 +32,9 @@ Ext.define('motioncalc.controller.Inertia', {
 			},
 			inertiaView: {
 				activate: 'onActivate'
+			},
+			buttonMaterials: {
+				tap: function(){this.showMaterials();}
 			}
 		}
 	},
@@ -62,6 +79,21 @@ Ext.define('motioncalc.controller.Inertia', {
 		Ext.Array.each(Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]'),function(){
 			setLabel(this,null);
 		});
+	},
+	populateMaterialDensity: function(storeID,returnArray){
+		var store;
+		returnArray = returnArray == null ? [] : returnArray;
+		store = Ext.getStore(storeID);
+		store.each(function(){
+			returnArray.push({text:this.get('name'),value:this.get('density')});
+		});
+		returnArray.unshift({text:'-- Select One -- ',value:0});
+		return returnArray;
+	},
+	showMaterials: function(){
+		var materialArray;
+		materialArray = this.populateMaterialDensity('_MaterialDensities',null);
+		Ext.getCmp('inertiaMaterials').setOptions(materialArray).setValue(0).showPicker();
 	},
 	hideShowInertiaItems: function(items){
 		var allItems = Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]');
@@ -114,12 +146,14 @@ Ext.define('motioncalc.controller.Inertia', {
 		density = Ext.getCmp('inertiaDensity');
 		if(isMass){
 			mass.setReadOnly(false);
+			Ext.getCmp('buttonMaterials').setDisabled(true);
 			density.setReadOnly(true);
 			density.setValue(0);
 			
 		}
 		else {
 			density.setReadOnly(false);
+			Ext.getCmp('buttonMaterials').setDisabled(false);
 			mass.setReadOnly(true);
 			mass.setValue(0);
 		}

@@ -15,8 +15,8 @@ Ext.application({
     ],
 
     views: ['Main'],
-    stores: ['HomeIcons','GlobalSettings','Conversions'],
-    models: ['GlobalSettings'],
+    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities'],
+    models: ['GlobalSettings','MaterialDensities'],
 	controllers: ['Inertia'],
 mainView: null,
 
@@ -27,6 +27,12 @@ density: 'g/cm³',
 mass: 'carat',
 linearDistance: 'angstrom',
 inertia: 'gm-cm²',
+LDBASEUNITS : "m",
+DENSITYBASEUNITS : "kg/m³",
+MASSBASEUNITS : "kg",
+INERTIABASEUNITS : "kg-m²",
+PI : 3.141593,
+
 conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
     icon: {
@@ -48,10 +54,9 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 
     launch: function() {
         // Destroy the #appLoadingIndicator element
-//        Ext.fly('appLoadingIndicator').destroy();
+        Ext.fly('appLoadingIndicator').destroy();
 	//set global vars
 	var decimalStyle, significantDigits,density,mass,linearDistance,inertia;
-//	motioncalc.app.conversionFunctions = Ext.create('motioncalc.util.Conversions');
 	decimalStyle = motioncalc.app.getGlobalSetting('DecimalStyle');
 	significantDigits = motioncalc.app.getGlobalSetting('SignificantDigits');
 	density = motioncalc.app.getGlobalSetting('Density');

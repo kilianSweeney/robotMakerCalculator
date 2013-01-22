@@ -6,6 +6,7 @@ Ext.define('motioncalc.view.Inertia', {
         'Ext.form.FieldSet',
 	'Ext.field.Number',
 	'Ext.field.Hidden',
+	'Ext.Button',
 	'motioncalc.util.Conversions'
     ],
 	
@@ -16,7 +17,17 @@ Ext.define('motioncalc.view.Inertia', {
             {
                 docked: 'top',
                 xtype: 'toolbar',
-                title: 'Inertia'
+                title: 'Inertia',
+		items: [
+			{xtype: 'spacer'},
+			{
+				xtype:'button', 
+				name:'buttonMaterials', 
+				id:'buttonMaterials', 
+				text:'materials',
+				disabled:true
+			}
+		]
             },
 	    {
 		xtype: 'hiddenfield',
@@ -29,6 +40,19 @@ Ext.define('motioncalc.view.Inertia', {
 		name : 'inertiaActive',
 		id: 'inertiaActive',
 		value: 0
+	    },
+	    {
+		xtype: 'hiddenfield',
+		name : 'inertiaMaterialsClickCount',
+		id: 'inertiaMaterialsClickCount',
+		value: 0
+	    },
+	    {
+		xtype: 'selectfield',
+		name : 'inertiaMaterials',
+		id: 'inertiaMaterials',
+		options: [{value:"cylinder",text:"Cylinder"},{value:"parallelepiped",text:"Parallelepiped"},{value:"sphericalShell",text:"Spherical Shell"},{value:"sphere",text:"Sphere"},{value:"slenderRod",text:"Slender Rod"},{value:"tetrahedron",text:"Tetrahedron"}],
+		hidden: true
 	    },
 	    {
 		xtype: 'selectfield',

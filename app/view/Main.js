@@ -8,6 +8,7 @@ Ext.define('motioncalc.view.Main', {
     ],
 
     config: {
+	title: 'Robot Maker Calculator',
         tabBar: {
             docked: 'bottom',
             layout: {
