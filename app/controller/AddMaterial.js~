@@ -1,0 +1,50 @@
+Ext.define('motioncalc.controller.AddMaterial', {
+	extend : 'Ext.app.Controller',
+	requires : 'motioncalc.store.MaterialDensities',
+	config: {
+		views : ['motioncalc.view.AddMaterial'],
+		refs : {
+			materials: '#materialDensities',
+			buttonMaterials: '#buttonManageMaterials'
+		},
+		control: {
+			materials: {
+				change: function(){
+					var record, name,value,densities;
+					densities = Ext.getCmp('materialDensities');
+					value = densities.getValue();
+					if(value == 0 || value == null)return;
+					value = motioncalc.app.conversionFunctions.unitConvert(value,motioncalc.app.DENSITYBASEUNITS,Ext.getCmp('materialUnitType').getValue(),'Density');
+					record = densities.record,
+					name = densities.getDisplayField();
+					name = record.get(name);
+					Ext.getCmp('materialName').setValue(name);
+					Ext.getCmp('materialDensity').setValue(value);
+				}
+			},
+			buttonMaterials: {
+				tap: function(){
+//					this.showMaterials();
+					Ext.getCmp('materialDensities').showPicker();
+				}
+			}
+		}
+	},
+	onActivate: function(){
+	},
+	populateMaterialDensity: function(storeID,returnArray){
+		var store;
+		returnArray = returnArray == null ? [] : returnArray;
+		store = Ext.getStore(storeID);
+		store.each(function(){
+			returnArray.push({text:this.get('name'),value:this.get('density')});
+		});
+		returnArray.unshift({text:'-- Select One -- ',value:0});
+		return returnArray;
+	},
+	showMaterials: function(){
+		var materialArray;
+		materialArray = this.populateMaterialDensity('_MaterialDensities',null);
+		Ext.getCmp('materialDensities').setOptions(materialArray).setValue(0).showPicker();
+	}
+});

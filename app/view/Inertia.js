@@ -51,7 +51,9 @@ Ext.define('motioncalc.view.Inertia', {
 		xtype: 'selectfield',
 		name : 'inertiaMaterials',
 		id: 'inertiaMaterials',
-		options: [{value:"cylinder",text:"Cylinder"},{value:"parallelepiped",text:"Parallelepiped"},{value:"sphericalShell",text:"Spherical Shell"},{value:"sphere",text:"Sphere"},{value:"slenderRod",text:"Slender Rod"},{value:"tetrahedron",text:"Tetrahedron"}],
+		store: '_MaterialDensities',
+		displayField: 'name',
+		valueField: 'density',
 		hidden: true
 	    },
 	    {

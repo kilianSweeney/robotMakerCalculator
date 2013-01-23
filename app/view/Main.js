@@ -4,7 +4,8 @@ Ext.define('motioncalc.view.Main', {
         'motioncalc.view.HomeIcons',
         'motioncalc.view.Units',
         'motioncalc.view.Inertia',
-	'motioncalc.view.GlobalSettings'
+	'motioncalc.view.GlobalSettings',
+	'motioncalc.view.AddMaterial'
     ],
 
     config: {
@@ -19,7 +20,8 @@ Ext.define('motioncalc.view.Main', {
             { xtype: 'homeicons' },
             { xtype: 'unitscard' },
             { xtype: 'inertiacard' },
-            { xtype: 'globalsettingscard' }
+            { xtype: 'globalsettingscard' },
+            { xtype: 'addmaterialcard', hidden: true }
         ]
     }
 });

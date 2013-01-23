@@ -1,13 +1,13 @@
 $base-color: #37FDFC;
 $active-color: #F4F776;
 $base-gradient: 'glossy';
-html,body { background-color:#37FDFC!important; }
+html,body { background-color:#37FDFC; }
 @import 'sencha-touch/default/all';
 
 
 .x-tab-active .x-button-icon {
-  background-color: #F4F776!important;
-  background-image:none!important;
+  background-color: #F4F776;
+  background-image:none;
 }
 
 

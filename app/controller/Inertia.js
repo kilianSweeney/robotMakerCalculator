@@ -34,7 +34,7 @@ Ext.define('motioncalc.controller.Inertia', {
 				activate: 'onActivate'
 			},
 			buttonMaterials: {
-				tap: function(){this.showMaterials();}
+				tap: function(){Ext.getCmp('inertiaMaterials').showPicker();}
 			}
 		}
 	},
@@ -79,21 +79,6 @@ Ext.define('motioncalc.controller.Inertia', {
 		Ext.Array.each(Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]'),function(){
 			setLabel(this,null);
 		});
-	},
-	populateMaterialDensity: function(storeID,returnArray){
-		var store;
-		returnArray = returnArray == null ? [] : returnArray;
-		store = Ext.getStore(storeID);
-		store.each(function(){
-			returnArray.push({text:this.get('name'),value:this.get('density')});
-		});
-		returnArray.unshift({text:'-- Select One -- ',value:0});
-		return returnArray;
-	},
-	showMaterials: function(){
-		var materialArray;
-		materialArray = this.populateMaterialDensity('_MaterialDensities',null);
-		Ext.getCmp('inertiaMaterials').setOptions(materialArray).setValue(0).showPicker();
 	},
 	hideShowInertiaItems: function(items){
 		var allItems = Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]');

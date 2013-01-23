@@ -17,7 +17,7 @@ Ext.application({
     views: ['Main'],
     stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities'],
     models: ['GlobalSettings','MaterialDensities'],
-    controllers: ['Inertia'],
+    controllers: ['Inertia','AddMaterial'],
 mainView: null,
 
 //global vars
@@ -62,7 +62,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 	density = motioncalc.app.getGlobalSetting('Density');
 	mass = motioncalc.app.getGlobalSetting('Mass');
 	linearDistance = motioncalc.app.getGlobalSetting('LinearDistance');
-	inertia = motioncalc.app.getGlobalSetting('inertia');
+	inertia = motioncalc.app.getGlobalSetting('Inertia');
 	motioncalc.app.decimalStyle=decimalStyle===null?motioncalc.app.decimalStyle:decimalStyle;
 	motioncalc.app.significantDigits=significantDigits===null?motioncalc.app.significantDigits:significantDigits;
 	motioncalc.app.density=density===null?motioncalc.app.density:density;
@@ -73,6 +73,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 	Ext.Viewport.add(motioncalc.app.mainView);
+	motioncalc.app.mainView.setActiveItem(4);
     },
 
     onUpdated: function() {

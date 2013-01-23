@@ -35,3 +35,4 @@ html,body { background-color:#37FDFC!important; }
 // Your custom code goes here...
 @include pictos-iconmask('sign_leftright');
 @include pictos-iconmask('settings3');
+@include pictos-iconmask('expand');

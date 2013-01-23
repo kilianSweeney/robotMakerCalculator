@@ -15,7 +15,24 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		    {
 			docked: 'top',
 			xtype: 'toolbar',
-			title: 'Global Settings'
+			title: 'Global Settings',
+			items: [
+				{xtype: 'spacer'},
+				{
+					xtype:'button', 
+					name:'buttonAddMaterial', 
+					id:'buttonAddMaterial', 
+					text:'+/- material',
+					disabled:false,
+					listeners: {
+						tap: function(){
+							var pane;
+							pane = 4;
+							motioncalc.app.mainView.setActiveItem(pane);
+						}
+					}
+				}
+			]
 		    },
 		    {
 			xtype: 'fieldset',
@@ -60,13 +77,10 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				name : 'density',
 				label: 'Density',
 				id: '_density',
-//				options: fillUnits('Density'),
 				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.density);
-					},
 				change: function(selectbox,newValue,oldValue)
 				    {
+					if(!motioncalc.view.GlobalSettings.isEnabled)return;
 					if(newValue === oldValue)return;        
 					motioncalc.app.density = newValue;
 					motioncalc.app.setGlobalSetting('Density',newValue);
@@ -78,17 +92,14 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				name : 'mass',
 				label: 'Mass',
 				id: '_mass',
-//				options: fillUnits('Mass'),
 				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.mass);
-					},
-				change: function(selectbox,newValue,oldValue)
-				    {
-					if(newValue === oldValue)return;        
-					motioncalc.app.mass = newValue;
-					motioncalc.app.setGlobalSetting('Mass',newValue);
-				    }
+					change: function(selectbox,newValue,oldValue)
+					    {
+						if(!motioncalc.view.GlobalSettings.isEnabled)return;
+						if(newValue === oldValue)return;        
+						motioncalc.app.mass = newValue;
+						motioncalc.app.setGlobalSetting('Mass',newValue);
+					    }
 		                    },
 			    },
 			    {
@@ -96,19 +107,14 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				name : 'linearDistance',
 				label: 'Linear Distance',
 				id: 'linear-distance',
-//				options: fillUnits('Linear distance'),
 				listeners:{
-//					initialize:function(){
-//						this.setValue(motioncalc.app.linearDistance);
-//					},
-				change: function(selectbox,newValue,oldValue)
-				    {
-					if(motioncalc.view.GlobalSettings.isEnabled){
+					change: function(selectbox,newValue,oldValue)
+					    {
+						if(!motioncalc.view.GlobalSettings.isEnabled)return;
 						if(newValue === oldValue)return;        
 						motioncalc.app.linearDistance = newValue;
 						motioncalc.app.setGlobalSetting('LinearDistance',newValue);
-					}
-				    }
+					    }
 		                    },
 			    },
 			    {
@@ -116,28 +122,26 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				name : 'inertia',
 				label: 'Inertia',
 				id: '_inertia',
-//				options: fillUnits('Inertia'),
 				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.inertia);
-					},
-				change: function(selectbox,newValue,oldValue)
-				    {
-					if(newValue === oldValue)return;        
-					motioncalc.app.inertia = newValue;
-					motioncalc.app.setGlobalSetting('Inertia',newValue);
-				    }
+					change: function(selectbox,newValue,oldValue)
+					    {
+						if(!motioncalc.view.GlobalSettings.isEnabled)return;
+						if(newValue === oldValue)return;        
+						motioncalc.app.inertia = newValue;
+						motioncalc.app.setGlobalSetting('Inertia',newValue);
+					    }
 		                    },
 			    }			],
 		    }
 		]
 	},
 	initialize: function(){
-			Ext.ComponentQuery.query('#_mass')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass'));
-			Ext.ComponentQuery.query('#linear-distance')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance'));
-			Ext.ComponentQuery.query('#linear-distance')[0].setValue(motioncalc.app.linearDistance);
-			Ext.ComponentQuery.query('#_inertia')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia'));
-			Ext.ComponentQuery.query('#_density')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Density'));
+			console.log(motioncalc.app.inertia +'|'+ Ext.getCmp('_inertia').getValue());
+			Ext.getCmp('_mass').setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass')).setValue(motioncalc.app.mass);;
+			Ext.getCmp('linear-distance').setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance')).setValue(motioncalc.app.linearDistance);
+			Ext.getCmp('_inertia').setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia')).setValue(motioncalc.app.inertia);
+			console.log(motioncalc.app.inertia +'|'+ Ext.getCmp('_inertia').getValue());
+			Ext.getCmp('_density').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density')).setValue(motioncalc.app.density);
 			motioncalc.view.GlobalSettings.isEnabled = true;
 	}
 });
