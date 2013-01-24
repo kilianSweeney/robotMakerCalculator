@@ -104,7 +104,7 @@ Ext.define('motioncalc.view.Units', {
 			blur: function(){sendToUnitsConvert();}
 		});
 		this.on({
-			activate: function(){console.log('ddd');}
+			activate: function(){sendToUnitsConvert();}
 		});
 
 	}

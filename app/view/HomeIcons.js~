@@ -8,14 +8,13 @@ Ext.define('motioncalc.view.HomeIcons', {
 		iconCls: 'home',
 		title: 'Home',
 		items: [{
-				title: 'Home',
+				title: 'Robot Maker Calculator',
 				xtype: 'list',
 				itemTpl: '{title}',
 				id: '_homeIcons',
 				store: 'HomeIcons',
 				listeners: {
 					itemtap: function(list,index,item,e){
-						console.log(index);
 						motioncalc.app.mainView.setActiveItem(index+1);
 					}
 			}

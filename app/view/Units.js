@@ -15,7 +15,7 @@ Ext.define('motioncalc.view.Units', {
             {
                 docked: 'top',
                 xtype: 'toolbar',
-                title: 'Unit Converter'
+                title: 'UNIT CONVERTER'
             },
 	    {
 		xtype: 'selectfield',

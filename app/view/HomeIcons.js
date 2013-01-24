@@ -8,7 +8,7 @@ Ext.define('motioncalc.view.HomeIcons', {
 		iconCls: 'home',
 		title: 'Home',
 		items: [{
-				title: 'Home',
+				title: 'ROBOT MAKER CALCULATOR',
 				xtype: 'list',
 				itemTpl: '{title}',
 				id: '_homeIcons',

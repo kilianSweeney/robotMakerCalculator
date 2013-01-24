@@ -17,7 +17,7 @@ Ext.define('motioncalc.view.Inertia', {
             {
                 docked: 'top',
                 xtype: 'toolbar',
-                title: 'Inertia',
+                title: 'INERTIA CALC',
 		items: [
 			{xtype: 'spacer'},
 			{

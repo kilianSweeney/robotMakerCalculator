@@ -1,11 +1,12 @@
 Ext.define('motioncalc.model.GlobalSettings', {
 	extend: 'Ext.data.Model',
-//	requires: 'Ext.data.proxy.LocalStorage',
+	requires: 'Ext.data.proxy.LocalStorage',
 	config: {
+		identifier: 'uuid',
 		fields: ['id', 'value'],
-//		proxy: {
-//		    type: 'localstorage',
-//		    id  : '_GlobalSettings'
-//		}
+		proxy: {
+		    type: 'localstorage',
+		    id  : '_GlobalSettings'
+		}
 	}
 });

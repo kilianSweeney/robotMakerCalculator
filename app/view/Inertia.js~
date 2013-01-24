@@ -17,7 +17,7 @@ Ext.define('motioncalc.view.Inertia', {
             {
                 docked: 'top',
                 xtype: 'toolbar',
-                title: 'Inertia',
+                title: 'INERTIA CALCULATOR',
 		items: [
 			{xtype: 'spacer'},
 			{
@@ -51,6 +51,9 @@ Ext.define('motioncalc.view.Inertia', {
 		xtype: 'selectfield',
 		name : 'inertiaMaterials',
 		id: 'inertiaMaterials',
+		store: '_MaterialDensities',
+		displayField: 'name',
+		valueField: 'density',
 		hidden: true
 	    },
 	    {

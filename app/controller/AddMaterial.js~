@@ -26,34 +26,50 @@ Ext.define('motioncalc.controller.AddMaterial', {
 					Ext.getCmp('materialOriginalValue').setValue(value);
 					Ext.getCmp('AddMaterialTop').setTitle('Edit Material');
 					Ext.getCmp('materialName').setReadOnly(true);
-					Ext.getCmp('buttonManageMaterials').set('text','cancel');
-					Ext.getCmp('buttonManageMaterialOne').set('text','Remove');
+					Ext.getCmp('buttonManageMaterials').set('text','-');
+					Ext.getCmp('buttonManageMaterials').addCls('danger-class');
 				}
 			},
 			buttonMaterials: {
 				tap: function(){
 					if(Ext.getCmp('materialOriginalValue').getValue()==0){
-						Ext.getCmp('materialDensities').setValue(0);
+						Ext.getCmp('materialDensities').setValue(null);
 						Ext.getCmp('materialDensities').showPicker();
 					}
-					else motioncalc.app.mainView.setActiveItem(3);
+					else {
+						var name = Ext.getCmp('materialName').getValue();
+						Ext.Msg.confirm(							
+						   	'Remove "' + name + '"',
+							'Do you want to permanently remove "' + name + '" from the Material Densities List?',
+							function(buttonId) {
+								if (buttonId === 'yes') {
+									var 	stor = Ext.getStore('_MaterialDensities'),
+										rec = stor.findRecord('name',Ext.getCmp('materialName').getValue());
+									stor.remove(rec);
+									stor.sync();
+									motioncalc.app.mainView.setActiveItem(3);            
+								}
+							}
+						);
+					}
 				}
 			},
 			buttonRestore: {
 				tap: function(){
-					motioncalc.app.restoreMaterials(true);
-					motioncalc.app.mainView.setActiveItem(3);
+					Ext.Msg.confirm(							
+					   	'Restore List',
+						'Do you want to restore to the default Material Densities List?',
+						function(buttonId) {
+							if (buttonId === 'yes') {
+								motioncalc.app.restoreMaterials(true);
+								motioncalc.app.mainView.setActiveItem(3);
+							}
+						}
+					);				
 				}
 			},
 			buttonOne: {
 				tap: function(){
-					if(Ext.getCmp('materialOriginalValue').getValue()!=0){
-						var 	stor = Ext.getStore('_MaterialDensities'),
-							rec = stor.findRecord('name',Ext.getCmp('materialName').getValue());
-						stor.remove(rec);
-						stor.sync();
-						
-					};
 					motioncalc.app.mainView.setActiveItem(3);
 				}
 			},

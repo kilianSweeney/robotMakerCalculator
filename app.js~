@@ -76,7 +76,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 	Ext.Viewport.add(motioncalc.app.mainView);
-	motioncalc.app.mainView.setActiveItem(4);
+//	motioncalc.app.mainView.setActiveItem(4);
     },
 
     onUpdated: function() {
@@ -90,7 +90,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
             }
         );
     },
-	restoreMaterials: function(doIt){console.log(doIt);
+	restoreMaterials: function(doIt){
 		var stor = Ext.getStore('_MaterialDensities');
 		doIt = doIt == null ? (stor.getCount()==0):doIt;
 		if(doIt){

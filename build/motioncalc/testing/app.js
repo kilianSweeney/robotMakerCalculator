@@ -67480,7 +67480,9 @@ Ext.define('motioncalc.view.Inertia', {
 		xtype: 'selectfield',
 		name : 'inertiaMaterials',
 		id: 'inertiaMaterials',
-		options: [{value:"cylinder",text:"Cylinder"},{value:"parallelepiped",text:"Parallelepiped"},{value:"sphericalShell",text:"Spherical Shell"},{value:"sphere",text:"Sphere"},{value:"slenderRod",text:"Slender Rod"},{value:"tetrahedron",text:"Tetrahedron"}],
+		store: '_MaterialDensities',
+		displayField: 'name',
+		valueField: 'density',
 		hidden: true
 	    },
 	    {
@@ -67606,7 +67608,7 @@ Ext.define('motioncalc.controller.Inertia', {
 				activate: 'onActivate'
 			},
 			buttonMaterials: {
-				tap: function(){this.showMaterials();}
+				tap: function(){Ext.getCmp('inertiaMaterials').showPicker();}
 			}
 		}
 	},
@@ -67651,21 +67653,6 @@ Ext.define('motioncalc.controller.Inertia', {
 		Ext.Array.each(Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]'),function(){
 			setLabel(this,null);
 		});
-	},
-	populateMaterialDensity: function(storeID,returnArray){
-		var store;
-		returnArray = returnArray == null ? [] : returnArray;
-		store = Ext.getStore(storeID);
-		store.each(function(){
-			returnArray.push({text:this.get('name'),value:this.get('density')});
-		});
-		returnArray.unshift({text:'-- Select One -- ',value:0});
-		return returnArray;
-	},
-	showMaterials: function(){
-		var materialArray;
-		materialArray = this.populateMaterialDensity('_MaterialDensities',null);
-		Ext.getCmp('inertiaMaterials').setOptions(materialArray).setValue(0).showPicker();
 	},
 	hideShowInertiaItems: function(items){
 		var allItems = Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]');
@@ -67793,6 +67780,219 @@ Ext.define('motioncalc.controller.Inertia', {
 	}
 });
 
+Ext.define('motioncalc.view.AddMaterial', {
+	extend: 'Ext.form.FormPanel',
+	xtype: 'addmaterialcard',
+	requires: [
+		'Ext.form.FieldSet',
+		'Ext.field.Select',
+		'Ext.field.Number',
+		'Ext.Button'
+		],
+	controllers: ['AddMaterial'],
+	config: {
+		title: 'Add Material',
+		isEnabled: false,
+		items: [
+		    {
+			docked: 'top',
+			xtype: 'toolbar',
+			title: 'Add Material',
+			id: 'AddMaterialTop',
+			items: [
+				{
+					xtype:'button', 
+					name:'buttonRestoreMaterials', 
+					id:'buttonRestoreMaterials', 
+					text:'restore list',
+					disabled:false
+				},
+				{xtype: 'spacer'},
+				{
+					xtype:'button', 
+					name:'buttonManageMaterials', 
+					id:'buttonManageMaterials', 
+					text:'edit material',
+					disabled:false,
+				}
+			]
+		    },
+		    {
+			xtype: 'fieldset',
+			items: [
+			    {
+				xtype: 'textfield',
+				name : 'materialName',
+				id: 'materialName',
+				label: 'Material Name'
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'materialDensity',
+				value: 0,
+				id: 'materialDensity',
+				label: 'Amount'
+			    },
+			    {
+				xtype: 'selectfield',
+				name : 'materialUnitType',
+				id: 'materialUnitType',
+				label: 'Unit Type'
+			    }
+			]
+		   },
+		    {
+			xtype: 'selectfield',
+			name : 'materialDensities',
+			id: 'materialDensities',
+			store: '_MaterialDensities',
+			displayField: 'name',
+			valueField: 'density',
+			hidden: true
+		    },
+		    {
+			xtype: 'button',
+			name : 'buttonManageMaterialOne',
+			id: 'buttonManageMaterialOne',
+			text: 'Cancel',
+			style: 'width:50%;float:left;'
+		    },
+		    {
+			xtype: 'button',
+			name : 'buttonManageMaterialTwo',
+			id: 'buttonManageMaterialTwo',
+			text: 'Save',
+			style: 'width:50%;float:left;'
+		    },
+		    {
+			xtype: 'hiddenfield',
+			name : 'materialOriginalValue',
+			value: 0,
+			id: 'materialOriginalValue'
+		    },
+
+
+		]
+	},
+	initialize: function(){
+		Ext.getCmp('materialUnitType').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density'));
+	}
+});
+
+
+Ext.define('motioncalc.model.MaterialDensities', {
+	extend: 'Ext.data.Model',
+	requires: 'Ext.data.proxy.LocalStorage',
+	config: {
+		identifier:'uuid',
+		fields: ['name', 'density'],
+		proxy: {
+		    type: 'localstorage',
+		    id  : '_MaterialDensities'
+		}
+	}
+});
+
+Ext.define('motioncalc.store.MaterialDensities', {
+	extend: 'Ext.data.Store',
+
+	config: {
+		storeId:'_MaterialDensities',
+		model: 'motioncalc.model.MaterialDensities',
+		autoLoad: true,
+		fields: ['name','density'],
+		sorters: [{
+			property: 'name',
+			direction: 'ASC'
+		}]
+	}
+});
+
+Ext.define('motioncalc.controller.AddMaterial', {
+	extend : 'Ext.app.Controller',
+	requires : 'motioncalc.store.MaterialDensities',
+	config: {
+		views : ['motioncalc.view.AddMaterial'],
+		refs : {
+			materials: '#materialDensities',
+			buttonMaterials: '#buttonManageMaterials',
+			buttonRestore: '#buttonRestoreMaterials',
+			buttonOne: '#buttonManageMaterialOne',
+			buttonTwo: '#buttonManageMaterialTwo'
+		},
+		control: {
+			materials: {
+				change: function(){
+					var record, name,value,densities;
+					densities = Ext.getCmp('materialDensities');
+					value = densities.getValue();
+					if(value == 0 || value == null)return;
+					value = motioncalc.app.conversionFunctions.unitsConvert(value,motioncalc.app.DENSITYBASEUNITS,Ext.getCmp('materialUnitType').getValue(),'Density');
+					record = densities.record,
+					name = densities.getDisplayField();
+					name = record.get(name);
+					Ext.getCmp('materialName').setValue(name);
+					Ext.getCmp('materialDensity').setValue(value);
+					Ext.getCmp('materialOriginalValue').setValue(value);
+					Ext.getCmp('AddMaterialTop').setTitle('Edit Material');
+					Ext.getCmp('materialName').setReadOnly(true);
+					Ext.getCmp('buttonManageMaterials').set('text','cancel');
+					Ext.getCmp('buttonManageMaterialOne').set('text','Remove');
+				}
+			},
+			buttonMaterials: {
+				tap: function(){
+					if(Ext.getCmp('materialOriginalValue').getValue()==0){
+						Ext.getCmp('materialDensities').setValue(null);
+						Ext.getCmp('materialDensities').showPicker();
+					}
+					else motioncalc.app.mainView.setActiveItem(3);
+				}
+			},
+			buttonRestore: {
+				tap: function(){
+					motioncalc.app.restoreMaterials(true);
+					motioncalc.app.mainView.setActiveItem(3);
+				}
+			},
+			buttonOne: {
+				tap: function(){
+					if(Ext.getCmp('materialOriginalValue').getValue()!=0){
+						var 	stor = Ext.getStore('_MaterialDensities'),
+							rec = stor.findRecord('name',Ext.getCmp('materialName').getValue());
+						stor.remove(rec);
+						stor.sync();
+						
+					};
+					motioncalc.app.mainView.setActiveItem(3);
+				}
+			},
+			buttonTwo: {
+				tap: function(){
+					var ogValue,name,density;
+					name = Ext.String.capitalize(Ext.getCmp('materialName').getValue());
+					density = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('materialDensity').getValue(),Ext.getCmp('materialUnitType').getValue(),motioncalc.app.DENSITYBASEUNITS,'Density');
+					ogValue = Ext.getCmp('materialOriginalValue').getValue();
+					if(density == 0)return;
+					if(name == '')return;
+					var stor = Ext.getStore('_MaterialDensities');
+					stor.load();
+					var rec = stor.findRecord('name',name);
+					if(rec===null){
+						stor.add({name:name,density:density});
+						rec = stor.findRecord('name',name);
+					}
+					else rec.set('density',density);
+					rec.save();
+					motioncalc.app.mainView.setActiveItem(3);
+				}
+			}
+
+		}
+	},
+});
+
+
 Ext.define('motioncalc.model.GlobalSettings', {
 	extend: 'Ext.data.Model',
 	requires: 'Ext.data.proxy.LocalStorage',
@@ -67801,18 +68001,6 @@ Ext.define('motioncalc.model.GlobalSettings', {
 		proxy: {
 		    type: 'localstorage',
 		    id  : '_GlobalSettings'
-		}
-	}
-});
-
-Ext.define('motioncalc.model.MaterialDensities', {
-	extend: 'Ext.data.Model',
-	requires: 'Ext.data.proxy.LocalStorage',
-	config: {
-		fields: ['name', 'density'],
-		proxy: {
-		    type: 'localstorage',
-		    id  : '_MaterialDensities'
 		}
 	}
 });
@@ -67937,8 +68125,6 @@ Ext.define('motioncalc.store.HomeIcons', {
         data: [
             { title: 'Units', xtype: 'unitscard', id: 'UnitsCard' },
             { title: 'Inertia', xtype: 'inertiacard', id: 'InertiaCard' },
-            { title: 'Material Densities', xtype: 'materialscard', id: 'MaterialsCard' },
-            { title: 'About tigerBaby',      xtype: 'aboutcard', id: 'AboutCard' },
             { title: 'Settings',      xtype: 'settingscard', id: 'SettingsCard' }
         ]
     }
@@ -68913,22 +69099,16 @@ Ext.define('motioncalc.store.Conversions', {
 });
 
 
-Ext.define('motioncalc.store.MaterialDensities', {
-	extend: 'Ext.data.Store',
-
-	config: {
-		storeId:'_MaterialDensities',
-		model: 'motioncalc.model.MaterialDensities',
-		autoLoad: true,
-		fields: ['name','density'],
-		sorters: [{
-			property: 'name',
-			direction: 'ASC'
-		}],
-		data: [
-			{name: 'Alcohol, ethyl',density: 788.5}, { name:  'Alcohol, methyl', density: 790.9}, { name:  'Aluminum', density: 2643}, { name:  'Aluminum alloy 3003', density: 2730}, { name:  'Aluminum alloy 360', density: 2640}, { name:  'Aluminum bronze', density: 7800}, { name:  'Antimonial lead', density: 10900}, { name:  'Asphalt', density: 720.8}, { name:  'Beryllium copper 25', density: 8230}, { name:  'Brick, common red', density: 1922.2}, { name:  'Carbon', density: 2146.5}, { name:  'Cast gray iron', density: 7200}, { name:  'CO2', density: 2}, { name:  'Coal, anthracite', density: 1506}, { name:  'Concrete, gravel', density: 2403}, { name:  'Copper', density: 8682}, { name:  'Copper, electrolytic', density: 8940}, { name:  'Cork', density: 240.3}, { name:  'Crude oil', density: 881}, { name:  'Cupronickel 30%', density: 8940}, { name:  'Cupronickel 55-45', density: 8900}, { name:  'Delrin', density: 1561}, { name:  'Earth-dry, excavated', density: 1249}, { name:  'Flour, wheat', density: 592.7}, { name:  'Glass, window', density: 2579}, { name:  'Gold, 24 Kt', density: 19320}, { name:  'Granite, solid', density: 2691}, { name:  'Gravel, dry loose', density: 1521.8}, { name:  'Ice', density: 919.5}, { name:  'Lexan', density: 1198}, { name:  'Malleable iron', density: 7300}, { name:  'Nickel (commercial)', density: 8890}, { name:  'Nylon, type 6', density: 1190}, { name:  'O2', density: 1.4}, { name:  'Oak, red', density: 704.8}, { name:  'Pine, Sothrn. yellow', density: 720.8}, { name:  'Pine, white', density: 416.5}, { name:  'Plain carbon steel', density: 7860}, { name:  'Platinum', density: 21452}, { name:  'Pure water', density: 999.6}, { name:  'PVC', density: 1439}, { name:  'Red brass 85%', density: 8750}, { name:  'Rubber, hard', density: 1190}, { name:  'Salt water', density: 1026.5}, { name:  'Salt, cake', density: 1442}, { name:  'Sand, dry', density: 1601.8}, { name:  'Silver', density: 10491}, { name:  'Solder 50-50', density: 8890}, { name:  'Steel, rolled', density: 7930}, { name:  'Sugar, granulated', density: 849}, { name:  'Titanium (commercial)', density: 4500}, { name:  'Yellow brass', density: 8470}, { name:  'Zinc (commercial)', density: 7140}, { name:  'Zirconium (commercial)', density: 6500}
-		]
-	}
+Ext.define('motioncalc.store.OriginalMaterialDensities', {
+    extend: 'Ext.data.Store',
+	
+    config: {
+	storeId: '_originalMaterialDensities',
+        fields: ['name', 'density'],
+        data: [
+            {name: '- Select One -',density: null},{name: 'Alcohol, ethyl',density: 788.5}, { name:  'Alcohol, methyl', density: 790.9}, { name:  'Aluminum', density: 2643}, { name:  'Aluminum alloy 3003', density: 2730}, { name:  'Aluminum alloy 360', density: 2640}, { name:  'Aluminum bronze', density: 7800}, { name:  'Antimonial lead', density: 10900}, { name:  'Asphalt', density: 720.8}, { name:  'Beryllium copper 25', density: 8230}, { name:  'Brick, common red', density: 1922.2}, { name:  'Carbon', density: 2146.5}, { name:  'Cast gray iron', density: 7200}, { name:  'CO2', density: 2}, { name:  'Coal, anthracite', density: 1506}, { name:  'Concrete, gravel', density: 2403}, { name:  'Copper', density: 8682}, { name:  'Copper, electrolytic', density: 8940}, { name:  'Cork', density: 240.3}, { name:  'Crude oil', density: 881}, { name:  'Cupronickel 30%', density: 8940}, { name:  'Cupronickel 55-45', density: 8900}, { name:  'Delrin', density: 1561}, { name:  'Earth-dry, excavated', density: 1249}, { name:  'Flour, wheat', density: 592.7}, { name:  'Glass, window', density: 2579}, { name:  'Gold, 24 Kt', density: 19320}, { name:  'Granite, solid', density: 2691}, { name:  'Gravel, dry loose', density: 1521.8}, { name:  'Ice', density: 919.5}, { name:  'Lexan', density: 1198}, { name:  'Malleable iron', density: 7300}, { name:  'Nickel (commercial)', density: 8890}, { name:  'Nylon, type 6', density: 1190}, { name:  'O2', density: 1.4}, { name:  'Oak, red', density: 704.8}, { name:  'Pine, Sothrn. yellow', density: 720.8}, { name:  'Pine, white', density: 416.5}, { name:  'Plain carbon steel', density: 7860}, { name:  'Platinum', density: 21452}, { name:  'Pure water', density: 999.6}, { name:  'PVC', density: 1439}, { name:  'Red brass 85%', density: 8750}, { name:  'Rubber, hard', density: 1190}, { name:  'Salt water', density: 1026.5}, { name:  'Salt, cake', density: 1442}, { name:  'Sand, dry', density: 1601.8}, { name:  'Silver', density: 10491}, { name:  'Solder 50-50', density: 8890}, { name:  'Steel, rolled', density: 7930}, { name:  'Sugar, granulated', density: 849}, { name:  'Titanium (commercial)', density: 4500}, { name:  'Yellow brass', density: 8470}, { name:  'Zinc (commercial)', density: 7140}, { name:  'Zirconium (commercial)', density: 6500}
+        ]
+    }
 });
 
 Ext.define('motioncalc.view.HomeIcons', {
@@ -68972,7 +69152,31 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		    {
 			docked: 'top',
 			xtype: 'toolbar',
-			title: 'Global Settings'
+			title: 'Global Settings',
+			items: [
+				{xtype: 'spacer'},
+				{
+					xtype:'button', 
+					name:'buttonAddMaterial', 
+					id:'buttonAddMaterial', 
+					text:'+/- material',
+					disabled:false,
+					listeners: {
+						tap: function(){
+							var pane;
+							pane = 4;
+							Ext.getCmp('materialName').setValue('');
+							Ext.getCmp('materialDensity').setValue(0);
+							Ext.getCmp('materialOriginalValue').setValue(null);
+							Ext.getCmp('materialName').setReadOnly(false);
+							Ext.getCmp('AddMaterialTop').setTitle('Add Material');
+							Ext.getCmp('buttonManageMaterialOne').set('text','Cancel');
+							Ext.getCmp('buttonManageMaterials').set('text','edit material');
+							motioncalc.app.mainView.setActiveItem(pane);
+						}
+					}
+				}
+			]
 		    },
 		    {
 			xtype: 'fieldset',
@@ -69017,13 +69221,10 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				name : 'density',
 				label: 'Density',
 				id: '_density',
-//				options: fillUnits('Density'),
 				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.density);
-					},
 				change: function(selectbox,newValue,oldValue)
 				    {
+					if(!motioncalc.view.GlobalSettings.isEnabled)return;
 					if(newValue === oldValue)return;        
 					motioncalc.app.density = newValue;
 					motioncalc.app.setGlobalSetting('Density',newValue);
@@ -69035,17 +69236,14 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				name : 'mass',
 				label: 'Mass',
 				id: '_mass',
-//				options: fillUnits('Mass'),
 				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.mass);
-					},
-				change: function(selectbox,newValue,oldValue)
-				    {
-					if(newValue === oldValue)return;        
-					motioncalc.app.mass = newValue;
-					motioncalc.app.setGlobalSetting('Mass',newValue);
-				    }
+					change: function(selectbox,newValue,oldValue)
+					    {
+						if(!motioncalc.view.GlobalSettings.isEnabled)return;
+						if(newValue === oldValue)return;        
+						motioncalc.app.mass = newValue;
+						motioncalc.app.setGlobalSetting('Mass',newValue);
+					    }
 		                    },
 			    },
 			    {
@@ -69053,19 +69251,14 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				name : 'linearDistance',
 				label: 'Linear Distance',
 				id: 'linear-distance',
-//				options: fillUnits('Linear distance'),
 				listeners:{
-//					initialize:function(){
-//						this.setValue(motioncalc.app.linearDistance);
-//					},
-				change: function(selectbox,newValue,oldValue)
-				    {
-					if(motioncalc.view.GlobalSettings.isEnabled){
+					change: function(selectbox,newValue,oldValue)
+					    {
+						if(!motioncalc.view.GlobalSettings.isEnabled)return;
 						if(newValue === oldValue)return;        
 						motioncalc.app.linearDistance = newValue;
 						motioncalc.app.setGlobalSetting('LinearDistance',newValue);
-					}
-				    }
+					    }
 		                    },
 			    },
 			    {
@@ -69073,28 +69266,24 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				name : 'inertia',
 				label: 'Inertia',
 				id: '_inertia',
-//				options: fillUnits('Inertia'),
 				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.inertia);
-					},
-				change: function(selectbox,newValue,oldValue)
-				    {
-					if(newValue === oldValue)return;        
-					motioncalc.app.inertia = newValue;
-					motioncalc.app.setGlobalSetting('Inertia',newValue);
-				    }
+					change: function(selectbox,newValue,oldValue)
+					    {
+						if(!motioncalc.view.GlobalSettings.isEnabled)return;
+						if(newValue === oldValue)return;        
+						motioncalc.app.inertia = newValue;
+						motioncalc.app.setGlobalSetting('Inertia',newValue);
+					    }
 		                    },
 			    }			],
 		    }
 		]
 	},
 	initialize: function(){
-			Ext.ComponentQuery.query('#_mass')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass'));
-			Ext.ComponentQuery.query('#linear-distance')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance')).setValue(motioncalc.app.linearDistance);
-//			Ext.ComponentQuery.query('#linear-distance')[0].setValue(motioncalc.app.linearDistance);
-			Ext.ComponentQuery.query('#_inertia')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia'));
-			Ext.ComponentQuery.query('#_density')[0].setOptions(motioncalc.app.conversionFunctions.fillUnits('Density'));
+			Ext.getCmp('_mass').setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass')).setValue(motioncalc.app.mass);;
+			Ext.getCmp('linear-distance').setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance')).setValue(motioncalc.app.linearDistance);
+			Ext.getCmp('_inertia').setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia')).setValue(motioncalc.app.inertia);
+			Ext.getCmp('_density').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density')).setValue(motioncalc.app.density);
 			motioncalc.view.GlobalSettings.isEnabled = true;
 	}
 });
@@ -69106,7 +69295,8 @@ Ext.define('motioncalc.view.Main', {
         'motioncalc.view.HomeIcons',
         'motioncalc.view.Units',
         'motioncalc.view.Inertia',
-	'motioncalc.view.GlobalSettings'
+	'motioncalc.view.GlobalSettings',
+	'motioncalc.view.AddMaterial'
     ],
 
     config: {
@@ -69121,7 +69311,8 @@ Ext.define('motioncalc.view.Main', {
             { xtype: 'homeicons' },
             { xtype: 'unitscard' },
             { xtype: 'inertiacard' },
-            { xtype: 'globalsettingscard' }
+            { xtype: 'globalsettingscard' },
+            { xtype: 'addmaterialcard', hidden: true }
         ]
     }
 });
@@ -69401,9 +69592,9 @@ Ext.application({
     ],
 
     views: ['Main'],
-    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities'],
+    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
     models: ['GlobalSettings','MaterialDensities'],
-    controllers: ['Inertia'],
+    controllers: ['Inertia','AddMaterial'],
 mainView: null,
 
 //global vars
@@ -69448,7 +69639,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 	density = motioncalc.app.getGlobalSetting('Density');
 	mass = motioncalc.app.getGlobalSetting('Mass');
 	linearDistance = motioncalc.app.getGlobalSetting('LinearDistance');
-	inertia = motioncalc.app.getGlobalSetting('inertia');
+	inertia = motioncalc.app.getGlobalSetting('Inertia');
 	motioncalc.app.decimalStyle=decimalStyle===null?motioncalc.app.decimalStyle:decimalStyle;
 	motioncalc.app.significantDigits=significantDigits===null?motioncalc.app.significantDigits:significantDigits;
 	motioncalc.app.density=density===null?motioncalc.app.density:density;
@@ -69456,9 +69647,13 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 	motioncalc.app.linearDistance=linearDistance===null?motioncalc.app.linearDistance:linearDistance;
 	motioncalc.app.inertia=inertia===null?motioncalc.app.inertia:inertia;
 
+	// Load localStorage densities if none exist.
+	this.restoreMaterials(null);
+	
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 	Ext.Viewport.add(motioncalc.app.mainView);
+	motioncalc.app.mainView.setActiveItem(4);
     },
 
     onUpdated: function() {
@@ -69472,6 +69667,23 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
             }
         );
     },
+	restoreMaterials: function(doIt){
+		var stor = Ext.getStore('_MaterialDensities');
+		doIt = doIt == null ? (stor.getCount()==0):doIt;
+		if(doIt){
+			stor.removeAll();
+			stor.sync();
+			var	ogStor = Ext.getStore('_originalMaterialDensities'),
+				rec = null,
+				name = null;
+			ogStor.each(function(){
+				name = this.get('name');
+				stor.add({name:name,density:this.get('density')});
+				rec = stor.findRecord('name',name);
+				rec.save();			
+			});
+		}
+	},
 	getGlobalSetting: function(id){
 		var rec,val;
 		rec = Ext.getStore('_GlobalSettings').getById(id);

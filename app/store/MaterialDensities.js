@@ -1,5 +1,6 @@
 Ext.define('motioncalc.store.MaterialDensities', {
 	extend: 'Ext.data.Store',
+	requires: ['Ext.data.proxy.LocalStorage','Ext.data.identifier.Uuid'],
 
 	config: {
 		storeId:'_MaterialDensities',

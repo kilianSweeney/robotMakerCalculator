@@ -15,7 +15,7 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		    {
 			docked: 'top',
 			xtype: 'toolbar',
-			title: 'Global Settings',
+			title: 'GLOBAL SETTINGS',
 			items: [
 				{xtype: 'spacer'},
 				{
@@ -33,8 +33,8 @@ Ext.define('motioncalc.view.GlobalSettings', {
 							Ext.getCmp('materialOriginalValue').setValue(null);
 							Ext.getCmp('materialName').setReadOnly(false);
 							Ext.getCmp('AddMaterialTop').setTitle('Add Material');
-							Ext.getCmp('buttonManageMaterialOne').set('text','Cancel');
 							Ext.getCmp('buttonManageMaterials').set('text','edit material');
+							Ext.getCmp('buttonManageMaterials').removeCls('danger-class');
 							motioncalc.app.mainView.setActiveItem(pane);
 						}
 					}

@@ -4,10 +4,8 @@ Ext.define('motioncalc.store.HomeIcons', {
     config: {
         fields: ['title', 'xtype'],
         data: [
-            { title: 'Units', xtype: 'unitscard', id: 'UnitsCard' },
-            { title: 'Inertia', xtype: 'inertiacard', id: 'InertiaCard' },
-            { title: 'Material Densities', xtype: 'materialscard', id: 'MaterialsCard' },
-            { title: 'About tigerBaby',      xtype: 'aboutcard', id: 'AboutCard' },
+            { title: 'Unit Converter', xtype: 'unitscard', id: 'UnitsCard' },
+            { title: 'Inertia Calculator', xtype: 'inertiacard', id: 'InertiaCard' },
             { title: 'Settings',      xtype: 'settingscard', id: 'SettingsCard' }
         ]
     }

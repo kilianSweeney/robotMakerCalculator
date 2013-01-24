@@ -22,7 +22,7 @@ mainView: null,
 
 //global vars
 decimalStyle: 1,
-significantDigits: 1,
+significantDigits: 7,
 density: 'g/cm³',
 mass: 'carat',
 linearDistance: 'angstrom',
@@ -76,7 +76,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 	Ext.Viewport.add(motioncalc.app.mainView);
-	motioncalc.app.mainView.setActiveItem(4);
+//	motioncalc.app.mainView.setActiveItem(4);
     },
 
     onUpdated: function() {
