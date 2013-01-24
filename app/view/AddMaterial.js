@@ -16,7 +16,15 @@ Ext.define('motioncalc.view.AddMaterial', {
 			docked: 'top',
 			xtype: 'toolbar',
 			title: 'Add Material',
+			id: 'AddMaterialTop',
 			items: [
+				{
+					xtype:'button', 
+					name:'buttonRestoreMaterials', 
+					id:'buttonRestoreMaterials', 
+					text:'restore list',
+					disabled:false
+				},
 				{xtype: 'spacer'},
 				{
 					xtype:'button', 
@@ -62,22 +70,22 @@ Ext.define('motioncalc.view.AddMaterial', {
 		    },
 		    {
 			xtype: 'button',
-			name : 'buttonManageMaterialCancel',
-			id: 'buttonManageMaterialCancel',
+			name : 'buttonManageMaterialOne',
+			id: 'buttonManageMaterialOne',
 			text: 'Cancel',
 			style: 'width:50%;float:left;'
 		    },
 		    {
 			xtype: 'button',
-			name : 'buttonManageMaterialSave',
-			id: 'buttonManageMaterialSave',
+			name : 'buttonManageMaterialTwo',
+			id: 'buttonManageMaterialTwo',
 			text: 'Save',
 			style: 'width:50%;float:left;'
 		    },
 		    {
 			xtype: 'hiddenfield',
 			name : 'materialOriginalValue',
-			value: null,
+			value: 0,
 			id: 'materialOriginalValue'
 		    },
 

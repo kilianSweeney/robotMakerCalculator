@@ -28,6 +28,13 @@ Ext.define('motioncalc.view.GlobalSettings', {
 						tap: function(){
 							var pane;
 							pane = 4;
+							Ext.getCmp('materialName').setValue('');
+							Ext.getCmp('materialDensity').setValue(0);
+							Ext.getCmp('materialOriginalValue').setValue(null);
+							Ext.getCmp('materialName').setReadOnly(false);
+							Ext.getCmp('AddMaterialTop').setTitle('Add Material');
+							Ext.getCmp('buttonManageMaterialOne').set('text','Cancel');
+							Ext.getCmp('buttonManageMaterials').set('text','edit material');
 							motioncalc.app.mainView.setActiveItem(pane);
 						}
 					}
@@ -136,11 +143,9 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		]
 	},
 	initialize: function(){
-			console.log(motioncalc.app.inertia +'|'+ Ext.getCmp('_inertia').getValue());
 			Ext.getCmp('_mass').setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass')).setValue(motioncalc.app.mass);;
 			Ext.getCmp('linear-distance').setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance')).setValue(motioncalc.app.linearDistance);
 			Ext.getCmp('_inertia').setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia')).setValue(motioncalc.app.inertia);
-			console.log(motioncalc.app.inertia +'||'+ Ext.getCmp('_inertia').getValue());
 			Ext.getCmp('_density').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density')).setValue(motioncalc.app.density);
 			motioncalc.view.GlobalSettings.isEnabled = true;
 	}

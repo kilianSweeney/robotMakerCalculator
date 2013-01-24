@@ -15,7 +15,7 @@ Ext.application({
     ],
 
     views: ['Main'],
-    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities'],
+    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
     models: ['GlobalSettings','MaterialDensities'],
     controllers: ['Inertia','AddMaterial'],
 mainView: null,
@@ -70,6 +70,9 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 	motioncalc.app.linearDistance=linearDistance===null?motioncalc.app.linearDistance:linearDistance;
 	motioncalc.app.inertia=inertia===null?motioncalc.app.inertia:inertia;
 
+	// Load localStorage densities if none exist.
+	this.restoreMaterials(null);
+	
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 	Ext.Viewport.add(motioncalc.app.mainView);
@@ -87,6 +90,23 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
             }
         );
     },
+	restoreMaterials: function(doIt){
+		var stor = Ext.getStore('_MaterialDensities');
+		doIt = doIt == null ? (stor.getCount()==0):doIt;
+		if(doIt){
+			stor.removeAll();
+			stor.sync();
+			var	ogStor = Ext.getStore('_originalMaterialDensities'),
+				rec = null,
+				name = null;
+			ogStor.each(function(){
+				name = this.get('name');
+				stor.add({name:name,density:this.get('density')});
+				rec = stor.findRecord('name',name);
+				rec.save();			
+			});
+		}
+	},
 	getGlobalSetting: function(id){
 		var rec,val;
 		rec = Ext.getStore('_GlobalSettings').getById(id);
