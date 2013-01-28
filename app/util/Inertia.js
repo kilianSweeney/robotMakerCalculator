@@ -56,8 +56,8 @@ inertiaCalc: function(){
 	returnArray.push(['Ixx',Ixx]);
 	returnArray.push(['Iyy',Iyy]);
 	returnArray.push(['Izz',Izz]);
-	returnArray.push(['IxxPrime',IxxPrime]);
-	returnArray.push(['IyyPrime',IyyPrime]);
+	returnArray.push(['Ix&#180;x&#180;',IxxPrime]);
+	returnArray.push(['Iy&#180;y&#180;',IyyPrime]);
 	returnArray.push(['Mass',mass]);
 	return returnArray;
 },

@@ -15,78 +15,101 @@ Ext.define('motioncalc.view.Units', {
             {
                 docked: 'top',
                 xtype: 'toolbar',
-                title: 'UNIT CONVERTER'
+                title: 'UNIT CONVERTER',
+		items: [
+			{
+				xtype: 'button',
+				id: 'buttonUnitsResult',
+				text: 'result',
+				disabled: true
+			}
+		]
             },
-	    {
-		xtype: 'selectfield',
-		name : 'measurementType',
-		label: 'Measurement Type',
-		id: 'unitsType',
-//		options: conversionFunctions.buildUnitTypeSELECT(),
-		listeners:{
+		{
+			xtype: 'hiddenfield',
+			name: 'unitsResultStatus',
+			id: 'unitsResultStatus',
+			value: 4,
+			listeners: {
+				change: function(){
+					var 	resultStatus = Ext.getCmp('unitsResultStatus').getValue(),
+						button = Ext.getCmp('buttonUnitsResult'),
+						disabled = true;
+					if(resultStatus == 1)disabled = false;
+					button.setDisabled(disabled);
+//					console.log(disabled);
+				}
+			}
+		},
+		{
+			xtype: 'fieldset',
+			items: [
+				    {
+					xtype: 'selectfield',
+					name : 'measurementType',
+					label: 'Measurement Type',
+					id: 'unitsType',
+					listeners:{
 			
-		change: function(selectbox,newValue,oldValue)
-		    {
-			global_measurementTypeChange = true;
-			Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
-			global_measurementTypeChange = true;
-			Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
-		    }
-               	}
-	    },
+					change: function(selectbox,newValue,oldValue)
+					    {
+						var resultStatus = Ext.getCmp('unitsResultStatus');			
+						if(resultStatus.getValue()==4)return;
+						resultStatus.setValue(3);
+						Ext.getCmp('unitsAmount').setValue(0);
+						Ext.getCmp('unitsAnswer').set('html','').hide();
+						Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
+						Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
+						resultStatus.setValue(0);
+					    }
+				       	}
+				    },
+				    {
+					xtype: 'selectfield',
+					name : 'unitsFrom',
+					id: 'unitsFrom',
+					label: 'Unit',
+					dataType: 'unit-types',
+				    },
+				    {
+					xtype: 'numberfield',
+					name : 'unitsAmount',
+					value: 0,
+					id: 'unitsAmount',
+					label: 'Amount',
+				    },
+				    {
+					xtype: 'selectfield',
+					name : 'convertTo',
+					id: 'unitsTo',
+					dataType: 'unit-types',
+					label: 'Convert To',
+				    },
+			]
+		},		
 	    {
-		xtype: 'selectfield',
-		name : 'unitsFrom',
-		id: 'unitsFrom',
-		label: 'Unit',
-		dataType: 'unit-types',
-//		options: fillUnits('Area'),
-            },
-	    {
-		xtype: 'numberfield',
-		name : 'unitsAmount',
-		value: 0,
-		id: 'unitsAmount',
-		label: 'Amount',
-	    },
-	    {
-		xtype: 'selectfield',
-		name : 'convertTo',
-		id: 'unitsTo',
-		dataType: 'unit-types',
-		label: 'Convert To',
-//		options: fillUnits('Area'),
-            },
-	    {
-		xtype: 'textfield',
+		xtype: 'container',
 		name : 'unitsAnswer',
 		id: 'unitsAnswer',
-		value: 0,
-		label: '=',
-		readOnly: true,
+		hidden: true
 	    }
         ]
     },
 	initialize: function(){
 		function sendToUnitsConvert(){
-			if(typeof global_measurementTypeChange ==='undefined')global_measurementTypeChange = false;
-			if(global_measurementTypeChange){
-				global_measurementTypeChange = false;			
-				return;
-			}
+			var resultStatus = Ext.getCmp('unitsResultStatus');
+			if(resultStatus.getValue()==3 || resultStatus.getValue()==4)return;
 			var unitsAmount,unitsAnswer,unitsFrom,unitsTo,returnedValue;
 			unitsAmount = Ext.getCmp('unitsAmount');
 			unitsAnswer = Ext.getCmp('unitsAnswer');
-			if(unitsAmount.get('value')==0){
-				unitsAnswer.set('value',0);
-				return;
-			}
 			unitsFrom = Ext.getCmp('unitsFrom');
 			unitsTo = Ext.getCmp('unitsTo');
 			unitsType = Ext.getCmp('unitsType');
+			unitsAnswer.hide();
 			returnedValue = motioncalc.app.conversionFunctions.unitsConvert(unitsAmount.get('value'),unitsFrom.get('value'),unitsTo.get('value'),unitsType.get('value'),true);
-			unitsAnswer.set('value',returnedValue);
-//			console.log(unitsAnswer.get('value') +' | '+returnedValue);
+			unitsAnswer.set('html',returnedValue);
+			resultStatus.setValue(1);
+			unitsAnswer.show({type :"slide",direction : "right", duration : 500});
 		}
 
 		Ext.getCmp('unitsType').setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
@@ -103,9 +126,9 @@ Ext.define('motioncalc.view.Units', {
 		Ext.getCmp('unitsAmount').on({
 			blur: function(){sendToUnitsConvert();}
 		});
-		this.on({
-			activate: function(){sendToUnitsConvert();}
-		});
-
+//		this.on({
+//			activate: function(){sendToUnitsConvert();}
+//		});
+		Ext.getCmp('unitsResultStatus').setValue(0);
 	}
 });

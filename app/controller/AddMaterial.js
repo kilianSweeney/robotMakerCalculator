@@ -79,18 +79,39 @@ Ext.define('motioncalc.controller.AddMaterial', {
 					name = Ext.String.capitalize(Ext.getCmp('materialName').getValue());
 					density = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('materialDensity').getValue(),Ext.getCmp('materialUnitType').getValue(),motioncalc.app.DENSITYBASEUNITS,'Density');
 					ogValue = Ext.getCmp('materialOriginalValue').getValue();
-					if(density == 0)return;
-					if(name == '')return;
-					var stor = Ext.getStore('_MaterialDensities');
-					stor.load();
-					var rec = stor.findRecord('name',name);
-					if(rec===null){
-						stor.add({name:name,density:density});
-						rec = stor.findRecord('name',name);
+					if(name == ''){
+						Ext.Msg.alert(							
+						   	'"Material Name"',
+							'Please give this material a name.'
+						);
+						return;
 					}
-					else rec.set('density',density);
-					rec.save();
-					motioncalc.app.mainView.setActiveItem(3);
+					
+					if(density == 0){
+						Ext.Msg.alert(							
+						   	'Amount',
+							'Please give this material a density value amount.'
+						);
+						return;
+					}
+					Ext.Msg.confirm(							
+					   	'Save "' + name + '"?',
+						'Do you want to save "' + name + '"?',
+						function(buttonId) {
+							if (buttonId === 'yes') {
+								var stor = Ext.getStore('_MaterialDensities');
+								stor.load();
+								var rec = stor.findRecord('name',name);
+								if(rec===null){
+									stor.add({name:name,density:density});
+									rec = stor.findRecord('name',name);
+								}
+								else rec.set('density',density);
+								rec.save();
+								motioncalc.app.mainView.setActiveItem(3);
+							}
+						}
+					);
 				}
 			}
 

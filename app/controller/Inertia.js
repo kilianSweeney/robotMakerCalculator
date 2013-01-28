@@ -35,8 +35,33 @@ Ext.define('motioncalc.controller.Inertia', {
 			},
 			buttonMaterials: {
 				tap: function(){Ext.getCmp('inertiaMaterials').showPicker();}
-			}
+			},
 		}
+	},
+	launch: function(){
+		Ext.getCmp('inertiaMass').addCls('convert-active');
+		var convertForItems = Ext.select('div.convert-for-it .x-form-label');
+		convertForItems.each(function(el){
+			Ext.get(el.dom).on('tap',function(){
+				var 	activeCls = 'convert-active',
+					isMassValue = 0;
+//				console.log(this.findParent('div.convert-for-it').id);
+				if(this.findParent('div.convert-for-it').className.indexOf(activeCls)>-1)return;
+				var 	itemId = 'inertiaDensity',
+					itemOtherId = 'inertiaMass';
+				if(this.findParent('div.convert-for-it').id==itemId){
+					itemId = 'inertiaMass';
+					itemOtherId = 'inertiaDensity';
+					isMassValue = 0;
+				}
+				else isMassValue = 1;
+				Ext.getCmp(itemId).removeCls(activeCls);
+//				console.log(itemId + '  |'+ Ext.getCmp(itemId).hasCls(activeCls));
+				Ext.getCmp(itemOtherId).addCls(activeCls);
+				motioncalc.app.getController('Inertia').changeDensityMass(isMassValue == 1);
+				Ext.getCmp('isMass').setValue(isMassValue);
+			});
+		});
 	},
 	onActivate: function(){
 		//unit testing
@@ -49,20 +74,16 @@ Ext.define('motioncalc.controller.Inertia', {
 //		console.log(Ext.getCmp('isMass').get('value')==1);
 
 		function setLabel(item,unit){
-			var tmpLbl,tmpLblSuffix,checkBox,checkBoxChecked,index;		
+			var tmpLbl,tmpLblSuffix,index;		
 			tmpLbl = item.get('label');
 			index = tmpLbl.indexOf('<')-1;
 			if(index>0)tmpLbl = tmpLbl.substring(0,index);
-			checkBox = '';
 			if(unit == null){
 				unit = motioncalc.app.linearDistance;
 				
 			}
-			else {
-				checkBoxChecked = tmpLbl.indexOf('Density')>-1?'':'checked';				
-				checkBox = '<input id="'+ tmpLbl +'-checkbox" onclick="motioncalc.app.getController(\'Inertia\').switchIsMass(this,\'' + tmpLbl + '\');" type="checkbox" '+ checkBoxChecked + ' />';
-			}
-			tmpLblSuffix = ' <span style="font-size:smaller;">(' + unit + ')</span>' + checkBox;
+			tmpLblSuffix = Ext.os.is('Phone') ? ' <br />' : ' ';
+			tmpLblSuffix = tmpLblSuffix + '<span style="font-size:smaller;">(' + unit + ')</span>';
 			
 			item.setLabel(tmpLbl + tmpLblSuffix);
 		}
@@ -88,7 +109,9 @@ Ext.define('motioncalc.controller.Inertia', {
 		});				
 	},
 	setInertiaAnswer : function(answers){
-		var returnString,cFunctions,itemCount,mass;
+		var returnString,cFunctions,itemCount,mass,inertiaAnswer;
+		inertiaAnswer = Ext.getCmp('inertiaAnswer');
+		inertiaAnswer.hide();
 		cFunctions = motioncalc.app.conversionFunctions;
 		returnString='';
 		mass = null;
@@ -96,34 +119,17 @@ Ext.define('motioncalc.controller.Inertia', {
 		for(var i = 0; i < itemCount; i++){
 //			console.log(answers[i][0]+'|'+answers[i][1]);
 			if(answers[i][1]!==null){
-				returnString += answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' | ' ;
+				returnString += answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="pipe">|</span> ' ;
 				if(answers[i][0].indexOf('Mass') > -1 && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
 			}
 		}
 		returnString = returnString.substring(0,(returnString.length-3));
-		Ext.getCmp('inertiaAnswer').setValue(returnString);
+		inertiaAnswer.set('html',returnString);
+		inertiaAnswer.show({type :"slide",direction : "right", duration : 500});
 		if(mass !== null){
 			Ext.getCmp('inertiaMass').set('value',mass);
 //			console.log(Ext.getCmp('inertiaMass').get('value')+'|'+mass);
 		}
-	},
-	switchIsMass: function(item,label){
-	//	console.log('orginal isMass: ' + Ext.getCmp('isMass').getValue());
-		var otherLabel,otherItem,isMassValue;
-		if(label == 'Density'){
-			otherLabel = 'Mass';
-			isMassValue = item.checked ? 0 : 1;
-		}
-		else{
-			otherLabel = 'Density';
-			isMassValue = item.checked ? 1 : 0;
-		};
-		this.changeDensityMass(isMassValue == 1);
-		otherItem = Ext.getDom(otherLabel + '-checkbox')
-		if(item.checked)otherItem.checked=false
-		else otherItem.checked=true;
-		Ext.getCmp('isMass').setValue(isMassValue);
-	//	console.log(Ext.getCmp('isMass').getValue());
 	},
 	changeDensityMass: function(isMass){
 		var mass,density;
@@ -147,7 +153,6 @@ Ext.define('motioncalc.controller.Inertia', {
 	setInertiaScreen: function(adjustForShape,firstLaunched){
 		if(adjustForShape || firstLaunched){
 			Ext.getCmp('inertiaDensity').show();
-			if(Ext.get('Mass-checkbox') !== null)Ext.get('Mass-checkbox').show();
 			var shape,items,mass,isMass;
 			isMass = true;
 			items = [];
@@ -172,7 +177,6 @@ Ext.define('motioncalc.controller.Inertia', {
 		//			setInertiaDefaults(shape,2);
 					items.push(Ext.getCmp('radius'));
 					Ext.getCmp('inertiaDensity').hide();
-					Ext.get('Mass-checkbox').hide();
 					isMass = true;
 					break;
 				case 'sphere':
@@ -184,7 +188,6 @@ Ext.define('motioncalc.controller.Inertia', {
 		//			setInertiaDefaults(shape,2);
 					items.push(Ext.getCmp('inertiaLength'));
 					Ext.getCmp('inertiaDensity').hide();
-					Ext.get('Mass-checkbox').hide();
 					isMass = true;
 					break;
 				case 'tetrahedron':
@@ -193,7 +196,6 @@ Ext.define('motioncalc.controller.Inertia', {
 					items.push(Ext.getCmp('inertiaLength'));
 					items.push(Ext.getCmp('inertiaWidth'));
 					Ext.getCmp('inertiaDensity').hide();
-					Ext.get('Mass-checkbox').hide();
 					isMass = true;
 					break;				
 			}

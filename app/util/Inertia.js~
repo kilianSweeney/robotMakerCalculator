@@ -56,8 +56,8 @@ inertiaCalc: function(){
 	returnArray.push(['Ixx',Ixx]);
 	returnArray.push(['Iyy',Iyy]);
 	returnArray.push(['Izz',Izz]);
-	returnArray.push(['IxxPrime',IxxPrime]);
-	returnArray.push(['IyyPrime',IyyPrime]);
+	returnArray.push(['Ix&#180;x&#180;',IxxPrime]);
+	returnArray.push(['Iy\'y\'',IyyPrime]);
 	returnArray.push(['Mass',mass]);
 	return returnArray;
 },
@@ -242,8 +242,10 @@ eqnSphereIxx: function(field){
 //		Ext.getCmp('inertiaMass').set('value',motioncalc.app.conversionFunctions.unitsConvert(sngMass, motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass'));
 	}
 	if(field == 'mass')return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');
-	var Ixx=sngMass * 2 / 5 * Math.pow(sngR,2);
-	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
+	else {
+		var Ixx=sngMass * 2 / 5 * Math.pow(sngR,2);
+		return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
+	}
 
 },
 

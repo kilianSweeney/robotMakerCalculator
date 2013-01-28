@@ -5,19 +5,14 @@
     <meta charset="UTF-8">
     <title>Robot Maker Calculator</title>
     <style type="text/css">
-         /**
-         * Example of an initial loading indicator.
-         * It is recommended to keep this as minimal as possible to provide instant feedback
-         * while other resources are still being loaded for the first time
-         */
         html, body {
             height: 100%;
-            background-color: #1985D0
+            background-color: #37FDFC;
         }
 
         #appLoadingIndicator {
             position: absolute;
-            top: 50%;
+            top: 35%;
             margin-top: -15px;
             text-align: center;
             width: 100%;
@@ -31,8 +26,7 @@
         #appLoadingIndicator > * {
             background-color: #FFFFFF;
             display: inline-block;
-            height: 30px;
-            -webkit-border-radius: 15px;
+            height: 150px;
             margin: 0 5px;
             width: 30px;
             opacity: 0.8;
@@ -56,8 +50,33 @@
 <body>
     <div id="appLoadingIndicator">
         <div></div>
-        <div></div>
+        <div id="pong-ball" style="height: 30px;-webkit-border-radius: 15px;" ></div>
         <div></div>
     </div>
+<script type="text/javascript">
+function movePongBall(i,distance,goForward){
+	console.log(document.getElementById('appLoadingIndicator').innerHTML.length);
+	if(typeof motioncalc != 'undefined' && typeof motioncalc.app != 'undefined')return;
+	if(i==690)return;
+	if(distance > 115){
+		goForward = false;
+		distance = 114;
+	}
+	if(distance < 0){
+		goForward = true;
+		distance = 1;
+	}
+	document.getElementById('pong-ball').style.marginBottom= (distance + 'px');
+//	if(distance % 100 === 0){
+//		document.getElementById('pong-ball').style.marginLeft= ((distance/100) + 'px');
+//		document.getElementById('pong-ball').style.marginRight= ((distance/100) + 'px');
+//	}
+	if(goForward)distance++;
+	else distance--;
+	i++;
+	setTimeout('movePongBall('+i+','+distance+','+goForward+')',15);
+}
+movePongBall(0,0,0,true);
+</script>
 </body>
 </html>

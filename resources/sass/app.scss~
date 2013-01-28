@@ -1,6 +1,7 @@
 $base-color: #37FDFC;
 $active-color: #F4F776;
 $base-gradient: 'glossy';
+$answer-color: #c23f2d;
 @import 'sencha-touch/default/all';
 
 // You may remove any of the following modules that you
@@ -43,10 +44,25 @@ $base-gradient: 'glossy';
 		-webkit-mask-image: url('../images/robot.png');
 }
 .x-phone .x-toolbar .x-title { font-size:1em;}
-.x-phone .x-toolbar.x-docked-top .x-button { width: 20%; padding:2px;}
-.x-phone .x-toolbar.x-docked-top .x-button .x-button-label { font-size: .6em; width:95%; }
-.x-form-label { font-size: .45em;}
-.x-form-label { position: relative; }
-.x-form-label input[type="checkbox"]{ position:absolute; top:.5em; right:.5em; margin-left:0; }
-
-
+.x-phone .x-toolbar.x-docked-top .x-toolbar-inner > .x-button { width: 20%; padding:2px;}
+.x-phone .x-toolbar.x-docked-top .x-toolbar-inner > .x-button .x-button-label { font-size: .6em; width:95%; }
+.x-phone .x-form-label { font-size: .7em;}
+.x-phone .x-form-label { position: relative; }
+.convert-for-it .x-form-label { background-color: #ffffff; border-right: 1px dotted #dddddd }
+.convert-for-it.convert-active .x-form-label { background-color: $active-color; }
+#inertiaAnswer,#unitsAnswer {
+	border: 1px solid #02b3b2;
+	margin: 0;
+	padding: 0;
+	border-radius: 3px;
+}
+#inertiaAnswer .x-inner,#unitsAnswer .x-inner {
+	border: 10px solid $active-color;
+	border-radius: 3px;
+	background: $base-color;
+	padding: .5em;
+	text-align: center;
+	font-size: 2.5em;
+	color: $answer-color;
+}
+#inertiaAnswer .x-inner,#unitsAnswer .x-inner span.pipe { color:$active-color; }

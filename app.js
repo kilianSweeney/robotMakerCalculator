@@ -10,6 +10,7 @@ Ext.application({
 
     requires: [
         'Ext.MessageBox',
+	'Ext.Anim',
 	'motioncalc.util.Conversions',
 	'motioncalc.util.Inertia'
     ],
@@ -76,7 +77,32 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 	Ext.Viewport.add(motioncalc.app.mainView);
-//	motioncalc.app.mainView.setActiveItem(4);
+	var isPhone = Ext.os.is('Phone');
+//	console.log(isPhone);
+	if(isPhone){
+		var allFormLabels = Ext.select('div.x-form-label');
+		allFormLabels.each(function(el){
+			Ext.get(el.dom).on('tap',function(){
+				var 	txt = this.dom.innerText,
+					txtEnd = txt.indexOf('\n')-1;				
+					txtEnd = txtEnd > -1 ? txtEnd : txt.length;
+//				console.log(txtEnd);
+				if(txtEnd<14)return;
+				var anim, fromW,toW;
+				fromW = '30%';
+				toW = '40%';
+				anim = Ext.create('Ext.Anim',{
+					autoclear:false,
+					from:{'min-width':fromW},
+					to:{'min-width':toW},
+					duration:750,
+				});
+	//			console.log(fromW +'|'+ toW);
+				anim.run(this);						
+			});
+		});
+	}
+//	motioncalc.app.mainView.setActiveItem(2);
     },
 
     onUpdated: function() {

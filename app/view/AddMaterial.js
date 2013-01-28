@@ -73,14 +73,14 @@ Ext.define('motioncalc.view.AddMaterial', {
 			name : 'buttonManageMaterialOne',
 			id: 'buttonManageMaterialOne',
 			text: 'Cancel',
-			style: 'width:50%;float:left;'
+			style: 'width:49%;float:left;'
 		    },
 		    {
 			xtype: 'button',
 			name : 'buttonManageMaterialTwo',
 			id: 'buttonManageMaterialTwo',
 			text: 'Save',
-			style: 'width:50%;float:left;'
+			style: 'width:49%;float:right;'
 		    },
 		    {
 			xtype: 'hiddenfield',
