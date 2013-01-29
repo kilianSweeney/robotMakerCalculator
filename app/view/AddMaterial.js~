@@ -1,6 +1,7 @@
 Ext.define('motioncalc.view.AddMaterial', {
 	extend: 'Ext.form.FormPanel',
 	xtype: 'addmaterialcard',
+	id: 'addMaterialID',
 	requires: [
 		'Ext.form.FieldSet',
 		'Ext.field.Select',
@@ -35,6 +36,10 @@ Ext.define('motioncalc.view.AddMaterial', {
 				}
 			]
 		    },
+{
+	xtype:'container',
+	html:'<canvas id="shapeCanvas" width="300" height="300"></canvas>'
+},
 		    {
 			xtype: 'fieldset',
 			items: [
@@ -73,14 +78,14 @@ Ext.define('motioncalc.view.AddMaterial', {
 			name : 'buttonManageMaterialOne',
 			id: 'buttonManageMaterialOne',
 			text: 'Cancel',
-			style: 'width:45%;float:left;'
+			style: 'width:49%;float:left;'
 		    },
 		    {
 			xtype: 'button',
 			name : 'buttonManageMaterialTwo',
 			id: 'buttonManageMaterialTwo',
 			text: 'Save',
-			style: 'width:45%;float:right;'
+			style: 'width:49%;float:right;'
 		    },
 		    {
 			xtype: 'hiddenfield',

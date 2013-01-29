@@ -1,6 +1,7 @@
 Ext.define('motioncalc.view.AddMaterial', {
 	extend: 'Ext.form.FormPanel',
 	xtype: 'addmaterialcard',
+	id: 'addMaterialID',
 	requires: [
 		'Ext.form.FieldSet',
 		'Ext.field.Select',

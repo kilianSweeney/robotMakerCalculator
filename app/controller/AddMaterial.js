@@ -8,7 +8,8 @@ Ext.define('motioncalc.controller.AddMaterial', {
 			buttonMaterials: '#buttonManageMaterials',
 			buttonRestore: '#buttonRestoreMaterials',
 			buttonOne: '#buttonManageMaterialOne',
-			buttonTwo: '#buttonManageMaterialTwo'
+			buttonTwo: '#buttonManageMaterialTwo',
+			addMaterialView: '#addMaterialID',
 		},
 		control: {
 			materials: {
@@ -118,4 +119,5 @@ Ext.define('motioncalc.controller.AddMaterial', {
 		}
 	},
 });
+
 

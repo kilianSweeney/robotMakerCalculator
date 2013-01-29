@@ -19,6 +19,13 @@ Ext.define('motioncalc.view.Inertia', {
                 xtype: 'toolbar',
                 title: 'INERTIA CALC',
 		items: [
+			{
+				xtype:'button', 
+				name:'buttonInertiaSolution', 
+				id:'buttonInertiaSolution', 
+				text:'result',
+				disabled:false,
+			},
 			{xtype: 'spacer'},
 			{
 				xtype:'button', 

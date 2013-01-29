@@ -21,7 +21,8 @@ Ext.define('motioncalc.view.Main', {
             { xtype: 'unitscard' },
             { xtype: 'inertiacard' },
             { xtype: 'globalsettingscard' },
-            { xtype: 'addmaterialcard', hidden: true; }
-        ]
-    }
+            { xtype: 'addmaterialcard', hidden: true }
+        ],
+    },
+	
 });

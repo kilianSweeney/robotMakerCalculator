@@ -138,9 +138,9 @@ Ext.define('motioncalc.view.Inertia', {
 		]
 	},
 	{
-	xtype: 'container',
-	name : 'inertiaAnswer',
-	id: 'inertiaAnswer',
+		xtype: 'container',
+		name : 'inertiaAnswer',
+		id: 'inertiaAnswer',
 	}
         ]
     }

@@ -20,9 +20,9 @@ Ext.define('motioncalc.controller.GlobalSettings', {
 //   }
 //  }  
 // 
-// },
+ },
  
  onActivate: function() {
-  console.log('Main container is active');
+//  console.log('Main container is active');
  }
 });

@@ -9,7 +9,8 @@ Ext.define('motioncalc.controller.Inertia', {
 			shape: '#inertiaShape',
 			inertiaView: '#inertiaID',
 			numberFields: 'numberfield',
-			buttonMaterials: '#buttonMaterials'
+			buttonMaterials: '#buttonMaterials',
+			buttonInertiaSolution : '#buttonInertiaSolution'
 		},
 		control: {
 			materials: {
@@ -35,6 +36,11 @@ Ext.define('motioncalc.controller.Inertia', {
 			},
 			buttonMaterials: {
 				tap: function(){Ext.getCmp('inertiaMaterials').showPicker();}
+			},
+			buttonInertiaSolution: {
+				tap: function(){
+					motioncalc.app.mainView.setActiveItem(5);
+				}
 			},
 		}
 	},

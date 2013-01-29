@@ -119,7 +119,7 @@ Ext.define('motioncalc.controller.Inertia', {
 		for(var i = 0; i < itemCount; i++){
 //			console.log(answers[i][0]+'|'+answers[i][1]);
 			if(answers[i][1]!==null){
-				returnString += answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span>|</span> ' ;
+				returnString += answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="pipe">|</span> ' ;
 				if(answers[i][0].indexOf('Mass') > -1 && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
 			}
 		}
