@@ -34,6 +34,8 @@ MASSBASEUNITS : "kg",
 INERTIABASEUNITS : "kg-m²",
 PI : 3.141593,
 
+answerFrom: null,
+
 conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
     icon: {
@@ -102,7 +104,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 			});
 		});
 	}
-//	motioncalc.app.mainView.setActiveItem(1);
+	motioncalc.app.mainView.setActiveItem(2);
     },
 
     onUpdated: function() {

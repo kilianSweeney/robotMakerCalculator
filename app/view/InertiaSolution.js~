@@ -16,7 +16,6 @@ Ext.define('motioncalc.view.InertiaSolution', {
 			title: 'Inertia Solution',
 			id: 'InertiaSolutionTop',
 			items: [
-				{xtype: 'spacer'},
 				{
 					xtype:'button', 
 					name:'buttonInertiaReturn', 
@@ -27,6 +26,8 @@ Ext.define('motioncalc.view.InertiaSolution', {
 						tap: function(){motioncalc.app.mainView.setActiveItem(2);}
 					}
 				},
+				{xtype: 'spacer'},
+
 			]
 		    },
 			{
@@ -40,12 +41,27 @@ Ext.define('motioncalc.view.InertiaSolution', {
 						html:'<canvas id="shapeCanvas" style="border: 1px solid black;background:#cccccc;" height="300" weight="300"></canvas>'
 					},
 					{
-						xtype:'container',
+						xtype:'textareafield',
 						name:'inertiaSolutionBox',
 						id:'inertiaSolutionBox',
+						readOnly: true
+					},
+				]
+			},
+			{
+				xtype:'container',
+				name:'unitsSolutionWrapper',
+				id:'unitsSolutionWrapper',
+				items: [
+					{
+						xtype:'textareafield',
+						name:'unitsSolutionBox',
+						id:'unitsSolutionBox',
+						readOnly: true
 					},
 				]
 			}
+
 		]
 	},
 });

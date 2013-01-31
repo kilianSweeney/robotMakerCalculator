@@ -42,6 +42,11 @@ Ext.define('motioncalc.controller.Units', {
 					selectField.setValue(0);
 				}				
 			},
+			buttonResult: {
+				tap: function(){
+
+				}
+			},
 			buttonAdd: {
 				tap: function(){
 					function errMsg(){
@@ -56,7 +61,7 @@ Ext.define('motioncalc.controller.Units', {
 							case "Density":
 							inertiaType = motioncalc.app.density;	
 							inertiaField = Ext.getCmp('inertiaDensity');
-							if(inertiaField.getDisabled !== false){
+							if(inertiaField.getDisabled() !== false){
 								errMsg();
 								return;	
 							}
@@ -65,7 +70,7 @@ Ext.define('motioncalc.controller.Units', {
 							case "Mass":
 							inertiaType = motioncalc.app.mass;	
 							inertiaField = Ext.getCmp('inertiaMass');
-							if(inertiaField.getDisabled == true){
+							if(inertiaField.getDisabled() == true){
 								errMsg();
 								return;	
 							}
@@ -74,7 +79,7 @@ Ext.define('motioncalc.controller.Units', {
 							case "Linear distance":
 							toType = motioncalc.app.linearDistance;
 							var 	selectForInertia = Ext.getCmp('selectForInertia'),
-								options = [{text:'-select inertia field to add this value to-',value:0}],
+								options = [{text:'-select inertia field-',value:0}],
 								inertiaFields = [
 									{text:'Height',value:'inertiaHeight'},
 									{text:'Length',value:'inertiaLength'},

@@ -42,6 +42,12 @@ Ext.define('motioncalc.controller.Units', {
 					selectField.setValue(0);
 				}				
 			},
+			buttonResult: {
+				tap: function(){
+					motioncalc.app.answerFrom = 'units';
+					motioncalc.app.mainView.setActiveItem(5);
+				}
+			},
 			buttonAdd: {
 				tap: function(){
 					function errMsg(){
@@ -56,7 +62,7 @@ Ext.define('motioncalc.controller.Units', {
 							case "Density":
 							inertiaType = motioncalc.app.density;	
 							inertiaField = Ext.getCmp('inertiaDensity');
-							if(inertiaField.getDisabled !== false){
+							if(inertiaField.getDisabled() !== false){
 								errMsg();
 								return;	
 							}
@@ -65,7 +71,7 @@ Ext.define('motioncalc.controller.Units', {
 							case "Mass":
 							inertiaType = motioncalc.app.mass;	
 							inertiaField = Ext.getCmp('inertiaMass');
-							if(inertiaField.getDisabled == true){
+							if(inertiaField.getDisabled() == true){
 								errMsg();
 								return;	
 							}

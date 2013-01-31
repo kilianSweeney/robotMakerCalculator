@@ -38,7 +38,7 @@ inertiaCalc: function(){
 			Izz = this.eqnParallelIxx('Izz');
 			IxxPrime = this.eqnParallelIxx('IxxPrime');
 			IyyPrime = this.eqnParallelIxx('IyyPrime');
-			mass = this.eqnCylinderIxx('mass');
+			mass = this.eqnParallelIxx('mass');
 			break;
 		case 'slenderRod':
 			Ixx = this.eqnRodIxx('Ixx');
@@ -136,7 +136,7 @@ eqnParallelIxx: function(field){
 	sngW = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaWidth').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
 	sngH = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaHeight').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
 
-	if (Ext.getCmp('isMass').value==1){
+	if (Ext.getCmp('isMass').get('value')==1){
 		sngMass = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaMass').get('value'), motioncalc.app.mass,motioncalc.app.MASSBASEUNITS, 'Mass');
 	}
 	else{
@@ -166,7 +166,9 @@ eqnParallelIxx: function(field){
 		case 'IyyPrime':
 			//sngI = sngMass / 12# * sngH ^ 2 + sngMass / 3# * sngL ^ 2
 			Ixx=(sngMass/12) * (Math.pow(sngH,2)) +((sngMass/3)*Math.pow(sngL,2));
+			break;
 		case 'mass':
+//			console.log(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');
 			return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');	
 	}
 								
@@ -190,16 +192,13 @@ eqnCylinderIxx: function(field){
 	}
 	else{
 		sngDensity = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaDensity').getValue(), motioncalc.app.density, motioncalc.app.DENSITYBASEUNITS,'Density');
-//		console.log(Ext.getCmp('inertiaDensity').getValue() + '|' + motioncalc.app.density + '|' + motioncalc.app.DENSITYBASEUNITS);
 		sngMass=sngDensity * motioncalc.app.PI * (Math.pow(sngOR,2)-Math.pow(sngIR,2)) * sngL;
-//		console.log(sngDensity + '|' + motioncalc.app.PI + '|' + (Math.pow(sngOR,2)-Math.pow(sngIR,2)) + '|' + sngL);
 	}	
 	switch(field)
 	{
 		case 'Ixx':
 			//sngI = sngMass * ((sngOR ^ 2 + sngIR ^ 2) / 4# + sngL ^ 2 / 12#)
 			Ixx=sngMass * ((Math.pow(sngOR,2)+Math.pow(sngIR,2))/4+Math.pow(sngL,2)/12);
-//			console.log(sngMass + '|' + motioncalc.app.MASSBASEUNITS + '|' + motioncalc.app.mass);
 //			Ext.getCmp('inertiaMass').set('value',motioncalc.app.conversionFunctions.unitsConvert(sngMass, motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass'));
 			break;
 		case 'Iyy':
@@ -219,6 +218,7 @@ eqnCylinderIxx: function(field){
 			break;
 		case 'mass':
 			//sngI = sngMass / 3# * sngL ^ 2 + sngMass / 4# * (sngOR ^ 2 + sngIR ^ 2)
+//			console.log(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');
 			return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');	
 	}
 	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');

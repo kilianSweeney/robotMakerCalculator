@@ -8,15 +8,84 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 		control: {
 			inertiaView: {
 				activate: function(){
-					var 	shape = Ext.getCmp('inertiaShape').getValue(),
-						solutionHTML = Ext.getCmp('inertiaAnswer').get('html');
-					this.animateShape(null,null,0,shape);					
-					Ext.getCmp('inertiaSolutionBox').set('html',solutionHTML);
+					switch(motioncalc.app.answerFrom){
+						case null:
+						return;
+						break;
+						case 'inertia':
+						setInertiaSolution(this);
+						break;
+						case 'units':
+						setUnitsSolution();
+						break;
+					}
+					function setUnitsSolution(){
+						Ext.getCmp('inertiaSolutionWrapper').hide();
+						Ext.getCmp('unitsSolutionWrapper').show();
+					}
+					function setInertiaSolution(controller){
+						Ext.getCmp('inertiaSolutionWrapper').show();
+						Ext.getCmp('unitsSolutionWrapper').hide();
+						var 	shape = Ext.getCmp('inertiaShape').getValue(),
+							densityStr = Ext.getCmp('inertiaDensity').getDisabled() ? '' : 'Density: ' + motioncalc.app.conversionFunctions.getValue(Ext.getCmp('inertiaDensity').getValue()) +  motioncalc.app.density  + '\n',
+							massStr = 'Mass: ' + motioncalc.app.conversionFunctions.getValue(Ext.getCmp('inertiaMass').getValue()) + motioncalc.app.mass + '\n',
+							solutionStr = 'Shape: ' + shape + '\n' + densityStr + massStr,
+							dimensions = [
+								['inertiaHeight','Height: '],
+								['inertiaLength','Length: ',],
+								['inertiaWidth','Width: '],
+								['outsideDiameter','OD: '],
+								['insideDiameter','ID: '],
+								['radius','Radius: '],
+							],
+							inertiaAnswers = [];
+
+						for(var i = 0;i<dimensions.length;i++){
+							solutionStr+= Ext.getCmp(dimensions[i][0]).isHidden() ? '' :dimensions[i][1] + motioncalc.app.conversionFunctions.getValue(Ext.getCmp(dimensions[i][0]).getValue()) + motioncalc.app.linearDistance + '\n';
+						}				
+						solutionStr += '-----------------------\n\n';								
+						if(typeof window.inertiaAnswers != 'undefined'){
+							for(var i=0;i<window.inertiaAnswers.length;i++){
+								var 	text = window.inertiaAnswers[i][0];
+								if(text.indexOf('Mass')==-1){
+									solutionStr += window.inertiaAnswers[i][0].replace('&#180;','\'').replace('&#180;','\'') + ': '  + window.inertiaAnswers[i][1] + motioncalc.app.inertia +'\n';
+								
+								}
+								switch(text){
+									case 'Ixx':
+									text = 'xx';
+									break;
+									case 'Ix&#180;x&#180;':
+									text = 'xxPrime';
+									break;
+									case 'Iyy':
+									text = 'yy';
+									break;
+									case 'Iy&#180;y&#180;':
+									text = 'yyPrime';
+									break;
+									case 'Izz':
+									text = 'zz';
+									break;
+									default:
+									text = null;
+									break;
+
+								}
+								if(text != null)inertiaAnswers.push([text,window.inertiaAnswers[i][1]]);
+							}
+						}
+						else inertiaAnswers.push(['',0,0]);
+					
+	//					this.animateShape(null,null,0,shape,[['yyPrime','3.783335e+101'],['yy','3.783335e+101'],['xxPrime','3.783335e+101'],['xx','3.783335e+101'],['zz','3.783335e+101']]);
+						controller.animateShape(null,null,0,shape,inertiaAnswers);										
+						Ext.getCmp('inertiaSolutionBox').set('value',solutionStr);
+					}
 				}
 			},
 		}
 	},
-	animateShape: function(oX,oY,route,shape){
+	animateShape: function(oX,oY,route,shape,answers){
 	function drawTitle() {
 		ctx.beginPath();
 		ctx.font = "1em Arial";
@@ -33,6 +102,20 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 			else ctx.fillStyle = 'black';
 			ctx.beginPath();
 			ctx.fillText(labels[i][0], labels[i][1], labels[i][2]);	
+		}		
+	}
+	function drawAnswers(){
+		var 	labels = getAnswerLabels();
+		ctx.font = "normal .75em Arial";
+		ctx.fillStyle = '#999999';
+		for(var i = 0;i<labels.length;i++){
+			var answerStr = '';
+			for(var ii = 0;ii<answers.length;ii++){
+				if(labels[i][0] == answers[ii][0])answerStr = answers[ii][1];
+			}
+			ctx.textAlign=labels[i][3];
+			ctx.beginPath();
+			ctx.fillText(answerStr, labels[i][1], labels[i][2]);	
 		}		
 	}
 	function drawDimensions(){
@@ -88,8 +171,8 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 		ctx.stroke();
 		ctx.closePath();
 		if(typeof route != 'undefined'){		
-			setTimeout('motioncalc.app.getController("InertiaSolution").animateShape(0,' + newPosition + ',' + route + ',"' + shape + '")',1);
-//			animateShape(0,newPosition,route,shape);
+			setTimeout(function(){motioncalc.app.getController("InertiaSolution").animateShape(0,newPosition,route,shape,answers);},1);
+//			animateShape(0,newPosition,route,shape,answers);
 		}
 	}
 
@@ -100,8 +183,8 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 		ctx.stroke();
 		ctx.closePath();
 		if(typeof route != 'undefined'){		
-			setTimeout('motioncalc.app.getController("InertiaSolution").animateShape(' + newPos[0] + ',' + newPos[1] + ','  + route + ',"' + shape + '")',1);
-//			animateShape(newPos[0],newPos[1],route,shape);
+			setTimeout(function(){motioncalc.app.getController("InertiaSolution").animateShape(newPos[0],newPos[1],route,shape,answers);},1);
+//			animateShape(newPos[0],newPos[1],route,shape,answers);
 		}
 	}
 	var 	canvas = document.getElementById("shapeCanvas"),
@@ -150,6 +233,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 			drawInertia();
 			drawDimensions();
 			drawLabels();
+			drawAnswers();
 			return;
 		}
 		isCircle = (allRoutes[route][3][0]=='circle');
@@ -224,6 +308,66 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 				break;				
 		}
 	}
+	function getAnswerLabels(){
+		switch(shape)
+		{
+			case 'cylinder':
+				return [
+//					answer,x,y,align
+					['yyPrime',103,13,'left'],
+					['yy',157,29,'left'],
+					['xxPrime',191,67,'right'],
+					['xx',245,126,'right'],
+					['zz',261,275,'right'],
+				];
+				break;
+			case 'parallelepiped':
+				return [
+//					answer,x,y,align
+					['yyPrime',101,21,'right'],
+					['yy',135,19,'left'],
+					['xxPrime',235,82,'right'],
+					['xx',290,148,'right'],
+					['zz',223,259,'right'],
+				];
+				break;
+			case 'sphericalShell':
+				return [
+//					answer,x,y,align
+					['yy',143,18,'right'],
+					['xx',30,146,'left'],
+					['zz',252,263,'right'],
+				];
+				break;
+			case 'sphere':
+				return [
+//					answer,x,y,align
+					['yy',143,18,'right'],
+					['xx',30,146,'left'],
+					['zz',252,263,'right'],
+				];
+				break;
+			case 'slenderRod':
+				return [
+//					answer,x,y,align
+					['yyPrime',60,18,'left'],
+					['yy',162,100,'left'],
+					['xxPrime',106,43,'left'],
+					['xx',194,158,'left'],
+					['zz',262,273,'right'],
+				];
+				break;
+			case 'tetrahedron':
+				return [
+//					answer,x,y,align
+					['yy',278,213,'right'],
+					['xx',95,245,'right'],
+					['zz',114,19,'right'],
+				];
+				break;				
+		}
+	}
+
 	function getLabels(){
 		switch(shape)
 		{

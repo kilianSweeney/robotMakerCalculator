@@ -39,6 +39,7 @@ Ext.define('motioncalc.controller.Inertia', {
 			},
 			buttonInertiaSolution: {
 				tap: function(){
+					motioncalc.app.answerFrom = 'inertia';
 					motioncalc.app.mainView.setActiveItem(5);
 				}
 			},
@@ -123,22 +124,21 @@ Ext.define('motioncalc.controller.Inertia', {
 		mass = null;
 		itemCount = answers.length;
 		returnString = '<ul>';
+		window.inertiaAnswers = [];		
 		for(var i = 0; i < itemCount; i++){
-//			console.log(answers[i][0]+'|'+answers[i][1]);
 			if(answers[i][1]!==null){
+				window.inertiaAnswers.push([answers[i][0],motioncalc.app.conversionFunctions.getValue(answers[i][1])]);
 				var 	isMassEntry = (answers[i][0].indexOf('Mass') > -1),
 					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.linearDistance;
 				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
 				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
 			}
 		}
-//		returnString = returnString.substring(0,(returnString.length-3));
 		returnString += '</ul>';
 		inertiaAnswer.set('html',returnString);
 		inertiaAnswer.show({type :"slide",direction : "right", duration : 500});
 		if(mass !== null){
 			Ext.getCmp('inertiaMass').set('value',mass);
-//			console.log(Ext.getCmp('inertiaMass').get('value')+'|'+mass);
 		}
 	},
 	changeDensityMass: function(isMass){

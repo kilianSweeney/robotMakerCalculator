@@ -23,7 +23,10 @@ Ext.define('motioncalc.view.InertiaSolution', {
 					text:'return',
 					disabled:false,
 					listeners: {
-						tap: function(){motioncalc.app.mainView.setActiveItem(2);}
+						tap: function(){
+							if(motioncalc.app.answerFrom=='inertia')motioncalc.app.mainView.setActiveItem(2);
+							else motioncalc.app.mainView.setActiveItem(1);
+						}
 					}
 				},
 				{xtype: 'spacer'},
@@ -41,12 +44,27 @@ Ext.define('motioncalc.view.InertiaSolution', {
 						html:'<canvas id="shapeCanvas" style="border: 1px solid black;background:#cccccc;" height="300" weight="300"></canvas>'
 					},
 					{
-						xtype:'container',
+						xtype:'textareafield',
 						name:'inertiaSolutionBox',
 						id:'inertiaSolutionBox',
+						readOnly: true
+					},
+				]
+			},
+			{
+				xtype:'container',
+				name:'unitsSolutionWrapper',
+				id:'unitsSolutionWrapper',
+				items: [
+					{
+						xtype:'textareafield',
+						name:'unitsSolutionBox',
+						id:'unitsSolutionBox',
+						readOnly: true
 					},
 				]
 			}
+
 		]
 	},
 });
