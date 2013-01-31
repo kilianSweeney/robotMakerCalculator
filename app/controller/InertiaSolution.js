@@ -8,8 +8,10 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 		control: {
 			inertiaView: {
 				activate: function(){
-					shape = Ext.getCmp('inertiaShape').getValue();
-					this.animateShape(null,null,0,shape);
+					var 	shape = Ext.getCmp('inertiaShape').getValue(),
+						solutionHTML = Ext.getCmp('inertiaAnswer').get('html');
+					this.animateShape(null,null,0,shape);					
+					Ext.getCmp('inertiaSolutionBox').set('html',solutionHTML);
 				}
 			},
 		}

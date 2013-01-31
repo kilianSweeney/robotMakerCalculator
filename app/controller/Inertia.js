@@ -122,14 +122,18 @@ Ext.define('motioncalc.controller.Inertia', {
 		returnString='';
 		mass = null;
 		itemCount = answers.length;
+		returnString = '<ul>';
 		for(var i = 0; i < itemCount; i++){
 //			console.log(answers[i][0]+'|'+answers[i][1]);
 			if(answers[i][1]!==null){
-				returnString += answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="pipe">|</span> ' ;
-				if(answers[i][0].indexOf('Mass') > -1 && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
+				var 	isMassEntry = (answers[i][0].indexOf('Mass') > -1),
+					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.linearDistance;
+				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
+				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
 			}
 		}
-		returnString = returnString.substring(0,(returnString.length-3));
+//		returnString = returnString.substring(0,(returnString.length-3));
+		returnString += '</ul>';
 		inertiaAnswer.set('html',returnString);
 		inertiaAnswer.show({type :"slide",direction : "right", duration : 500});
 		if(mass !== null){
@@ -142,16 +146,16 @@ Ext.define('motioncalc.controller.Inertia', {
 		mass = Ext.getCmp('inertiaMass');
 		density = Ext.getCmp('inertiaDensity');
 		if(isMass){
-			mass.setReadOnly(false);
+			mass.setDisabled(false);
 			Ext.getCmp('buttonMaterials').setDisabled(true);
-			density.setReadOnly(true);
+			density.setDisabled(true);
 			density.setValue(0);
 			
 		}
 		else {
-			density.setReadOnly(false);
+			density.setDisabled(false);
 			Ext.getCmp('buttonMaterials').setDisabled(false);
-			mass.setReadOnly(true);
+			mass.setDisabled(true);
 			mass.setValue(0);
 		}
 		this.setInertiaAnswer(motioncalc.app.inertiaFunctions.inertiaCalc());

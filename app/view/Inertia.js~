@@ -19,6 +19,13 @@ Ext.define('motioncalc.view.Inertia', {
                 xtype: 'toolbar',
                 title: 'INERTIA CALC',
 		items: [
+			{
+				xtype:'button', 
+				name:'buttonInertiaSolution', 
+				id:'buttonInertiaSolution', 
+				text:'result',
+				disabled:false,
+			},
 			{xtype: 'spacer'},
 			{
 				xtype:'button', 
@@ -73,7 +80,7 @@ Ext.define('motioncalc.view.Inertia', {
 				id: 'inertiaDensity',
 				cls: ['convert-for-it'],
 				label: 'Density',
-				readonly: true
+				disabled: true
 			    },
 			    {
 				xtype: 'numberfield',
@@ -82,7 +89,6 @@ Ext.define('motioncalc.view.Inertia', {
 				id: 'inertiaMass',
 				cls: 'convert-for-it',
 				label: 'Mass',
-				readonly: false
 			    },
 			    {
 				xtype: 'numberfield',

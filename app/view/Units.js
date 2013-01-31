@@ -22,9 +22,25 @@ Ext.define('motioncalc.view.Units', {
 				id: 'buttonUnitsResult',
 				text: 'result',
 				disabled: true
+			},
+			{
+				xtype: 'spacer',
+			},
+			{
+				xtype: 'button',
+				id: 'buttonAddToInertia',
+				text: '+ Inertia Calc',
+				disabled: true
 			}
 		]
+
             },
+		{
+		xtype: 'selectfield',
+		name : 'selectForInertia',
+		id: 'selectForInertia',
+		hidden: 'true',
+		},
 		{
 			xtype: 'hiddenfield',
 			name: 'unitsResultStatus',
@@ -126,9 +142,9 @@ Ext.define('motioncalc.view.Units', {
 		Ext.getCmp('unitsAmount').on({
 			blur: function(){sendToUnitsConvert();}
 		});
-//		this.on({
-//			activate: function(){sendToUnitsConvert();}
-//		});
+		this.on({
+			activate: function(){sendToUnitsConvert();}
+		});
 		Ext.getCmp('unitsResultStatus').setValue(0);
 	}
 });

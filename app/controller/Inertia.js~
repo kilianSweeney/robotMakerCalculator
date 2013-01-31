@@ -9,7 +9,8 @@ Ext.define('motioncalc.controller.Inertia', {
 			shape: '#inertiaShape',
 			inertiaView: '#inertiaID',
 			numberFields: 'numberfield',
-			buttonMaterials: '#buttonMaterials'
+			buttonMaterials: '#buttonMaterials',
+			buttonInertiaSolution : '#buttonInertiaSolution'
 		},
 		control: {
 			materials: {
@@ -35,6 +36,11 @@ Ext.define('motioncalc.controller.Inertia', {
 			},
 			buttonMaterials: {
 				tap: function(){Ext.getCmp('inertiaMaterials').showPicker();}
+			},
+			buttonInertiaSolution: {
+				tap: function(){
+					motioncalc.app.mainView.setActiveItem(5);
+				}
 			},
 		}
 	},
@@ -116,14 +122,18 @@ Ext.define('motioncalc.controller.Inertia', {
 		returnString='';
 		mass = null;
 		itemCount = answers.length;
+		returnString = '<ul>';
 		for(var i = 0; i < itemCount; i++){
 //			console.log(answers[i][0]+'|'+answers[i][1]);
 			if(answers[i][1]!==null){
-				returnString += answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="pipe">|</span> ' ;
-				if(answers[i][0].indexOf('Mass') > -1 && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
+				var 	isMassEntry = (answers[i][0].indexOf('Mass') > -1),
+					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.linearDistance;
+				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
+				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
 			}
 		}
-		returnString = returnString.substring(0,(returnString.length-3));
+//		returnString = returnString.substring(0,(returnString.length-3));
+		returnString += '</ul>';
 		inertiaAnswer.set('html',returnString);
 		inertiaAnswer.show({type :"slide",direction : "right", duration : 500});
 		if(mass !== null){

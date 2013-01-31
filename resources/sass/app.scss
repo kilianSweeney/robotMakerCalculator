@@ -66,3 +66,10 @@ $answer-color: #c23f2d;
 	color: $answer-color;
 }
 #inertiaAnswer .x-inner span.pipe,#unitsAnswer .x-inner span.pipe { color:$active-color; }
+#inertiaSolutionWrapper { margin: 0 auto; width: 600px; }
+#inertiaSolutionBox { float: left; width: 200px; margin-left: 40px; margin-top: 20px; }
+#inertiaSolutionBox ul li { margin-bottom: 10px; }
+#inertiaSolutionBox li span.unit-type { font-size: smaller; }
+#inertiaCanvas { float: left; }
+.x-phone #inertiaSolutionBox, .x-phone #inertiaCanvas { float: none; }
+//.x-phone #inertiaCanvas { margin-left:-20px; }
