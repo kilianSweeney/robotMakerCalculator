@@ -20,10 +20,23 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						break;
 					}
 					function setUnitsSolution(){
+						Ext.getCmp('InertiaSolutionTop').setTitle('Units Converter Solution');
+						var 	type = Ext.getCmp('unitsType').getValue(),
+							unitFrom = Ext.getCmp('unitsFrom').getValue(),
+							amountFrom = Ext.getCmp('unitsAmount').getValue(),
+							unitTo = Ext.getCmp('unitsTo').getValue(),
+							amountTo = Ext.getCmp('unitsAnswer').getHtml(),
+							answer;
+						answer = 'Measurement Type: ' + type + '\n';
+						answer += amountFrom + ' ' + unitFrom + ' = ';
+						answer += amountTo + ' ' + unitTo;
+						
 						Ext.getCmp('inertiaSolutionWrapper').hide();
 						Ext.getCmp('unitsSolutionWrapper').show();
+						Ext.getCmp('unitsSolutionBox').setValue(answer);
 					}
 					function setInertiaSolution(controller){
+						Ext.getCmp('InertiaSolutionTop').setTitle('Inertia Calculator Solution');
 						Ext.getCmp('inertiaSolutionWrapper').show();
 						Ext.getCmp('unitsSolutionWrapper').hide();
 						var 	shape = Ext.getCmp('inertiaShape').getValue(),

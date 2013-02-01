@@ -46,7 +46,7 @@
         }
     </style>
     <!-- The line below must be kept intact for Sencha Command to build your application -->
-<!--    <script id="microloader" type="text/javascript" src="touch/microloader/development.js"></script>-->
+    <script id="microloader" type="text/javascript" src="touch/microloader/development.js"></script>
 </head>
 <body>
     <div id="appLoadingIndicator">
@@ -54,6 +54,7 @@
         <div id="pong-ball" style="margin-bottom: 50px; height: 30px;-webkit-border-radius: 15px;" ></div>
         <div></div>
     </div>
+	<a id="tigerBabyButton"></a>
 <script type="text/javascript">
 function movePongBall(i,distance,goForward){
 	if(typeof motioncalc != 'undefined' && typeof motioncalc.app != 'undefined')return;

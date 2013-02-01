@@ -15,7 +15,7 @@ Ext.define('motioncalc.view.Main', {
             docked: 'bottom',
             layout: {
                 pack: 'center'
-            }
+            },
         },
         items: [
             { xtype: 'homeicons' },

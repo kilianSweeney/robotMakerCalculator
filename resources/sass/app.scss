@@ -51,15 +51,13 @@ $answer-color: #c23f2d;
 .convert-for-it .x-form-label { background-color: #ffffff; border-right: 1px dotted #dddddd }
 .convert-for-it.convert-active .x-form-label { background-color: $active-color; }
 #inertiaAnswer,#unitsAnswer {
-	border: 1px solid #02b3b2;
+	border: 1px solid #36648B;
 	margin: 0;
 	padding: 0;
 	border-radius: 3px;
 }
 #inertiaAnswer .x-inner,#unitsAnswer .x-inner {
-	border: 10px solid $active-color;
-	border-radius: 3px;
-	background: $base-color;
+	background: #cccccc;
 	padding: .5em;
 	text-align: center;
 	font-size: 2.5em;
@@ -72,3 +70,13 @@ $answer-color: #c23f2d;
 #inertiaCanvas { float: left; }
 .x-phone #inertiaSolutionBox, .x-phone #inertiaCanvas { float: none; }
 .x-phone #inertiaCanvas { margin-left:-10px; }
+#tigerBabyButton {
+		z-index: 100;
+		position:absolute;
+		bottom: 5px;
+		right: 5px;
+		height: 28px;
+		width: 28px;
+		background-image: url('/resources/icons/motioncalc/tigerbaby.png');
+		background-repeat: no-repeat;
+}
