@@ -58,6 +58,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
     launch: function() {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
+	Ext.DomHelper.append(document.body,{tag: 'a', id:'tigerBabyButton', href:'http://www.tigerbaby.me/robot-maker-calculator',target:'_blank' });
 	//set global vars
 	var decimalStyle, significantDigits,density,mass,linearDistance,inertia;
 	decimalStyle = motioncalc.app.getGlobalSetting('DecimalStyle');

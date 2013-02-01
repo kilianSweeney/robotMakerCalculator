@@ -63,12 +63,13 @@ $answer-color: #c23f2d;
 	font-size: 2.5em;
 	color: $answer-color;
 }
+.x-phone #inertiaAnswer .x-inner, .x-phone #unitsAnswer .x-inner { text-align: left; font-size: 2em; }
 #inertiaAnswer .x-inner span.pipe,#unitsAnswer .x-inner span.pipe { color:$active-color; }
 #inertiaSolutionWrapper { margin: 0 auto; width: 600px; }
-#inertiaSolutionBox { float: left; min-width: 200px; min-height:300px; margin-left: 40px; }
-#inertiaSolutionBox textarea { height:300px; }
+#inertiaSolutionBox { float: left; min-width: 200px; min-height:300px; max-width: 250px; margin-left: 40px; }
+#inertiaSolutionBox textarea { min-height:300px; }
 #inertiaCanvas { float: left; }
-.x-phone #inertiaSolutionBox, .x-phone #inertiaCanvas { float: none; }
+.x-phone #inertiaSolutionBox, .x-phone #inertiaCanvas { float: none; margin-left:0px;}
 .x-phone #inertiaCanvas { margin-left:-10px; }
 #tigerBabyButton {
 		z-index: 100;
@@ -77,6 +78,6 @@ $answer-color: #c23f2d;
 		right: 5px;
 		height: 28px;
 		width: 28px;
-		background-image: url('/resources/icons/motioncalc/tigerbaby.png');
+		background-image: url('../icons/motioncalc/tigerbaby.png');
 		background-repeat: no-repeat;
 }

@@ -23,7 +23,10 @@ Ext.define('motioncalc.view.InertiaSolution', {
 					text:'return',
 					disabled:false,
 					listeners: {
-						tap: function(){motioncalc.app.mainView.setActiveItem(2);}
+						tap: function(){
+							if(motioncalc.app.answerFrom=='inertia')motioncalc.app.mainView.setActiveItem(2);
+							else motioncalc.app.mainView.setActiveItem(1);
+						}
 					}
 				},
 				{xtype: 'spacer'},

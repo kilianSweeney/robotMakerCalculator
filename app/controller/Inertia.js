@@ -131,7 +131,9 @@ Ext.define('motioncalc.controller.Inertia', {
 				var 	isMassEntry = (answers[i][0].indexOf('Mass') > -1),
 					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.linearDistance;
 				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
-				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
+				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0)){
+					mass = answers[i][1];
+				}
 			}
 		}
 		returnString += '</ul>';

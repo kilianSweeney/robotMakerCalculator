@@ -39,6 +39,7 @@ Ext.define('motioncalc.controller.Inertia', {
 			},
 			buttonInertiaSolution: {
 				tap: function(){
+					motioncalc.app.answerFrom = 'inertia';
 					motioncalc.app.mainView.setActiveItem(5);
 				}
 			},
@@ -130,14 +131,18 @@ Ext.define('motioncalc.controller.Inertia', {
 				var 	isMassEntry = (answers[i][0].indexOf('Mass') > -1),
 					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.linearDistance;
 				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
-				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
+				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0)){
+					console.log(answers[i][1]);
+					mass = answers[i][1];
+				}
 			}
 		}
 		returnString += '</ul>';
 		inertiaAnswer.set('html',returnString);
 		inertiaAnswer.show({type :"slide",direction : "right", duration : 500});
 		if(mass !== null){
-			Ext.getCmp('inertiaMass').set('value',mass);
+			console.log(mass);
+			Ext.getCmp('inertiaMass').set('value',cFunctions.getValue(mass));
 		}
 	},
 	changeDensityMass: function(isMass){

@@ -47,7 +47,6 @@ Ext.define('motioncalc.view.InertiaSolution', {
 						xtype:'textareafield',
 						name:'inertiaSolutionBox',
 						id:'inertiaSolutionBox',
-						readOnly: true
 					},
 				]
 			},
@@ -60,7 +59,6 @@ Ext.define('motioncalc.view.InertiaSolution', {
 						xtype:'textareafield',
 						name:'unitsSolutionBox',
 						id:'unitsSolutionBox',
-						readOnly: true
 					},
 				]
 			}

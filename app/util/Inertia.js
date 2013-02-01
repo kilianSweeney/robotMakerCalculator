@@ -220,7 +220,7 @@ eqnCylinderIxx: function(field){
 			//sngI = sngMass / 3# * sngL ^ 2 + sngMass / 4# * (sngOR ^ 2 + sngIR ^ 2)
 //			console.log(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');
 			return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');	
-	}
+	}	
 	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
 
 },
