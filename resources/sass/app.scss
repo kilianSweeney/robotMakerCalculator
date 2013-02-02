@@ -30,7 +30,7 @@ $answer-color: #c23f2d;
   background-image:none!important;
 }
 .x-button-label,
-.x-title { color: #36648B!important; }
+.x-title { color: #36648B!important; text-shadow: 1px 1px 1px rgba(178, 234, 248, 1)!important; }
 .x-toolbar-dark.x-docked-top { border-bottom-color: #36648B!important; }
 
 .x-button.danger-class {
@@ -69,6 +69,7 @@ $answer-color: #c23f2d;
 #inertiaSolutionBox { float: left; min-width: 200px; min-height:300px; max-width: 250px; margin-left: 40px; }
 #inertiaSolutionBox textarea { min-height:300px; }
 #inertiaCanvas { float: left; }
+#inertiaCanvas .x-innerhtml { overflow-x: auto; }
 .x-phone #inertiaSolutionBox, .x-phone #inertiaCanvas { float: none; margin-left:0px;}
 .x-phone #inertiaCanvas { margin-left:-10px; }
 #tigerBabyButton {

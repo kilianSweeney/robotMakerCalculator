@@ -36,10 +36,6 @@ Ext.define('motioncalc.view.AddMaterial', {
 				}
 			]
 		    },
-{
-	xtype:'container',
-	html:'<canvas id="shapeCanvas" width="300" height="300"></canvas>'
-},
 		    {
 			xtype: 'fieldset',
 			items: [

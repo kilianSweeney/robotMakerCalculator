@@ -132,7 +132,6 @@ Ext.define('motioncalc.controller.Inertia', {
 					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.linearDistance;
 				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
 				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0)){
-					console.log(answers[i][1]);
 					mass = answers[i][1];
 				}
 			}
@@ -141,8 +140,7 @@ Ext.define('motioncalc.controller.Inertia', {
 		inertiaAnswer.set('html',returnString);
 		inertiaAnswer.show({type :"slide",direction : "right", duration : 500});
 		if(mass !== null){
-			console.log(mass);
-			Ext.getCmp('inertiaMass').set('value',cFunctions.getValue(mass));
+			Ext.getCmp('inertiaMass').set('value',mass);
 		}
 	},
 	changeDensityMass: function(isMass){

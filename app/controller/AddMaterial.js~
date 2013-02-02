@@ -1,70 +1,6 @@
 Ext.define('motioncalc.controller.AddMaterial', {
 	extend : 'Ext.app.Controller',
 	requires : 'motioncalc.store.MaterialDensities',
-animateShape: function(oX,oY,route){
-	function drawCircle(circleLocation,newPosition,radius,route){
-		oldPi = 0.01;
-		newPi = oldPi + (newPosition/100);
-		console.log(newPi);
-		newPi = newPi * Math.PI;
-		ctx.beginPath();
-		ctx.arc(circleLocation[0],circleLocation[1],radius,oldPi,newPi,false);
-		ctx.stroke();
-		ctx.closePath();		
-		setTimeout('motioncalc.app.getController("AddMaterial").animateShape(0,' + newPosition + ','  + route + ')',1);
-	}
-	function drawLine(curPos,newPos,route){
-		ctx.beginPath();
-		ctx.moveTo(curPos[0],curPos[1]);
-		ctx.lineTo(newPos[0],newPos[1]);
-		ctx.stroke();
-		ctx.closePath();
-		setTimeout('motioncalc.app.getController("AddMaterial").animateShape(' + newPos[0] + ',' + newPos[1] + ','  + route + ')',1);
-	}
-	var 	canvas = document.getElementById("shapeCanvas"),
-		ctx = canvas.getContext("2d"),
-		allRoutes = [
-			[[0,0],[0,100],[0,1]],
-			[[0,100],[100,100],[1,0]],
-			[[100,100],[100,0],[0,-1]],
-			[[100,0],[0,0],[-1,0]],
-			[[50,50],[200,0],[20,null]],
-		],
-		newRoute = false;
-		nX = oX + allRoutes[route][2][0];
-		nY = oY + allRoutes[route][2][1];
-		curPos = [oX,oY],
-		newPos = [nX,nY],
-		endPos = [allRoutes[route][1][0],allRoutes[route][1][1]],
-		isCircle = (allRoutes[route][2][1]==null);
-	if(isCircle){
-		newPos[0]=oY;
-		newPos[1]=0;
-	}
-	if(newPos[0] == endPos[0] && newPos[1] == endPos[1]){
-		newRoute = true;
-		route++;
-		if(typeof allRoutes[route] == 'undefined')return;
-		isCircle = allRoutes[route][2][1]==null;
-		if(!isCircle){
-			curPos[0] = allRoutes[route][0][0];
-			curPos[1] = allRoutes[route][0][1];
-			newPos[0] = curPos[0] + allRoutes[route][2][0];
-			newPos[1] = curPos[1] + allRoutes[route][2][1];
-		}
-	}
-	if(isCircle){
-		curPos[0] = allRoutes[route][0][0];
-		curPos[1] = allRoutes[route][0][1];
-		newPos[0] = newRoute ? 0 : oY + 1;
-		newPos[1] = allRoutes[route][1][1];
-	}
-//	if(oY==360)return;
-	ctx.lineWidth = 1;
-	ctx.strokeStyle = 'red';
-	if(isCircle)drawCircle(curPos,newPos[0],allRoutes[route][2][0],route);
-	else drawLine(curPos,newPos,route);
-},
 	config: {
 		views : ['motioncalc.view.AddMaterial'],
 		refs : {
@@ -76,11 +12,6 @@ animateShape: function(oX,oY,route){
 			addMaterialView: '#addMaterialID',
 		},
 		control: {
-			addMaterialView: {
-				activate: function(){
-setTimeout('motioncalc.app.getController("AddMaterial").animateShape(0,0,0)',1000);
-				}
-			},
 			materials: {
 				change: function(){
 					var record, name,value,densities;

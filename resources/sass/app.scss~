@@ -67,8 +67,9 @@ $answer-color: #c23f2d;
 #inertiaAnswer .x-inner span.pipe,#unitsAnswer .x-inner span.pipe { color:$active-color; }
 #inertiaSolutionWrapper { margin: 0 auto; width: 600px; }
 #inertiaSolutionBox { float: left; min-width: 200px; min-height:300px; max-width: 250px; margin-left: 40px; }
-#inertiaSolutionBox textarea { height:300px; }
+#inertiaSolutionBox textarea { min-height:300px; }
 #inertiaCanvas { float: left; }
+#inertiaCanvas .x-innerhtml { overflow-x: auto; }
 .x-phone #inertiaSolutionBox, .x-phone #inertiaCanvas { float: none; margin-left:0px;}
 .x-phone #inertiaCanvas { margin-left:-10px; }
 #tigerBabyButton {

@@ -13,7 +13,7 @@ Ext.define('motioncalc.view.InertiaSolution', {
 		    {
 			docked: 'top',
 			xtype: 'toolbar',
-			title: 'Inertia Solution',
+			title: 'INERTIA SOLUTION',
 			id: 'InertiaSolutionTop',
 			items: [
 				{
@@ -30,7 +30,25 @@ Ext.define('motioncalc.view.InertiaSolution', {
 					}
 				},
 				{xtype: 'spacer'},
-
+				{
+					xtype:'button', 
+					name:'buttonSendSolution', 
+					id:'buttonSendSolution', 
+					text:'send',
+					disabled:false,
+					listeners: {
+						tap: function(){
+							var 	solutionStr = Ext.getCmp('InertiaSolutionTop').getTitle().getTitle().indexOf('INERTIA') > -1 ? 'inertia' : 'units',
+								subject = "tigerBaby's Robot Maker Calculator (" + solutionStr + ") Solution",			
+								mailTo;
+							solutionStr += 'SolutionBox';
+							solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D');
+							mailTo = 'mailto:?subject='+subject+'&body='+solutionStr;
+//							console.log(mailTo);							
+							window.open(mailTo);
+						}
+					}
+				},
 			]
 		    },
 			{

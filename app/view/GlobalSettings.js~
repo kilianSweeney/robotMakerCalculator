@@ -15,7 +15,7 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		    {
 			docked: 'top',
 			xtype: 'toolbar',
-			title: 'Global Settings',
+			title: 'GLOBAL SETTINGS',
 			items: [
 				{xtype: 'spacer'},
 				{

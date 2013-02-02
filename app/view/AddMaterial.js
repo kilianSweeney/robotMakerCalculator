@@ -16,7 +16,7 @@ Ext.define('motioncalc.view.AddMaterial', {
 		    {
 			docked: 'top',
 			xtype: 'toolbar',
-			title: 'Add Material',
+			title: 'ADD MATERIAL',
 			id: 'AddMaterialTop',
 			items: [
 				{

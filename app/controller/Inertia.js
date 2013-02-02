@@ -129,7 +129,7 @@ Ext.define('motioncalc.controller.Inertia', {
 			if(answers[i][1]!==null){
 				window.inertiaAnswers.push([answers[i][0],motioncalc.app.conversionFunctions.getValue(answers[i][1])]);
 				var 	isMassEntry = (answers[i][0].indexOf('Mass') > -1),
-					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.linearDistance;
+					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.inertia;
 				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
 				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0)){
 					mass = answers[i][1];

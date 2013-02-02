@@ -32,7 +32,7 @@ Ext.define('motioncalc.view.GlobalSettings', {
 							Ext.getCmp('materialDensity').setValue(0);
 							Ext.getCmp('materialOriginalValue').setValue(null);
 							Ext.getCmp('materialName').setReadOnly(false);
-							Ext.getCmp('AddMaterialTop').setTitle('Add Material');
+							Ext.getCmp('AddMaterialTop').setTitle('ADD MATERIAL');
 							Ext.getCmp('buttonManageMaterials').set('text','edit material');
 							Ext.getCmp('buttonManageMaterials').removeCls('danger-class');
 							motioncalc.app.mainView.setActiveItem(pane);

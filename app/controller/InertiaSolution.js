@@ -27,7 +27,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						return solutionStr;
 					}
 					function setUnitsSolution(){
-						Ext.getCmp('InertiaSolutionTop').setTitle('Units Solution');
+						Ext.getCmp('InertiaSolutionTop').setTitle('UNITS SOLUTION');
 						var 	type = Ext.getCmp('unitsType').getValue(),
 							unitFrom = Ext.getCmp('unitsFrom').getValue(),
 							amountFrom = Ext.getCmp('unitsAmount').getValue(),
@@ -44,7 +44,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						Ext.getCmp('unitsSolutionBox').setValue(answer);
 					}
 					function setInertiaSolution(controller){
-						Ext.getCmp('InertiaSolutionTop').setTitle('Inertia Solution');
+						Ext.getCmp('InertiaSolutionTop').setTitle('INERTIA SOLUTION');
 						Ext.getCmp('inertiaSolutionWrapper').show();
 						Ext.getCmp('unitsSolutionWrapper').hide();
 						var 	shape = Ext.getCmp('inertiaShape').getValue(),
@@ -69,7 +69,8 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						if(typeof window.inertiaAnswers != 'undefined'){
 							for(var i=0;i<window.inertiaAnswers.length;i++){
 								var 	text = window.inertiaAnswers[i][0];
-									solutionStr += window.inertiaAnswers[i][0].replace('&#180;','\'').replace('&#180;','\'') + ': '  + window.inertiaAnswers[i][1] + motioncalc.app.inertia +'\n';
+									unitType = text.indexOf('Mass') === -1 ? motioncalc.app.inertia:motioncalc.app.mass,
+									solutionStr += window.inertiaAnswers[i][0].replace('&#180;','\'').replace('&#180;','\'') + ': '  + window.inertiaAnswers[i][1] + unitType +'\n';
 								
 								switch(text){
 									case 'Ixx':
@@ -87,7 +88,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 									case 'Izz':
 									text = 'zz';
 									break;
-									case 'mass':
+									case 'Mass':
 									text = 'Mass'
 									default:
 									text = null;
