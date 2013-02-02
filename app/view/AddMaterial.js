@@ -23,7 +23,7 @@ Ext.define('motioncalc.view.AddMaterial', {
 					xtype:'button', 
 					name:'buttonRestoreMaterials', 
 					id:'buttonRestoreMaterials', 
-					text:'restore list',
+					text:'restore',
 					disabled:false
 				},
 				{xtype: 'spacer'},

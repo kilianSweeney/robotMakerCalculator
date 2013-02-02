@@ -20,10 +20,10 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						break;
 					}
 					function tagSolutionString(){
-						var solutionStr = '\n\n----------------------------------------------\n';
+						var solutionStr = '\n\n----------------------------------------------\n\n';
 						solutionStr += 'tigerBaby\'s Robot Maker Calculator\n';
 						solutionStr += 'http://www.tigerbaby.me/robot-maker-calculator\n';
-						solutionStr += '----------------------------------------------\n\n';
+						solutionStr += '\n----------------------------------------------\n\n';
 						return solutionStr;
 					}
 					function setUnitsSolution(){
@@ -65,7 +65,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						for(var i = 0;i<dimensions.length;i++){
 							solutionStr+= Ext.getCmp(dimensions[i][0]).isHidden() ? '' :dimensions[i][1] + motioncalc.app.conversionFunctions.getValue(Ext.getCmp(dimensions[i][0]).getValue()) + motioncalc.app.linearDistance + '\n';
 						}				
-						solutionStr += '--------------------\n\n';								
+						solutionStr += '\n--------------------\n\n';								
 						if(typeof window.inertiaAnswers != 'undefined'){
 							for(var i=0;i<window.inertiaAnswers.length;i++){
 								var 	text = window.inertiaAnswers[i][0];
@@ -536,7 +536,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 //					start position, end position, radius/back-forward, type
 					[[200,200],[200,0],[40,null],['circle',null]],
 					[[200,200],[200,0],[20,null],['circle',null]],
-					[[225,167],[71,39],[-1,-1],['diag',1]],
+					[[225,169],[71,39],[-1,-1],['diag',1]],
 					[[71,71],[200,0],[40,null],['circle',null]],
 					[[172,230],[43,99],[-1,-1],['diag',0]],
 				];

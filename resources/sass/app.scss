@@ -30,7 +30,8 @@ $answer-color: #c23f2d;
   background-image:none!important;
 }
 .x-button-label,
-.x-title { color: #36648B!important; text-shadow: 1px 1px 1px rgba(178, 234, 248, 1)!important; }
+.x-title { color: #36648B!important; }
+.x-title { text-shadow: 1px 1px 1px rgba(178, 234, 248, 1)!important; }
 .x-toolbar-dark.x-docked-top { border-bottom-color: #36648B!important; }
 
 .x-button.danger-class {
@@ -82,3 +83,4 @@ $answer-color: #c23f2d;
 		background-image: url('../icons/motioncalc/tigerbaby.png');
 		background-repeat: no-repeat;
 }
+#inertiaAnswer ul li { padding: 2px 0px; border-bottom: 1px solid #999999; }

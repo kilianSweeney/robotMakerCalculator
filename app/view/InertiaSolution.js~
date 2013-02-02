@@ -42,10 +42,10 @@ Ext.define('motioncalc.view.InertiaSolution', {
 								subject = "tigerBaby's Robot Maker Calculator (" + solutionStr + ") Solution",			
 								mailTo;
 							solutionStr += 'SolutionBox';
-							solutionStr = Ext.getCmp(solutionStr).getValue().replace('\n','%0D');
+							solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D');
 							mailTo = 'mailto:?subject='+subject+'&body='+solutionStr;
 //							console.log(mailTo);							
-							window.open(mailTo);
+							window.locaton.href = mailTo;
 						}
 					}
 				},

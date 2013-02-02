@@ -105,7 +105,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 			});
 		});
 	}
-	motioncalc.app.mainView.setActiveItem(2);
+//	motioncalc.app.mainView.setActiveItem(2);
     },
 
     onUpdated: function() {
