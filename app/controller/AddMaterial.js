@@ -10,8 +10,23 @@ Ext.define('motioncalc.controller.AddMaterial', {
 			buttonOne: '#buttonManageMaterialOne',
 			buttonTwo: '#buttonManageMaterialTwo',
 			addMaterialView: '#addMaterialID',
+			materialName: '#materialName',
+			materialDensity: '#materialDensity',
+			materialUnitType: '#materialUnitType',
 		},
 		control: {
+			addMaterialView: {
+				activate: function(){
+					Ext.getCmp('manageMaterialActive').setValue(1);
+				}
+			},
+			materialName: {
+			},
+			materialDensity: {
+			},
+			materialUnitType: {
+			},
+
 			materials: {
 				change: function(){
 					var record, name,value,densities;

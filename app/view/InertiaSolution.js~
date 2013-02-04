@@ -45,7 +45,7 @@ Ext.define('motioncalc.view.InertiaSolution', {
 							solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D');
 							mailTo = 'mailto:?subject='+subject+'&body='+solutionStr;
 //							console.log(mailTo);							
-							window.locaton.href = mailTo;
+							window.location.href = mailTo;
 						}
 					}
 				},

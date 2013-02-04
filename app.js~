@@ -16,9 +16,9 @@ Ext.application({
     ],
 
     views: ['Main'],
-    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
-    models: ['GlobalSettings','MaterialDensities'],
-    controllers: ['Inertia','AddMaterial','InertiaSolution','Units'],
+    stores: ['AppState','HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
+    models: ['AppState','GlobalSettings','MaterialDensities'],
+    controllers: ['HomeIcons','GlobalSettings','Inertia','AddMaterial','InertiaSolution','Units'],
 mainView: null,
 
 //global vars
@@ -79,6 +79,8 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 	
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
+//	console.log('launch',this.getGlobalSetting('activeItem','_AppState'));
+	motioncalc.app.mainView.setActiveItem(this.getGlobalSetting('activeItem','_AppState'));
 	Ext.Viewport.add(motioncalc.app.mainView);
 	var isPhone = Ext.os.is('Phone');
 //	console.log(isPhone);
@@ -105,7 +107,6 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 			});
 		});
 	}
-	motioncalc.app.mainView.setActiveItem(2);
     },
 
     onUpdated: function() {
@@ -136,22 +137,40 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 			});
 		}
 	},
-	getGlobalSetting: function(id){
+	getGlobalSetting: function(id,store){
 		var rec,val;
-		rec = Ext.getStore('_GlobalSettings').getById(id);
+		store = (typeof store == 'undefined') ? '_GlobalSettings' : store; 
+		rec = Ext.getStore(store).getById(id);
 		val = rec===null?rec:rec.get('value');
 		return val;
 	},
-	setGlobalSetting: function(id,newValue){	
-		var stor = Ext.getStore('_GlobalSettings');
-		stor.load();
-		var rec = stor.getById(id);
+	setGlobalSetting: function(id,newValue,store){	
+//		console.log('setglobal',id,newValue,store);
+		store = (typeof store == 'undefined') ? Ext.getStore('_GlobalSettings') : Ext.getStore(store); 
+		store.load();
+		var rec = store.getById(id);
 		if(rec===null){
-			stor.add({id:id,value:newValue});
-			rec = stor.getById(id);
+			store.add({id:id,value:newValue});
+			rec = store.getById(id);
 		}
 		else rec.set('value',newValue);
 		rec.save();
+	},
+	getAppState: function(fieldList){
+		for(record in fieldList){
+//			console.log(motioncalc.app.getGlobalSetting(fieldList[record],'_AppState'));
+			var fieldName,fieldValue;
+			fieldName = fieldList[record];
+			fieldValue = motioncalc.app.getGlobalSetting(fieldName,'_AppState');
+			if(fieldValue != null)Ext.getCmp(fieldName).setValue(fieldValue);
+		}
+	},
+	setAppState: function(fieldList,activeItem){
+//		console.log('setappstate',fieldList,activeItem);
+		for(record in fieldList){
+			motioncalc.app.setGlobalSetting(fieldList[record],Ext.getCmp(fieldList[record]).getValue(),'_AppState');
+		}
+		motioncalc.app.setGlobalSetting('activeItem',activeItem,'_AppState');
 	}
 });
 

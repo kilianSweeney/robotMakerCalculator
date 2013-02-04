@@ -1,6 +1,7 @@
 Ext.define('motioncalc.view.GlobalSettings', {
 	extend: 'Ext.form.FormPanel',
 	xtype: 'globalsettingscard',
+	id: 'globalSettingsID',
 	requires: [
 		'Ext.form.FieldSet',
 		'Ext.field.Select',
@@ -69,11 +70,13 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				options: [{text:'1',value:'1'},{text:'2',value:'2'},{text:'3',value:'3'},{text:'4',value:'4'},{text:'5',value:'5'},{text:'6',value:'6'},{text:'7',value:'7'}],
 				listeners:{
 					initialize:function(){
+						if(!motioncalc.view.GlobalSettings.isEnabled)return;
 						this.setValue(motioncalc.app.significantDigits);
 					},
 				change: function(selectbox,newValue,oldValue)
 				    {
-					if(newValue === oldValue)return;        
+					if(newValue === oldValue)return; 
+					console.log(selectbox,newValue,oldValue);       
 					motioncalc.app.significantDigits = newValue;
 					motioncalc.app.setGlobalSetting('SignificantDigits',newValue);
 				    }

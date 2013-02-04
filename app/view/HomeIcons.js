@@ -1,5 +1,6 @@
 Ext.define('motioncalc.view.HomeIcons', {
 	extend: 'Ext.navigation.View',
+	id: 'homeIconsID',
 	xtype: 'homeicons',
 		requires: [
 		'Ext.dataview.List',
@@ -16,8 +17,9 @@ Ext.define('motioncalc.view.HomeIcons', {
 				listeners: {
 					itemtap: function(list,index,item,e){
 						motioncalc.app.mainView.setActiveItem(index+1);
-					}
+					},					
 			}
 		}]
-	}
+	},
+	isActivated: false
 });

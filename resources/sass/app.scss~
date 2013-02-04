@@ -31,7 +31,6 @@ $answer-color: #c23f2d;
 }
 .x-button-label,
 .x-title { color: #36648B!important; }
-.x-tab-active .x-button-label,
 .x-title { text-shadow: 1px 1px 1px rgba(178, 234, 248, 1)!important; }
 .x-toolbar-dark.x-docked-top { border-bottom-color: #36648B!important; }
 

@@ -90,7 +90,6 @@ Ext.define('motioncalc.view.Units', {
 				    {
 					xtype: 'numberfield',
 					name : 'unitsAmount',
-					value: 0,
 					id: 'unitsAmount',
 					label: 'Amount',
 				    },
@@ -126,11 +125,20 @@ Ext.define('motioncalc.view.Units', {
 			unitsAnswer.set('html',returnedValue);
 			resultStatus.setValue(1);
 			unitsAnswer.show({type :"slide",direction : "right", duration : 500});
+			motioncalc.app.setAppState(getFieldList(),1);
 		}
 
+		function getFieldList(){
+			var fieldList;
+			fieldList = ['unitsType','unitsTo','unitsFrom','unitsAmount'];
+			return fieldList;
+		}
+		
 		Ext.getCmp('unitsType').setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
-		Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
-		Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
+		var theType = motioncalc.app.getGlobalSetting('unitsType','_AppState');
+		theType = theType == null ? Area: theType;
+		Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(theType));
+		Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(theType));
 
 
 		Ext.Array.each(Ext.ComponentQuery.query('selectfield[dataType="unit-types"]'),function(){
@@ -142,6 +150,7 @@ Ext.define('motioncalc.view.Units', {
 		Ext.getCmp('unitsAmount').on({
 			blur: function(){sendToUnitsConvert();}
 		});
+		motioncalc.app.getAppState(getFieldList());
 		this.on({
 			activate: function(){sendToUnitsConvert();}
 		});

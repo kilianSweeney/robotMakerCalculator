@@ -8,6 +8,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 		control: {
 			inertiaView: {
 				activate: function(){
+					motioncalc.app.setAppState(null,5);
 					switch(motioncalc.app.answerFrom){
 						case null:
 						return;
@@ -20,7 +21,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						break;
 					}
 					function tagSolutionString(){
-						var solutionStr = '\n----------------------------------------------\n\n';
+						var solutionStr = '\n\n----------------------------------------------\n\n';
 						solutionStr += 'tigerBaby\'s Robot Maker Calculator\n';
 						solutionStr += 'http://www.tigerbaby.me/robot-maker-calculator\n';
 						solutionStr += '\n----------------------------------------------\n\n';

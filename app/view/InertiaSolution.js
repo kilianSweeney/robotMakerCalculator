@@ -42,7 +42,7 @@ Ext.define('motioncalc.view.InertiaSolution', {
 								subject = "tigerBaby's Robot Maker Calculator (" + solutionStr + ") Solution",			
 								mailTo;
 							solutionStr += 'SolutionBox';
-							solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D');
+							solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D%0A');
 							mailTo = 'mailto:?subject='+subject+'&body='+solutionStr;
 //							console.log(mailTo);							
 							window.location.href = mailTo;

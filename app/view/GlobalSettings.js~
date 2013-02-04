@@ -1,6 +1,7 @@
 Ext.define('motioncalc.view.GlobalSettings', {
 	extend: 'Ext.form.FormPanel',
 	xtype: 'globalsettingscard',
+	id: 'globalSettingsID',
 	requires: [
 		'Ext.form.FieldSet',
 		'Ext.field.Select',
@@ -28,13 +29,13 @@ Ext.define('motioncalc.view.GlobalSettings', {
 						tap: function(){
 							var pane;
 							pane = 4;
-							Ext.getCmp('materialName').setValue('');
-							Ext.getCmp('materialDensity').setValue(0);
-							Ext.getCmp('materialOriginalValue').setValue(null);
-							Ext.getCmp('materialName').setReadOnly(false);
-							Ext.getCmp('AddMaterialTop').setTitle('Add Material');
-							Ext.getCmp('buttonManageMaterials').set('text','edit material');
-							Ext.getCmp('buttonManageMaterials').removeCls('danger-class');
+//							Ext.getCmp('materialName').setValue('');
+//							Ext.getCmp('materialDensity').setValue(0);
+//							Ext.getCmp('materialOriginalValue').setValue(null);
+//							Ext.getCmp('materialName').setReadOnly(false);
+//							Ext.getCmp('AddMaterialTop').setTitle('ADD MATERIAL');
+//							Ext.getCmp('buttonManageMaterials').set('text','edit material');
+//							Ext.getCmp('buttonManageMaterials').removeCls('danger-class');
 							motioncalc.app.mainView.setActiveItem(pane);
 						}
 					}
@@ -69,11 +70,13 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				options: [{text:'1',value:'1'},{text:'2',value:'2'},{text:'3',value:'3'},{text:'4',value:'4'},{text:'5',value:'5'},{text:'6',value:'6'},{text:'7',value:'7'}],
 				listeners:{
 					initialize:function(){
+						if(!motioncalc.view.GlobalSettings.isEnabled)return;
 						this.setValue(motioncalc.app.significantDigits);
 					},
 				change: function(selectbox,newValue,oldValue)
 				    {
-					if(newValue === oldValue)return;        
+					if(newValue === oldValue)return; 
+					console.log(selectbox,newValue,oldValue);       
 					motioncalc.app.significantDigits = newValue;
 					motioncalc.app.setGlobalSetting('SignificantDigits',newValue);
 				    }

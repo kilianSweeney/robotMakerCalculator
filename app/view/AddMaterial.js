@@ -48,7 +48,6 @@ Ext.define('motioncalc.view.AddMaterial', {
 			    {
 				xtype: 'numberfield',
 				name : 'materialDensity',
-				value: 0,
 				id: 'materialDensity',
 				label: 'Amount'
 			    },
@@ -89,8 +88,12 @@ Ext.define('motioncalc.view.AddMaterial', {
 			value: 0,
 			id: 'materialOriginalValue'
 		    },
-
-
+		    {
+			xtype: 'hiddenfield',
+			name : 'manageMaterialActive',
+			value: 0,
+			id: 'manageMaterialActive'
+		    },
 		]
 	},
 	initialize: function(){

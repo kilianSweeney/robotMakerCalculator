@@ -51,6 +51,7 @@ Ext.define('motioncalc.util.Conversions', {
 		var i = 0;
 		store.each(function()
 		{
+			console.log(this.get("unitFrom"),this.get("unitType"), ' | ',unitsFrom, unitType);
 			if(this.get("unitFrom") == unitsFrom && this.get("unitType")==unitType){
 				intX=i;
 			}
@@ -78,53 +79,5 @@ Ext.define('motioncalc.util.Conversions', {
 		valueTemp = valueTemp.toPrecision(motioncalc.app.significantDigits);
 		valueTemp= motioncalc.app.decimalStyle == 1 ? valueTemp : valueTemp.replace('.',',') ;
 		return valueTemp;
-	},
-	hideShowInertiaItems: function(items){
-		var allItems = Ext.ComponentQuery.query('numberfield[dataType="linear-distance"]');
-		Ext.Array.each(allItems,function(){
-			if((items.indexOf(this) != -1))this.show();
-			else this.hide();
-		});				
-	},
-	setInertiaScreen: function(){
-		var shape,items;
-		items = [];
-		shape = Ext.ComponentQuery.query('#inertiaShape')[0].get('value');
-		switch(shape)
-		{
-			case 'cylinder':
-	//			setInertiaDefaults(shape,1);
-				items.push(Ext.getCmp('inertiaLength'));
-				items.push(Ext.getCmp('outsideDiameter'));
-				items.push(Ext.getCmp('insideDiameter'));
-				break;
-			case 'parallelepiped':
-	//			setInertiaDefaults(shape,1);
-				items.push(Ext.getCmp('inertiaHeight'));
-				items.push(Ext.getCmp('inertiaLength'));
-				items.push(Ext.getCmp('inertiaWidth'));
-
-				break;
-			case 'sphericalShell':
-	//			setInertiaDefaults(shape,2);
-				items.push(Ext.getCmp('radius'));
-				break;
-			case 'sphere':
-	//			setInertiaDefaults(shape,1);
-				items.push(Ext.getCmp('radius'));
-				break;
-			case 'slenderRod':
-	//			setInertiaDefaults(shape,2);
-				items.push(Ext.getCmp('inertiaLength'));
-				break;
-			case 'tetrahedron':
-	//			setInertiaDefaults(shape,2);
-				items.push(Ext.getCmp('inertiaHeight'));
-				items.push(Ext.getCmp('inertiaLength'));
-				items.push(Ext.getCmp('inertiaWidth'));
-				break;				
-		}
-		this.hideShowInertiaItems(items);
 	}
-
 });

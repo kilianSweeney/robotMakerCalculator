@@ -44,7 +44,8 @@ Ext.define('motioncalc.controller.Units', {
 			},
 			buttonResult: {
 				tap: function(){
-
+					motioncalc.app.answerFrom = 'units';
+					motioncalc.app.mainView.setActiveItem(5);
 				}
 			},
 			buttonAdd: {
@@ -112,8 +113,7 @@ Ext.define('motioncalc.controller.Units', {
 		inertiaAmount = motioncalc.app.conversionFunctions.unitsConvert(toAmount,toType,inertiaType,typeVal,false);					
 		inertiaField.set('value',inertiaAmount);
 		motioncalc.app.mainView.setActiveItem(2);
-	}
-
+	},
 });
 
 

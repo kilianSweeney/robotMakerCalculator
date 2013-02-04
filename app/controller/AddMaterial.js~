@@ -10,8 +10,37 @@ Ext.define('motioncalc.controller.AddMaterial', {
 			buttonOne: '#buttonManageMaterialOne',
 			buttonTwo: '#buttonManageMaterialTwo',
 			addMaterialView: '#addMaterialID',
+			materialName: '#materialName',
+			materialDensity: '#materialDensity',
+			materialUnitType: '#materialUnitType',
 		},
 		control: {
+			addMaterialView: {
+				activate: function(){
+					motioncalc.app.getAppState(this.getFieldList());
+					Ext.getCmp('manageMaterialActive').setValue(1);
+				}
+			},
+			materialName: {
+				blur: function(){
+					motioncalc.app.setAppState(this.getFieldList(),4);
+				},
+				change: function(){
+					motioncalc.app.setAppState(this.getFieldList(),4);
+				}
+			},
+			materialDensity: {
+				blur: function(){
+					motioncalc.app.setAppState(this.getFieldList(),4);
+				}
+			},
+			materialUnitType: {
+				change: function(){
+					if(Ext.getCmp('manageMaterialActive').getValue()==0)return;
+					motioncalc.app.setAppState(this.getFieldList(),4);				
+				}
+			},
+
 			materials: {
 				change: function(){
 					var record, name,value,densities;
@@ -25,7 +54,7 @@ Ext.define('motioncalc.controller.AddMaterial', {
 					Ext.getCmp('materialName').setValue(name);
 					Ext.getCmp('materialDensity').setValue(value);
 					Ext.getCmp('materialOriginalValue').setValue(value);
-					Ext.getCmp('AddMaterialTop').setTitle('Edit Material');
+					Ext.getCmp('AddMaterialTop').setTitle('EDIT MATERIAL');
 					Ext.getCmp('materialName').setReadOnly(true);
 					Ext.getCmp('buttonManageMaterials').set('text','remove');
 					Ext.getCmp('buttonManageMaterials').addCls('danger-class');
@@ -117,6 +146,11 @@ Ext.define('motioncalc.controller.AddMaterial', {
 			}
 
 		}
+	},
+	getFieldList: function(){
+		var fieldList;
+		fieldList = ['materialOriginalValue','materialName','materialDensity','materialUnitType'];
+		return fieldList;		
 	},
 });
 

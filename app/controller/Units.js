@@ -109,12 +109,13 @@ Ext.define('motioncalc.controller.Units', {
 			fromType = Ext.getCmp('unitsFrom').getValue(),
 			toType = Ext.getCmp('unitsTo').getValue(),
 			toAmount, inertiaAmount;
+		console.log('before to',fromAmount,fromType,toType,typeVal);
 		toAmount = motioncalc.app.conversionFunctions.unitsConvert(fromAmount,fromType,toType,typeVal,false);
+		console.log('after to',fromAmount,fromType,toType,typeVal);
 		inertiaAmount = motioncalc.app.conversionFunctions.unitsConvert(toAmount,toType,inertiaType,typeVal,false);					
 		inertiaField.set('value',inertiaAmount);
 		motioncalc.app.mainView.setActiveItem(2);
-	}
-
+	},
 });
 
 

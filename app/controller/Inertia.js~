@@ -8,7 +8,7 @@ Ext.define('motioncalc.controller.Inertia', {
 			materials: '#inertiaMaterials',
 			shape: '#inertiaShape',
 			inertiaView: '#inertiaID',
-			numberFields: 'numberfield',
+			numberFields: '#inertiaID numberfield',
 			buttonMaterials: '#buttonMaterials',
 			buttonInertiaSolution : '#buttonInertiaSolution'
 		},
@@ -46,13 +46,11 @@ Ext.define('motioncalc.controller.Inertia', {
 		}
 	},
 	launch: function(){
-		Ext.getCmp('inertiaMass').addCls('convert-active');
 		var convertForItems = Ext.select('div.convert-for-it .x-form-label');
 		convertForItems.each(function(el){
 			Ext.get(el.dom).on('tap',function(){
 				var 	activeCls = 'convert-active',
 					isMassValue = 0;
-//				console.log(this.findParent('div.convert-for-it').id);
 				if(this.findParent('div.convert-for-it').className.indexOf(activeCls)>-1)return;
 				var 	itemId = 'inertiaDensity',
 					itemOtherId = 'inertiaMass';
@@ -63,7 +61,6 @@ Ext.define('motioncalc.controller.Inertia', {
 				}
 				else isMassValue = 1;
 				Ext.getCmp(itemId).removeCls(activeCls);
-//				console.log(itemId + '  |'+ Ext.getCmp(itemId).hasCls(activeCls));
 				Ext.getCmp(itemOtherId).addCls(activeCls);
 				motioncalc.app.getController('Inertia').changeDensityMass(isMassValue == 1);
 				Ext.getCmp('isMass').setValue(isMassValue);
@@ -71,15 +68,6 @@ Ext.define('motioncalc.controller.Inertia', {
 		});
 	},
 	onActivate: function(){
-		//unit testing
-//		console.log('motioncalc.app.inertiaFunctions.eqnTetraIxx: ' + motioncalc.app.inertiaFunctions.eqnTetraIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnRodIxx: ' + motioncalc.app.inertiaFunctions.eqnRodIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnParallelIxx: ' + motioncalc.app.inertiaFunctions.eqnParallelIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnCylinderIxx: ' + motioncalc.app.inertiaFunctions.eqnCylinderIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnSphereIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnSphereShellIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereShellIxx('Ixx'));
-//		console.log(Ext.getCmp('isMass').get('value')==1);
-
 		function setLabel(item,unit){
 			var tmpLbl,tmpLblSuffix,index;		
 			tmpLbl = item.get('label');
@@ -98,8 +86,20 @@ Ext.define('motioncalc.controller.Inertia', {
 		firstActive = false;
 		inertiaActive = Ext.getCmp('inertiaActive');
 		if(inertiaActive.getValue()==0){
+			var convertActive,convertOther;
 			inertiaActive.setValue(1);
 			firstActive = true;
+			motioncalc.app.getAppState(this.getInertiaFieldList());
+			if(Ext.getCmp('isMass').getValue()==0){
+				convertActive = 'inertiaDensity';
+				convertOther = 'inertiaMass';
+			}
+			else {
+				convertActive = 'inertiaMass';
+				convertOther = 'inertiaDensity';
+			}
+			Ext.getCmp(convertOther).removeCls('convert-active');
+			Ext.getCmp(convertActive).addCls('convert-active');
 		}
 		this.setInertiaScreen(firstActive);
 		setLabel(Ext.getCmp('inertiaDensity'),motioncalc.app.density);
@@ -129,7 +129,7 @@ Ext.define('motioncalc.controller.Inertia', {
 			if(answers[i][1]!==null){
 				window.inertiaAnswers.push([answers[i][0],motioncalc.app.conversionFunctions.getValue(answers[i][1])]);
 				var 	isMassEntry = (answers[i][0].indexOf('Mass') > -1),
-					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.linearDistance;
+					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.inertia;
 				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
 				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0)){
 					mass = answers[i][1];
@@ -211,11 +211,18 @@ Ext.define('motioncalc.controller.Inertia', {
 					isMass = true;
 					break;				
 			}
+			motioncalc.app.setAppState(this.getInertiaFieldList(),2);
 			this.changeDensityMass(isMass);
 			this.hideShowInertiaItems(items);
 		}
-		else{ this.setInertiaAnswer(motioncalc.app.inertiaFunctions.inertiaCalc());
+		else{
+			motioncalc.app.setAppState(this.getInertiaFieldList(),2);
+			this.setInertiaAnswer(motioncalc.app.inertiaFunctions.inertiaCalc());
 		}
-
-	}
+	},
+	getInertiaFieldList: function(){
+		var fieldList;
+		fieldList = ['isMass','inertiaShape','inertiaMass','inertiaDensity','inertiaHeight','inertiaLength','inertiaWidth','radius','insideDiameter','outsideDiameter'];
+		return fieldList;		
+	},
 });

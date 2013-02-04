@@ -51,6 +51,7 @@ Ext.define('motioncalc.util.Conversions', {
 		var i = 0;
 		store.each(function()
 		{
+//			console.log(this.get("unitFrom"),this.get("unitType"), ' | ',unitsFrom, unitType);
 			if(this.get("unitFrom") == unitsFrom && this.get("unitType")==unitType){
 				intX=i;
 			}
