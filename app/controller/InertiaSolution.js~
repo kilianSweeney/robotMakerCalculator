@@ -4,11 +4,19 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 		views : ['motioncalc.view.InertiaSolution'],
 		refs : {
 			inertiaView: '#inertiaSolutionID',
+			socialShares: '#socialShares',
 		},
 		control: {
+			socialShares: {
+				change: function(){
+					var 	solutionStr = Ext.getCmp('InertiaSolutionTop').getTitle().getTitle().indexOf('INERTIA') > -1 ? 'inertia' : 'units';
+					solutionStr += 'SolutionBox';
+					solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D%0A');
+					Ext.getCmp('socialShares').getValue()(solutionStr);
+				}
+			},
 			inertiaView: {
 				activate: function(){
-					motioncalc.app.setAppState(null,5);
 					switch(motioncalc.app.answerFrom){
 						case null:
 						return;
@@ -49,7 +57,9 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						Ext.getCmp('inertiaSolutionWrapper').show();
 						Ext.getCmp('unitsSolutionWrapper').hide();
 						var 	shape = Ext.getCmp('inertiaShape').getValue(),
-							densityStr = Ext.getCmp('inertiaDensity').getDisabled() ? '' : 'Density: ' + motioncalc.app.conversionFunctions.getValue(Ext.getCmp('inertiaDensity').getValue()) +  motioncalc.app.density  + '\n',
+							densityStr = Ext.getCmp('inertiaDensity').getDisabled() ? '' : 'Density: ' + motioncalc.app.conversionFunctions.getValue(Ext.getCmp('inertiaDensity').getValue()) +  motioncalc.app.density,
+							material = Ext.getCmp('inertiaMaterials').getValue();
+							material = material.indexOf('Select One')>-1 ? '' : ' (' + material + ')';
 							solutionStr,
 							dimensions = [
 								['inertiaHeight','Height: '],
@@ -61,6 +71,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 							],
 							inertiaAnswers = [];
 
+						densityStr += material  + '\n';
 						solutionStr = 'Shape: ' + shape + '\n' + densityStr;
 
 						for(var i = 0;i<dimensions.length;i++){

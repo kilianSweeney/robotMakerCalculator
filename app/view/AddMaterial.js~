@@ -6,7 +6,7 @@ Ext.define('motioncalc.view.AddMaterial', {
 		'Ext.form.FieldSet',
 		'Ext.field.Select',
 		'Ext.field.Number',
-		'Ext.Button'
+		'Ext.Button',
 		],
 	controllers: ['AddMaterial'],
 	config: {
@@ -48,7 +48,6 @@ Ext.define('motioncalc.view.AddMaterial', {
 			    {
 				xtype: 'numberfield',
 				name : 'materialDensity',
-				value: 0,
 				id: 'materialDensity',
 				label: 'Amount'
 			    },
@@ -67,6 +66,15 @@ Ext.define('motioncalc.view.AddMaterial', {
 			store: '_MaterialDensities',
 			displayField: 'name',
 			valueField: 'density',
+			hidden: true
+		    },
+		    {
+			xtype: 'selectfield',
+			name : 'socialShares',
+			id: 'socialShares',
+			store: '_ShareOptions',
+			displayField: 'title',
+			valueField: 'fc',
 			hidden: true
 		    },
 		    {
@@ -99,6 +107,7 @@ Ext.define('motioncalc.view.AddMaterial', {
 	},
 	initialize: function(){
 		Ext.getCmp('materialUnitType').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density'));
+		
 	}
 });
 

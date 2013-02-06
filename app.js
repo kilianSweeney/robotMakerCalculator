@@ -16,7 +16,7 @@ Ext.application({
     ],
 
     views: ['Main'],
-    stores: ['AppState','HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
+    stores: ['ShareOptions','AppState','HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
     models: ['AppState','GlobalSettings','MaterialDensities'],
     controllers: ['HomeIcons','GlobalSettings','Inertia','AddMaterial','InertiaSolution','Units'],
 mainView: null,
@@ -35,6 +35,7 @@ INERTIABASEUNITS : "kg-m²",
 PI : 3.141593,
 
 answerFrom: null,
+siteURL: 'tigerbaby.me/motioncalc',
 
 conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
@@ -158,7 +159,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 	},
 	getAppState: function(fieldList){
 		for(record in fieldList){
-			console.log(motioncalc.app.getGlobalSetting(fieldList[record],'_AppState'));
+//			console.log(motioncalc.app.getGlobalSetting(fieldList[record],'_AppState'));
 			var fieldName,fieldValue;
 			fieldName = fieldList[record];
 			fieldValue = motioncalc.app.getGlobalSetting(fieldName,'_AppState');
@@ -166,7 +167,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 		}
 	},
 	setAppState: function(fieldList,activeItem){
-		console.log('setappstate',fieldList,activeItem);
+//		console.log('setappstate',fieldList,activeItem);
 		for(record in fieldList){
 			motioncalc.app.setGlobalSetting(fieldList[record],Ext.getCmp(fieldList[record]).getValue(),'_AppState');
 		}

@@ -15,8 +15,9 @@ Ext.define('motioncalc.controller.Inertia', {
 		control: {
 			materials: {
 				change: function(){
-					var materialDensity,density;
-					materialDensity = Ext.getCmp('inertiaMaterials').getValue();
+
+					var materialDensity,density,materialName;
+					materialDensity = Ext.getCmp('inertiaMaterials').getStore().findRecord("name", Ext.getCmp('inertiaMaterials').getValue()).get("density");
 					if(materialDensity == null || materialDensity == 0)return;
 					materialDensity = motioncalc.app.conversionFunctions.unitsConvert(materialDensity,motioncalc.app.DENSITYBASEUNITS,motioncalc.app.density,'Density');
 					density = Ext.getCmp('inertiaDensity');

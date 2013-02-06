@@ -16,7 +16,7 @@ Ext.application({
     ],
 
     views: ['Main'],
-    stores: ['AppState','HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
+    stores: ['ShareOptions','AppState','HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
     models: ['AppState','GlobalSettings','MaterialDensities'],
     controllers: ['HomeIcons','GlobalSettings','Inertia','AddMaterial','InertiaSolution','Units'],
 mainView: null,
@@ -35,6 +35,7 @@ INERTIABASEUNITS : "kg-m²",
 PI : 3.141593,
 
 answerFrom: null,
+siteURL: 'tigerbaby.me/motioncalc'
 
 conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 inertiaFunctions: Ext.create('motioncalc.util.Inertia'),

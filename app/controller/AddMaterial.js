@@ -1,6 +1,6 @@
 Ext.define('motioncalc.controller.AddMaterial', {
 	extend : 'Ext.app.Controller',
-	requires : 'motioncalc.store.MaterialDensities',
+	requires : ['motioncalc.store.MaterialDensities'],
 	config: {
 		views : ['motioncalc.view.AddMaterial'],
 		refs : {

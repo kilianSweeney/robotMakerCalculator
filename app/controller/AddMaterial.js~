@@ -1,6 +1,6 @@
 Ext.define('motioncalc.controller.AddMaterial', {
 	extend : 'Ext.app.Controller',
-	requires : 'motioncalc.store.MaterialDensities',
+	requires : ['motioncalc.store.MaterialDensities','motioncalc.store.ShareOptions'],
 	config: {
 		views : ['motioncalc.view.AddMaterial'],
 		refs : {
@@ -17,28 +17,14 @@ Ext.define('motioncalc.controller.AddMaterial', {
 		control: {
 			addMaterialView: {
 				activate: function(){
-					motioncalc.app.getAppState(this.getFieldList());
 					Ext.getCmp('manageMaterialActive').setValue(1);
 				}
 			},
 			materialName: {
-				blur: function(){
-					motioncalc.app.setAppState(this.getFieldList(),4);
-				},
-				change: function(){
-					motioncalc.app.setAppState(this.getFieldList(),4);
-				}
 			},
 			materialDensity: {
-				blur: function(){
-					motioncalc.app.setAppState(this.getFieldList(),4);
-				}
 			},
 			materialUnitType: {
-				change: function(){
-					if(Ext.getCmp('manageMaterialActive').getValue()==0)return;
-					motioncalc.app.setAppState(this.getFieldList(),4);				
-				}
 			},
 
 			materials: {
@@ -146,11 +132,6 @@ Ext.define('motioncalc.controller.AddMaterial', {
 			}
 
 		}
-	},
-	getFieldList: function(){
-		var fieldList;
-		fieldList = ['materialOriginalValue','materialName','materialDensity','materialUnitType'];
-		return fieldList;		
 	},
 });
 

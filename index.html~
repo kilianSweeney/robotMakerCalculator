@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>RobotMakerCalc</title>
-    <link rel="shortcut icon" href="/resources/icons/motioncalc/favicon.ico" type="image/vnd.microsoft.icon" />
+    <link rel="shortcut icon" href="../resources/icons/motioncalc/favicon.ico" type="image/vnd.microsoft.icon" />
     <style type="text/css">
         html, body {
             height: 100%;
@@ -52,7 +52,7 @@
 	#chin { position: absolute; top: 115px; left: 74px; font-size: 54px; -webkit-transform: rotate(90deg); }
     </style>
     <!-- The line below must be kept intact for Sencha Command to build your application -->
-<!--    <script id="microloader" type="text/javascript" src="touch/microloader/development.js"></script>-->
+    <script id="microloader" type="text/javascript" src="touch/microloader/development.js"></script>
 </head>
 <body>
     <div id="appLoadingIndicator">

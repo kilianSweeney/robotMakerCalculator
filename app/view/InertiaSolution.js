@@ -3,7 +3,8 @@ Ext.define('motioncalc.view.InertiaSolution', {
 	xtype: 'inertiasolutioncard',
 	id:'inertiaSolutionID',
 	requires: [
-		'Ext.Button'
+		'Ext.Button',
+		'motioncalc.store.ShareOptions'
 		],
 	controllers: ['InertiaSolution'],
 	config: {
@@ -34,18 +35,11 @@ Ext.define('motioncalc.view.InertiaSolution', {
 					xtype:'button', 
 					name:'buttonSendSolution', 
 					id:'buttonSendSolution', 
-					text:'send',
+					text:'share',
 					disabled:false,
 					listeners: {
 						tap: function(){
-							var 	solutionStr = Ext.getCmp('InertiaSolutionTop').getTitle().getTitle().indexOf('INERTIA') > -1 ? 'inertia' : 'units',
-								subject = "tigerBaby's Robot Maker Calculator (" + solutionStr + ") Solution",			
-								mailTo;
-							solutionStr += 'SolutionBox';
-							solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D%0A');
-							mailTo = 'mailto:?subject='+subject+'&body='+solutionStr;
-//							console.log(mailTo);							
-							window.location.href = mailTo;
+							Ext.getCmp('socialShares').showPicker();
 						}
 					}
 				},
@@ -79,8 +73,17 @@ Ext.define('motioncalc.view.InertiaSolution', {
 						id:'unitsSolutionBox',
 					},
 				]
-			}
-
+			},
+			{
+				xtype: 'selectfield',
+				name : 'socialShares',
+				id: 'socialShares',
+				store: '_ShareOptions',
+				displayField: 'title',
+				valueField: 'fc',
+				hidden: true
+			},
+		
 		]
 	},
 });

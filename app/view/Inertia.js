@@ -63,7 +63,7 @@ Ext.define('motioncalc.view.Inertia', {
 				id: 'inertiaMaterials',
 				store: '_MaterialDensities',
 				displayField: 'name',
-				valueField: 'density',
+				valueField: 'name',
 				hidden: true
 			    },
 			    {
@@ -147,7 +147,7 @@ Ext.define('motioncalc.view.Inertia', {
 		xtype: 'container',
 		name : 'inertiaAnswer',
 		id: 'inertiaAnswer',
-	}
+	},
         ]
     }
 });

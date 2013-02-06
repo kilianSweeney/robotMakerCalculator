@@ -76,7 +76,7 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				change: function(selectbox,newValue,oldValue)
 				    {
 					if(newValue === oldValue)return; 
-					console.log(selectbox,newValue,oldValue);       
+//					console.log(selectbox,newValue,oldValue);       
 					motioncalc.app.significantDigits = newValue;
 					motioncalc.app.setGlobalSetting('SignificantDigits',newValue);
 				    }

@@ -6,7 +6,7 @@ Ext.define('motioncalc.view.AddMaterial', {
 		'Ext.form.FieldSet',
 		'Ext.field.Select',
 		'Ext.field.Number',
-		'Ext.Button'
+		'Ext.Button',
 		],
 	controllers: ['AddMaterial'],
 	config: {
@@ -98,6 +98,7 @@ Ext.define('motioncalc.view.AddMaterial', {
 	},
 	initialize: function(){
 		Ext.getCmp('materialUnitType').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density'));
+		
 	}
 });
 
