@@ -9,10 +9,10 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 		control: {
 			socialShares: {
 				change: function(){
-					var 	solutionStr = Ext.getCmp('InertiaSolutionTop').getTitle().getTitle().indexOf('INERTIA') > -1 ? 'inertia' : 'units';
-					solutionStr += 'SolutionBox';
+					var 	typeStr = Ext.getCmp('InertiaSolutionTop').getTitle().getTitle().indexOf('INERTIA') > -1 ? 'inertia' : 'units';
+					solutionStr = typeStr + 'SolutionBox';
 					solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D%0A');
-					Ext.getCmp('socialShares').getValue()(solutionStr);
+					Ext.getCmp('socialShares').getValue()(solutionStr,typeStr);
 				}
 			},
 			inertiaView: {
@@ -31,7 +31,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 					function tagSolutionString(){
 						var solutionStr = '\n\n----------------------------------------------\n\n';
 						solutionStr += 'tigerBaby\'s Robot Maker Calculator\n';
-						solutionStr += 'http://www.tigerbaby.me/robot-maker-calculator\n';
+						solutionStr += 'http:/' + motioncalc.app.siteURL + '\n';
 						solutionStr += '\n----------------------------------------------\n\n';
 						return solutionStr;
 					}
@@ -42,15 +42,16 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 							amountFrom = Ext.getCmp('unitsAmount').getValue(),
 							unitTo = Ext.getCmp('unitsTo').getValue(),
 							amountTo = Ext.getCmp('unitsAnswer').getHtml(),
+							shortAnswer = amountFrom + ' ' + unitFrom + ' = ' + amountTo + ' ' + unitTo,
 							answer;
 						answer = 'Measurement Type: ' + type + '\n\n';
-						answer += amountFrom + ' ' + unitFrom + ' = ';
-						answer += amountTo + ' ' + unitTo;
+						answer += shortAnswer;
 						answer += tagSolutionString();
 						
 						Ext.getCmp('inertiaSolutionWrapper').hide();
 						Ext.getCmp('unitsSolutionWrapper').show();
 						Ext.getCmp('unitsSolutionBox').setValue(answer);
+						Ext.getCmp('shortAnswer').setValue(shortAnswer.replace(/ /g,'%20'));
 					}
 					function setInertiaSolution(controller){
 						Ext.getCmp('InertiaSolutionTop').setTitle('INERTIA SOLUTION');
@@ -67,7 +68,8 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 								['outsideDiameter','OD: '],
 								['insideDiameter','ID: '],
 								['radius','Radius: '],
-							],
+							]
+							shortAnswer = 'I%20just%20solved%20a%20' + shape + '%20inertia%20problem%20using%20%23RbtMkrCalc!',
 							inertiaAnswers = [];
 						material = material.indexOf('Select One')>-1 ? '' : ' (' + material + ')';
 						densityStr += material  + '\n';
@@ -115,6 +117,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						controller.animateShape(null,null,0,shape,inertiaAnswers);										
 						solutionStr += tagSolutionString();
 						Ext.getCmp('inertiaSolutionBox').set('value',solutionStr);
+						Ext.getCmp('shortAnswer').setValue(shortAnswer);
 					}
 				}
 			},

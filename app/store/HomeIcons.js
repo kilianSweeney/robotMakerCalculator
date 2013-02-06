@@ -6,7 +6,8 @@ Ext.define('motioncalc.store.HomeIcons', {
         data: [
             { title: 'Unit Converter', xtype: 'unitscard', id: 'UnitsCard' },
             { title: 'Inertia Calculator', xtype: 'inertiacard', id: 'InertiaCard' },
-            { title: 'Global Settings',      xtype: 'settingscard', id: 'SettingsCard' }
+            { title: 'Global Settings',      xtype: 'settingscard', id: 'SettingsCard' },
+            { title: 'About RMC',      xtype: 'aboutcard', id: 'AboutCard' }
         ]
     }
 });

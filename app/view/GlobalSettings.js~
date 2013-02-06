@@ -69,14 +69,10 @@ Ext.define('motioncalc.view.GlobalSettings', {
 				label: 'Significant Digits',
 				options: [{text:'1',value:'1'},{text:'2',value:'2'},{text:'3',value:'3'},{text:'4',value:'4'},{text:'5',value:'5'},{text:'6',value:'6'},{text:'7',value:'7'}],
 				listeners:{
-					initialize:function(){
-						if(!motioncalc.view.GlobalSettings.isEnabled)return;
-						this.setValue(motioncalc.app.significantDigits);
-					},
 				change: function(selectbox,newValue,oldValue)
 				    {
 					if(newValue === oldValue)return; 
-					console.log(selectbox,newValue,oldValue);       
+//					console.log(selectbox,newValue,oldValue);       
 					motioncalc.app.significantDigits = newValue;
 					motioncalc.app.setGlobalSetting('SignificantDigits',newValue);
 				    }
@@ -146,7 +142,8 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		]
 	},
 	initialize: function(){
-			Ext.getCmp('_mass').setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass')).setValue(motioncalc.app.mass);;
+			Ext.getCmp('significantDigits').setValue(motioncalc.app.significantDigits);
+			Ext.getCmp('_mass').setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass')).setValue(motioncalc.app.mass);
 			Ext.getCmp('linear-distance').setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance')).setValue(motioncalc.app.linearDistance);
 			Ext.getCmp('_inertia').setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia')).setValue(motioncalc.app.inertia);
 			Ext.getCmp('_density').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density')).setValue(motioncalc.app.density);

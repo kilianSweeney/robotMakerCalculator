@@ -16,7 +16,9 @@ Ext.define('motioncalc.view.HomeIcons', {
 				store: 'HomeIcons',
 				listeners: {
 					itemtap: function(list,index,item,e){
-						motioncalc.app.mainView.setActiveItem(index+1);
+						var nextPage = index == 3 ? 6 : index+1;
+//						console.log(list,index,item,e);
+						motioncalc.app.mainView.setActiveItem(nextPage);
 					},					
 			}
 		}]

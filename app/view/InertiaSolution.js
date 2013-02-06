@@ -83,6 +83,11 @@ Ext.define('motioncalc.view.InertiaSolution', {
 				valueField: 'fc',
 				hidden: true
 			},
+			{
+				xtype: 'hiddenfield',
+				name : 'shortAnswer',
+				id: 'shortAnswer',
+			},
 		
 		]
 	},

@@ -6,7 +6,8 @@ Ext.define('motioncalc.view.Main', {
         'motioncalc.view.Inertia',
 	'motioncalc.view.GlobalSettings',
 	'motioncalc.view.AddMaterial',
-	'motioncalc.view.InertiaSolution'
+	'motioncalc.view.InertiaSolution',
+	'motioncalc.view.About',
     ],
 
     config: {
@@ -16,16 +17,7 @@ Ext.define('motioncalc.view.Main', {
             layout: {
                 pack: 'center'
             },
-//		items: [
-//			{
-//				xtype: 'button',
-////				style: "background: url('/resources/icons/motioncalc/tigerbaby.png') no-repeat 10px right;",
-////				listeners:{
-////					tap: function(){console.log('a');}
-////				}
-//			}
-//		]
-//        },
+        },
         items: [
             { xtype: 'homeicons' },
             { xtype: 'unitscard' },
@@ -33,6 +25,7 @@ Ext.define('motioncalc.view.Main', {
             { xtype: 'globalsettingscard' },
             { xtype: 'addmaterialcard', hidden: true },
             { xtype: 'inertiasolutioncard', hidden: true }
+            { xtype: 'aboutcard', hidden: true }
         ],
     },
 	

@@ -36,6 +36,7 @@ PI : 3.141593,
 
 answerFrom: null,
 siteURL: 'tigerbaby.me/motioncalc',
+siteTiny: 'tiny.cc/f7d3rw',
 
 conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
@@ -61,7 +62,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
         Ext.fly('appLoadingIndicator').destroy();
 	Ext.DomHelper.append(document.body,{tag: 'a', id:'tigerBabyButton', href:'http://www.tigerbaby.me/robot-maker-calculator',target:'_blank' });
 	//set global vars
-	var decimalStyle, significantDigits,density,mass,linearDistance,inertia;
+	var decimalStyle, significantDigits,density,mass,linearDistance,inertia,activeItem;
 	decimalStyle = motioncalc.app.getGlobalSetting('DecimalStyle');
 	significantDigits = motioncalc.app.getGlobalSetting('SignificantDigits');
 	density = motioncalc.app.getGlobalSetting('Density');
@@ -81,7 +82,8 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 //	console.log('launch',this.getGlobalSetting('activeItem','_AppState'));
-	motioncalc.app.mainView.setActiveItem(this.getGlobalSetting('activeItem','_AppState'));
+	if(activeItem == null)motioncalc.app.mainView.setActiveItem(6);
+	else motioncalc.app.mainView.setActiveItem(this.getGlobalSetting('activeItem','_AppState'));
 	Ext.Viewport.add(motioncalc.app.mainView);
 	var isPhone = Ext.os.is('Phone');
 //	console.log(isPhone);
@@ -139,6 +141,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 		}
 	},
 	getGlobalSetting: function(id,store){
+//		console.log(id,store);
 		var rec,val;
 		store = (typeof store == 'undefined') ? '_GlobalSettings' : store; 
 		rec = Ext.getStore(store).getById(id);
