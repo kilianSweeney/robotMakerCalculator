@@ -82,11 +82,9 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 //	console.log('launch',this.getGlobalSetting('activeItem','_AppState'));
-	if(activeItem == null){
-		this.setGlobalSetting('activeItem',6,'_AppState');
-		this.setGlobalSetting('aboutActiveField','aboutWelcome','_AppState');
-	}
-	motioncalc.app.mainView.setActiveItem(this.getGlobalSetting('activeItem','_AppState'));
+	activeItem = this.getGlobalSetting('activeItem','_AppState');
+	if(activeItem == null)motioncalc.app.mainView.setActiveItem(6);
+	else motioncalc.app.mainView.setActiveItem(this.getGlobalSetting('activeItem','_AppState'));
 	Ext.Viewport.add(motioncalc.app.mainView);
 	var isPhone = Ext.os.is('Phone');
 //	console.log(isPhone);
@@ -164,6 +162,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 		rec.save();
 	},
 	getAppState: function(fieldList){
+		var x = 10;
 		for(record in fieldList){
 //			console.log(motioncalc.app.getGlobalSetting(fieldList[record],'_AppState'));
 			var fieldName,fieldValue;

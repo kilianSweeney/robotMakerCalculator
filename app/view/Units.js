@@ -29,7 +29,7 @@ Ext.define('motioncalc.view.Units', {
 			{
 				xtype: 'button',
 				id: 'buttonAddToInertia',
-				text: '+ Inertia Calc',
+				text: '+ inertia',
 				disabled: true
 			}
 		]

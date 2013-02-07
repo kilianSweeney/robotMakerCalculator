@@ -125,7 +125,7 @@ Ext.define('motioncalc.controller.Inertia', {
 		mass = null;
 		itemCount = answers.length;
 		returnString = '<ul>';
-		window.inertiaAnswers = [];		
+		window.inertiaAnswers = [];
 		for(var i = 0; i < itemCount; i++){
 			if(answers[i][1]!==null){
 				window.inertiaAnswers.push([answers[i][0],motioncalc.app.conversionFunctions.getValue(answers[i][1])]);

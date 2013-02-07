@@ -29,9 +29,6 @@ Ext.define('motioncalc.controller.Inertia', {
 			shape: {
 				change: function(){this.setInertiaScreen(true,false)}
 			},
-			density: {
-				blur: function(){Ext.getCmp('inertiaMaterialName').setValue(null);}
-			},
 			numberFields: {
 				blur: function(){this.setInertiaScreen(false,false)}
 			},
@@ -128,7 +125,8 @@ Ext.define('motioncalc.controller.Inertia', {
 		mass = null;
 		itemCount = answers.length;
 		returnString = '<ul>';
-		window.inertiaAnswers = [];		
+		window.inertiaAnswers = [];
+		console.log(itemCount);		
 		for(var i = 0; i < itemCount; i++){
 			if(answers[i][1]!==null){
 				window.inertiaAnswers.push([answers[i][0],motioncalc.app.conversionFunctions.getValue(answers[i][1])]);

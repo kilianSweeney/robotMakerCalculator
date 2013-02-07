@@ -82,6 +82,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
 //	console.log('launch',this.getGlobalSetting('activeItem','_AppState'));
+	activeItem = this.getGlobalSetting('activeItem','_AppState');
 	if(activeItem == null)motioncalc.app.mainView.setActiveItem(6);
 	else motioncalc.app.mainView.setActiveItem(this.getGlobalSetting('activeItem','_AppState'));
 	Ext.Viewport.add(motioncalc.app.mainView);
@@ -161,6 +162,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 		rec.save();
 	},
 	getAppState: function(fieldList){
+		var x = 2;
 		for(record in fieldList){
 //			console.log(motioncalc.app.getGlobalSetting(fieldList[record],'_AppState'));
 			var fieldName,fieldValue;

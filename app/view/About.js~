@@ -1,5 +1,5 @@
 Ext.define('motioncalc.view.About', {
-	extend: 'Ext.Container',
+	extend: 'Ext.Panel',
 	xtype: 'aboutcard',
 	requires: [
 		],
@@ -7,6 +7,8 @@ Ext.define('motioncalc.view.About', {
 	config: {
 		title: 'ABOUT',
 		isEnabled: false,
+		id: 'aboutCardID',
+		scrollable: true,
 		items: [
 		    {
 			docked: 'top',
@@ -41,52 +43,62 @@ Ext.define('motioncalc.view.About', {
 				}
 			]
 		    },
-		    	{
-				xtype: 'container',
-				id: 'aboutAbout',
-				html: 'version: 1.0.0 | &copy;2013',
-				style: 'margin: 20px auto; height:460px; width: 320px; padding: 30px; color: #999999; font-size: .75em; background:url(resources/startup/motioncalc/robotstart320.png) no-repeat;',
-				hidden: true					
-			},
-		    	{
-				xtype: 'container',
-				id: 'aboutUnits',
-				html: '<embed style="width:100%;height:100%;" src="app/content/units.html"/>',
-				style: '',
-				hidden: true
-			},
-		    	{
-				xtype: 'container',
-				id: 'aboutInertia',
-				html: 'inertia Txt',
-				style: '',
-				hidden: true					
-			},
-		    	{
-				xtype: 'container',
-				id: 'aboutSettings',
-				html: 'settings Txt',
-				style: '',
-				hidden: true					
-			},
-		    	{
-				xtype: 'container',
-				id: 'aboutWelcome',
-				html: 'welcome Txt',
-				style: '',
-			},
 			{
-				xtype: 'selectfield',
-				name : 'aboutItems',
-				id: 'aboutItems',
-				options: [{text:'Version info',value:'aboutAbout'},{text:'Units Converter',value:'aboutUnits'},{text:'Inertia Calculator',value:'aboutInertia'},{text:'Global Settings',value:'aboutSettings'},{text:'Welcome Memo',value:'aboutWelcome'}],
-				hidden: true,
+				xtype: 'container',
+				name: 'aboutPages',
+				id: 'aboutPages',
+				items: [
+					{
+						xtype: 'container',
+						id: 'aboutAbout',
+						html: '<div style="margin: 20px auto; height:460px; width: 320px; padding: 30px; color: #999999; font-size: .75em; background:url(resources/startup/motioncalc/robotstart320.png) no-repeat;">version: 1.0.0 | &copy;2013</div><p>&nbsp;</p>',
+						hidden: true					
+					},
+				    	{
+						xtype: 'container',
+						id: 'aboutUnits',
+						html: 'units loading...',
+						hidden: true
+					},
+				    	{
+						xtype: 'container',
+						id: 'aboutInertia',
+						html: 'inertia loading...',
+						style: '',
+						hidden: true					
+					},
+				    	{
+						xtype: 'container',
+						id: 'aboutSettings',
+						html: 'settings loading...',
+						style: '',
+						hidden: true					
+					},
+				    	{
+						xtype: 'container',
+						id: 'aboutWelcome',
+						html: 'welcome! loading...',
+					},
+				    	{
+						xtype: 'container',
+						id: 'aboutMaterials',
+						html: 'materials loading...',
+					},
+
+					{
+						xtype: 'selectfield',
+						name : 'aboutItems',
+						id: 'aboutItems',
+						options: [{text:'Units Converter',value:'aboutUnits'},{text:'Inertia Calculator',value:'aboutInertia'},{text:'Global Settings',value:'aboutSettings'},{text:'Managing Materials',value:'aboutMaterials'},{text:'Version info',value:'aboutAbout'},{text:'Welcome Memo',value:'aboutWelcome'}],
+						hidden: true,
+					},
+				]
 			},
 			{
 				xtype:'hiddenfield',
 				name: 'aboutActiveField',
 				id: 'aboutActiveField',
-				value: 0
+				value: 'aboutWelcome'
 			},
 			{
 				xtype: 'selectfield',
@@ -108,30 +120,55 @@ Ext.define('motioncalc.view.About', {
 			var fieldList = ['aboutActiveField'];
 			return fieldList;
 		}
-		function hideShow(activeItem){
-			var allItems = Ext.getCmp('aboutItems'),
+		function hideShow(){
+			var allItems = Ext.getCmp('aboutItems')
+			activeItem = Ext.getCmp('aboutActiveField').getValue(),
 			items = allItems.getOptions(),
 			count = items.length;
 			for(var i = 0; i < count; i++){
 				Ext.getCmp(items[i].value).hide();
 			}
-			if(activeItem == 0)activeItem = 'aboutWelcome';
-			else Ext.getCmp('aboutItems').setValue(activeItem);
 //			console.log(Ext.getCmp('aboutActiveField').getValue(),activeItem);
 			Ext.getCmp(activeItem).show();
 			Ext.getCmp('aboutActiveField').setValue(activeItem);
+			
+			var scroller = Ext.getCmp('aboutCardID').getScrollable();
+			if(typeof scroller != "undefined")console.log(scroller.getScroller());
+			
+//			Ext.getCmp('aboutPages').getScrollable().getScroller().scrollTo(0,0,false);
 		}
+		function getPages(){
+			function getIt(url,id){
+				Ext.Ajax.request({
+					url: 'resources/content/' + url,
+					method: 'GET',
+					callback: function(options, success, response) {
+					    Ext.getCmp(id).setHtml( response.responseText );
+					}
+				});
+			}
+			var 	pages = [{url:'units.html',id:'aboutUnits'},{url:'inertia.html',id:'aboutInertia'},{url:'welcome.html',id:'aboutWelcome'}];
+			for(i in pages){
+				getIt(pages[i].url,pages[i].id);
+//				console.log(pages[i].url,pages[i].id);
+			}			
+		}
+		var 	aboutItems = Ext.getCmp('aboutItems'),
+			activeItem; 
 		motioncalc.app.getAppState(this.getFieldList());
-		hideShow(Ext.getCmp('aboutActiveField').getValue());
+		activeItem = Ext.getCmp('aboutActiveField').getValue();
+		aboutItems.setValue(activeItem);
+		hideShow();
 		Ext.getCmp('aboutItems').on({
 			change: function(){
-				hideShow(0);
+				Ext.getCmp('aboutActiveField').setValue(Ext.getCmp('aboutItems').getValue());
+				hideShow();
 				motioncalc.app.setAppState(getFieldList(),6);
 			}
 		});
 		Ext.getCmp('aboutSocialShares').on({
 			change: function(){
-				var txt ='Get%20with%20it!%20Get%20Robot%20Maker%20Calculator;
+				var txt ='Get%20with%20it!%20Get%20Robot%20Maker%20Calculator';
 				Ext.getCmp('aboutSocialShares').getValue()(txt,'about');			
 			}
 			
@@ -139,6 +176,7 @@ Ext.define('motioncalc.view.About', {
 		this.on({
 			activate: function(){motioncalc.app.setAppState(getFieldList(),6);}
 		});
+		getPages();
  	}
 });
 

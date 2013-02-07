@@ -70,7 +70,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 								['radius','Radius: '],
 							]
 							shortAnswer = 'I%20just%20solved%20a%20' + shape + '%20inertia%20problem%20using%20%23RbtMkrCalc!',
-							inertiaAnswers = [];
+							answers = [];
 						material = material.indexOf('Select One')>-1 ? '' : ' (' + material + ')';
 						densityStr += material  + '\n';
 						solutionStr = 'Shape: ' + shape + '\n' + densityStr;
@@ -78,7 +78,8 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 						for(var i = 0;i<dimensions.length;i++){
 							solutionStr+= Ext.getCmp(dimensions[i][0]).isHidden() ? '' :dimensions[i][1] + motioncalc.app.conversionFunctions.getValue(Ext.getCmp(dimensions[i][0]).getValue()) + motioncalc.app.linearDistance + '\n';
 						}				
-						solutionStr += '\n--------------------\n\n';								
+						solutionStr += '\n--------------------\n\n';	
+						console.log(window.inertiaAnswers);							
 						if(typeof window.inertiaAnswers != 'undefined'){
 							for(var i=0;i<window.inertiaAnswers.length;i++){
 								var 	text = window.inertiaAnswers[i][0];
@@ -108,13 +109,13 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 									break;
 
 								}
-								if(text != null)inertiaAnswers.push([text,window.inertiaAnswers[i][1]]);
+								if(text != null)answers.push([text,window.inertiaAnswers[i][1]]);
 							}
 						}
-						else inertiaAnswers.push(['',0,0]);
+						else answers.push(['',0,0]);
 					
 	//					this.animateShape(null,null,0,shape,[['yyPrime','3.783335e+101'],['yy','3.783335e+101'],['xxPrime','3.783335e+101'],['xx','3.783335e+101'],['zz','3.783335e+101']]);
-						controller.animateShape(null,null,0,shape,inertiaAnswers);										
+						controller.animateShape(null,null,0,shape,answers);										
 						solutionStr += tagSolutionString();
 						Ext.getCmp('inertiaSolutionBox').set('value',solutionStr);
 						Ext.getCmp('shortAnswer').setValue(shortAnswer);

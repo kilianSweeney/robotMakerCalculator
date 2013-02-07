@@ -1,0 +1,18 @@
+<h1>Units Converter</h1>
+<h2>Convert seconds to days, days to years, lbs to kilos and a whole lot more with the units converter.</h2>
+<ol>
+<li>Choose a measurement type such as "Mass."</li>
+<li>Then choose a unit type such as "lbs."</li>
+<li>Enter an amount such as 195.</li>
+<li>And finally choose another unit type such as "slug."</li>
+</ol>
+<textarea readonly >
+Measurement Type: Mass
+
+176.4 lb = 5.482682 slug
+</textarea>
+<p>There, now you know how many slugs Barack Obama weighs.</p>
+<p>&nbsp;</p>
+<p>The answer is at the bottom of the unit converter screen. It can also be found by tapping on the "result" button. That will take you to the Solution page where you can copy and paste the solution or share it with other apps and people using the "share" button.</p>
+<h2>Integration with the inertia calculator</h2>
+<p>If you are in an inertia calculator measurement type (i.e. density, mass, or "linear distance") then the "+ inertia" button will be active. You can push the value over to the inertia calculator. Be sure to set up the inertia calculator for the correct equation.</p>

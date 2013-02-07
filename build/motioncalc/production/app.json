@@ -1,1 +1,1 @@
-{"id":"afc60c8c-73a4-4270-bb06-3e4b72964464","js":[{"path":"app.js","bundle":true,"update":"delta","type":"js","version":"db9f52717e7d9dcf8ad1cd6c88aee33cd3c0b4b3"}],"css":[{"path":"resources/css/app.css","update":"delta","type":"css","version":"f7a09f0b02fda9d1aec9b3292c523b2ef7cf013b"}]}
+{"id":"afc60c8c-73a4-4270-bb06-3e4b72964464","js":[{"path":"app.js","bundle":true,"update":"full","type":"js","version":"b37038efcce9ca538fcfde0e2b9d8886144cd96d"}],"css":[{"path":"resources/css/app.css","update":"full","type":"css","version":"e464b9430a68fb020c6468ef0dfbe5044b22fe85"}]}

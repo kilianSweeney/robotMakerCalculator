@@ -136,7 +136,7 @@ Ext.define('motioncalc.view.Units', {
 		
 		Ext.getCmp('unitsType').setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
 		var theType = motioncalc.app.getGlobalSetting('unitsType','_AppState');
-		theType = theType == null ? Area: theType;
+		theType = theType == null ? 'Area': theType;
 		Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(theType));
 		Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(theType));
 

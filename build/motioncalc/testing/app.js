@@ -33880,6 +33880,638 @@ Ext.define('Ext.Ajax', {
 });
 
 /**
+ * Ext.Anim is used to execute simple animations defined in {@link Ext.anims}. The {@link #run} method can take any of the
+ * properties defined below.
+ *
+ *     Ext.Anim.run(this, 'fade', {
+ *         out: false,
+ *         autoClear: true
+ *     });
+ *
+ * When using {@link Ext.Anim#run}, ensure you require {@link Ext.Anim} in your application. Either do this using {@link Ext#require}:
+ *
+ *     Ext.requires('Ext.Anim');
+ *
+ * when using {@link Ext#setup}:
+ *
+ *     Ext.setup({
+ *         requires: ['Ext.Anim'],
+ *         onReady: function() {
+ *             //do something
+ *         }
+ *     });
+ *
+ * or when using {@link Ext#application}:
+ *
+ *     Ext.application({
+ *         requires: ['Ext.Anim'],
+ *         launch: function() {
+ *             //do something
+ *         }
+ *     });
+ *
+ * @singleton
+ */
+
+Ext.define('Ext.Anim', {
+    isAnim: true,
+
+    /**
+     * @cfg {Boolean} disableAnimations
+     * `true` to disable animations.
+     */
+    disableAnimations: false,
+
+    defaultConfig: {
+        /**
+         * @cfg {Object} from
+         * An object of CSS values which the animation begins with. If you define a CSS property here, you must also
+         * define it in the {@link #to} config.
+         */
+        from: {},
+
+        /**
+         * @cfg {Object} to
+         * An object of CSS values which the animation ends with. If you define a CSS property here, you must also
+         * define it in the {@link #from} config.
+         */
+        to: {},
+
+        /**
+         * @cfg {Number} duration
+         * Time in milliseconds for the animation to last.
+         */
+        duration: 250,
+
+        /**
+         * @cfg {Number} delay Time to delay before starting the animation.
+         */
+        delay: 0,
+
+        /**
+         * @cfg {String} easing
+         * Valid values are 'ease', 'linear', ease-in', 'ease-out', 'ease-in-out', or a cubic-bezier curve as defined by CSS.
+         */
+        easing: 'ease-in-out',
+
+        /**
+         * @cfg {Boolean} autoClear
+         * `true` to remove all custom CSS defined in the {@link #to} config when the animation is over.
+         */
+        autoClear: true,
+
+        /**
+         * @cfg {Boolean} out
+         * `true` if you want the animation to slide out of the screen.
+         */
+        out: true,
+
+        /**
+         * @cfg {String} direction
+         * Valid values are: 'left', 'right', 'up', 'down', and `null`.
+         */
+        direction: null,
+
+        /**
+         * @cfg {Boolean} reverse
+         * `true` to reverse the animation direction. For example, if the animation direction was set to 'left', it would
+         * then use 'right'.
+         */
+        reverse: false
+    },
+
+    /**
+     * @cfg {Function} before
+     * Code to execute before starting the animation.
+     */
+
+    /**
+     * @cfg {Function} after
+     * Code to execute after the animation ends.
+     */
+
+    /**
+     * @cfg {Object} scope
+     * Scope to run the {@link #before} function in.
+     */
+
+    opposites: {
+        'left': 'right',
+        'right': 'left',
+        'up': 'down',
+        'down': 'up'
+    },
+
+    constructor: function(config) {
+        config = Ext.apply({}, config || {}, this.defaultConfig);
+        this.config = config;
+
+        this.callSuper([config]);
+
+        this.running = [];
+    },
+
+    initConfig: function(el, runConfig) {
+        var me = this,
+            config = Ext.apply({}, runConfig || {}, me.config);
+
+        config.el = el = Ext.get(el);
+
+        if (config.reverse && me.opposites[config.direction]) {
+            config.direction = me.opposites[config.direction];
+        }
+
+        if (me.config.before) {
+            me.config.before.call(config, el, config);
+        }
+
+        if (runConfig.before) {
+            runConfig.before.call(config.scope || config, el, config);
+        }
+
+        return config;
+    },
+
+    /**
+     * @ignore
+     */
+    run: function(el, config) {
+        el = Ext.get(el);
+        config = config || {};
+
+
+        var me = this,
+            style = el.dom.style,
+            property,
+            after = config.after;
+
+        if (me.running[el.id]) {
+            me.onTransitionEnd(null, el, {
+                config: config,
+                after: after
+            });
+        }
+
+        config = this.initConfig(el, config);
+
+        if (this.disableAnimations) {
+            for (property in config.to) {
+                if (!config.to.hasOwnProperty(property)) {
+                    continue;
+                }
+                style[property] = config.to[property];
+            }
+            this.onTransitionEnd(null, el, {
+                config: config,
+                after: after
+            });
+            return me;
+        }
+
+        el.un('transitionend', me.onTransitionEnd, me);
+
+        style.webkitTransitionDuration = '0ms';
+        for (property in config.from) {
+            if (!config.from.hasOwnProperty(property)) {
+                continue;
+            }
+            style[property] = config.from[property];
+        }
+
+        setTimeout(function() {
+            // If this element has been destroyed since the timeout started, do nothing
+            if (!el.dom) {
+                return;
+            }
+
+            // If this is a 3d animation we have to set the perspective on the parent
+            if (config.is3d === true) {
+                el.parent().setStyle({
+                    // See https://sencha.jira.com/browse/TOUCH-1498
+                    '-webkit-perspective': '1200',
+                    '-webkit-transform-style': 'preserve-3d'
+                });
+            }
+
+            style.webkitTransitionDuration = config.duration + 'ms';
+            style.webkitTransitionProperty = 'all';
+            style.webkitTransitionTimingFunction = config.easing;
+
+            // Bind our listener that fires after the animation ends
+            el.on('transitionend', me.onTransitionEnd, me, {
+                single: true,
+                config: config,
+                after: after
+            });
+
+            for (property in config.to) {
+                if (!config.to.hasOwnProperty(property)) {
+                    continue;
+                }
+                style[property] = config.to[property];
+            }
+        }, config.delay || 5);
+
+        me.running[el.id] = config;
+        return me;
+    },
+
+    onTransitionEnd: function(ev, el, o) {
+        el = Ext.get(el);
+
+        if (this.running[el.id] === undefined) {
+            return;
+        }
+
+        var style = el.dom.style,
+            config = o.config,
+            me = this,
+            property;
+
+        if (config.autoClear) {
+            for (property in config.to) {
+                if (!config.to.hasOwnProperty(property) || config[property] === false) {
+                    continue;
+                }
+                style[property] = '';
+            }
+        }
+
+        style.webkitTransitionDuration = null;
+        style.webkitTransitionProperty = null;
+        style.webkitTransitionTimingFunction = null;
+
+        if (config.is3d) {
+            el.parent().setStyle({
+                '-webkit-perspective': '',
+                '-webkit-transform-style': ''
+            });
+        }
+
+        if (me.config.after) {
+            me.config.after.call(config, el, config);
+        }
+
+        if (o.after) {
+            o.after.call(config.scope || me, el, config);
+        }
+
+        delete me.running[el.id];
+    }
+}, function() {
+
+    Ext.Anim.seed = 1000;
+
+    /**
+     * Used to run an animation on a specific element. Use the config argument to customize the animation.
+     * @param {Ext.Element/HTMLElement} el The element to animate.
+     * @param {String} anim The animation type, defined in {@link Ext.anims}.
+     * @param {Object} config The config object for the animation.
+     * @method run
+     */
+    Ext.Anim.run = function(el, anim, config) {
+        if (el.isComponent) {
+            el = el.element;
+        }
+
+        config = config || {};
+
+        if (anim.isAnim) {
+            anim.run(el, config);
+        }
+        else {
+            if (Ext.isObject(anim)) {
+                if (config.before && anim.before) {
+                    config.before = Ext.createInterceptor(config.before, anim.before, anim.scope);
+                }
+                if (config.after && anim.after) {
+                    config.after = Ext.createInterceptor(config.after, anim.after, anim.scope);
+                }
+                config = Ext.apply({}, config, anim);
+                anim = anim.type;
+            }
+
+            if (!Ext.anims[anim]) {
+                throw anim + ' is not a valid animation type.';
+            }
+            else {
+                // add el check to make sure dom exists.
+                if (el && el.dom) {
+                    Ext.anims[anim].run(el, config);
+                }
+            }
+        }
+    };
+
+    /**
+     * @class Ext.anims
+     * Defines different types of animations.
+     *
+     * __Note:__ _flip_, _cube_, and _wipe_ animations do not work on Android.
+     *
+     * Please refer to {@link Ext.Anim} on how to use animations.
+     * @singleton
+     */
+    Ext.anims = {
+        /**
+         * Fade Animation
+         */
+        fade: new Ext.Anim({
+            type: 'fade',
+            before: function(el) {
+                var fromOpacity = 1,
+                    toOpacity = 1,
+                    curZ = el.getStyle('z-index') == 'auto' ? 0 : el.getStyle('z-index'),
+                    zIndex = curZ;
+
+                if (this.out) {
+                    toOpacity = 0;
+                } else {
+                    zIndex = Math.abs(curZ) + 1;
+                    fromOpacity = 0;
+                }
+
+                this.from = {
+                    'opacity': fromOpacity,
+                    'z-index': zIndex
+                };
+                this.to = {
+                    'opacity': toOpacity,
+                    'z-index': zIndex
+                };
+            }
+        }),
+
+        /**
+         * Slide Animation
+         */
+        slide: new Ext.Anim({
+            direction: 'left',
+            cover: false,
+            reveal: false,
+            opacity: false,
+            'z-index': false,
+
+            before: function(el) {
+                var currentZIndex = el.getStyle('z-index') == 'auto' ? 0 : el.getStyle('z-index'),
+                    currentOpacity = el.getStyle('opacity'),
+                    zIndex = currentZIndex + 1,
+                    out = this.out,
+                    direction = this.direction,
+                    toX = 0,
+                    toY = 0,
+                    fromX = 0,
+                    fromY = 0,
+                    elH = el.getHeight(),
+                    elW = el.getWidth();
+
+                if (direction == 'left' || direction == 'right') {
+                    if (out) {
+                        toX = -elW;
+                    }
+                    else {
+                        fromX = elW;
+                    }
+                }
+                else if (direction == 'up' || direction == 'down') {
+                    if (out) {
+                        toY = -elH;
+                    }
+                    else {
+                        fromY = elH;
+                    }
+                }
+
+                if (direction == 'right' || direction == 'down') {
+                    toY *= -1;
+                    toX *= -1;
+                    fromY *= -1;
+                    fromX *= -1;
+                }
+
+                if (this.cover && out) {
+                    toX = 0;
+                    toY = 0;
+                    zIndex = currentZIndex;
+                }
+                else if (this.reveal && !out) {
+                    fromX = 0;
+                    fromY = 0;
+                    zIndex = currentZIndex;
+                }
+
+                this.from = {
+                    '-webkit-transform': 'translate3d(' + fromX + 'px, ' + fromY + 'px, 0)',
+                    'z-index': zIndex,
+                    'opacity': currentOpacity - 0.01
+                };
+                this.to = {
+                    '-webkit-transform': 'translate3d(' + toX + 'px, ' + toY + 'px, 0)',
+                    'z-index': zIndex,
+                    'opacity': currentOpacity
+                };
+            }
+        }),
+
+        /**
+         * Pop Animation
+         */
+        pop: new Ext.Anim({
+            scaleOnExit: true,
+            before: function(el) {
+                var fromScale = 1,
+                    toScale = 1,
+                    fromOpacity = 1,
+                    toOpacity = 1,
+                    curZ = el.getStyle('z-index') == 'auto' ? 0 : el.getStyle('z-index'),
+                    fromZ = curZ,
+                    toZ = curZ;
+
+                if (!this.out) {
+                    fromScale = 0.01;
+                    fromZ = curZ + 1;
+                    toZ = curZ + 1;
+                    fromOpacity = 0;
+                }
+                else {
+                    if (this.scaleOnExit) {
+                        toScale = 0.01;
+                        toOpacity = 0;
+                    } else {
+                        toOpacity = 0.8;
+                    }
+                }
+
+                this.from = {
+                    '-webkit-transform': 'scale(' + fromScale + ')',
+                    '-webkit-transform-origin': '50% 50%',
+                    'opacity': fromOpacity,
+                    'z-index': fromZ
+                };
+
+                this.to = {
+                    '-webkit-transform': 'scale(' + toScale + ')',
+                    '-webkit-transform-origin': '50% 50%',
+                    'opacity': toOpacity,
+                    'z-index': toZ
+                };
+            }
+        }),
+
+        /**
+         * Flip Animation
+         */
+        flip: new Ext.Anim({
+            is3d: true,
+            direction: 'left',
+            before: function(el) {
+                var rotateProp = 'Y',
+                    fromScale = 1,
+                    toScale = 1,
+                    fromRotate = 0,
+                    toRotate = 0;
+
+                if (this.out) {
+                    toRotate = -180;
+                    toScale = 0.8;
+                }
+                else {
+                    fromRotate = 180;
+                    fromScale = 0.8;
+                }
+
+                if (this.direction == 'up' || this.direction == 'down') {
+                    rotateProp = 'X';
+                }
+
+                if (this.direction == 'right' || this.direction == 'left') {
+                    toRotate *= -1;
+                    fromRotate *= -1;
+                }
+
+                this.from = {
+                    '-webkit-transform': 'rotate' + rotateProp + '(' + fromRotate + 'deg) scale(' + fromScale + ')',
+                    '-webkit-backface-visibility': 'hidden'
+                };
+                this.to = {
+                    '-webkit-transform': 'rotate' + rotateProp + '(' + toRotate + 'deg) scale(' + toScale + ')',
+                    '-webkit-backface-visibility': 'hidden'
+                };
+            }
+        }),
+
+        /**
+         * Cube Animation
+         */
+        cube: new Ext.Anim({
+            is3d: true,
+            direction: 'left',
+            style: 'outer',
+            before: function(el) {
+                var origin = '0% 0%',
+                    fromRotate = 0,
+                    toRotate = 0,
+                    rotateProp = 'Y',
+                    fromZ = 0,
+                    toZ = 0,
+                    elW = el.getWidth(),
+                    elH = el.getHeight(),
+                    showTranslateZ = true,
+                    fromTranslate = ' translateX(0)',
+                    toTranslate = '';
+
+                if (this.direction == 'left' || this.direction == 'right') {
+                    if (this.out) {
+                        origin = '100% 100%';
+                        toZ = elW;
+                        toRotate = -90;
+                    } else {
+                        origin = '0% 0%';
+                        fromZ = elW;
+                        fromRotate = 90;
+                    }
+                } else if (this.direction == 'up' || this.direction == 'down') {
+                    rotateProp = 'X';
+                    if (this.out) {
+                        origin = '100% 100%';
+                        toZ = elH;
+                        toRotate = 90;
+                    } else {
+                        origin = '0% 0%';
+                        fromZ = elH;
+                        fromRotate = -90;
+                    }
+                }
+
+                if (this.direction == 'down' || this.direction == 'right') {
+                    fromRotate *= -1;
+                    toRotate *= -1;
+                    origin = (origin == '0% 0%') ? '100% 100%': '0% 0%';
+                }
+
+                if (this.style == 'inner') {
+                    fromZ *= -1;
+                    toZ *= -1;
+                    fromRotate *= -1;
+                    toRotate *= -1;
+
+                    if (!this.out) {
+                        toTranslate = ' translateX(0px)';
+                        origin = '0% 50%';
+                    } else {
+                        toTranslate = fromTranslate;
+                        origin = '100% 50%';
+                    }
+                }
+
+                this.from = {
+                    '-webkit-transform': 'rotate' + rotateProp + '(' + fromRotate + 'deg)' + (showTranslateZ ? ' translateZ(' + fromZ + 'px)': '') + fromTranslate,
+                    '-webkit-transform-origin': origin
+                };
+                this.to = {
+                    '-webkit-transform': 'rotate' + rotateProp + '(' + toRotate + 'deg) translateZ(' + toZ + 'px)' + toTranslate,
+                    '-webkit-transform-origin': origin
+                };
+            },
+            duration: 250
+        }),
+
+
+        /**
+         * Wipe Animation.
+         * Because of the amount of calculations involved, this animation is best used on small display
+         * changes or specifically for phone environments. Does not currently accept any parameters.
+         */
+        wipe: new Ext.Anim({
+            before: function(el) {
+                var curZ = el.getStyle('z-index'),
+                    zIndex,
+                    mask = '';
+
+                if (!this.out) {
+                    zIndex = curZ + 1;
+                    mask = '-webkit-gradient(linear, left bottom, right bottom, from(transparent), to(#000), color-stop(66%, #000), color-stop(33%, transparent))';
+
+                    this.from = {
+                        '-webkit-mask-image': mask,
+                        '-webkit-mask-size': el.getWidth() * 3 + 'px ' + el.getHeight() + 'px',
+                        'z-index': zIndex,
+                        '-webkit-mask-position-x': 0
+                    };
+                    this.to = {
+                        '-webkit-mask-image': mask,
+                        '-webkit-mask-size': el.getWidth() * 3 + 'px ' + el.getHeight() + 'px',
+                        'z-index': zIndex,
+                        '-webkit-mask-position-x': -el.getWidth() * 2 + 'px'
+                    };
+                }
+            },
+            duration: 500
+        })
+    };
+});
+
+/**
  * @class Ext.ComponentQuery
  * @extends Object
  * @singleton
@@ -52777,6 +53409,270 @@ Ext.define('Ext.data.Validations', {
 });
 
 /**
+ * @author Tommy Maintz
+ *
+ * This class generates UUID's according to RFC 4122. This class has a default id property.
+ * This means that a single instance is shared unless the id property is overridden. Thus,
+ * two {@link Ext.data.Model} instances configured like the following share one generator:
+ *
+ *     Ext.define('MyApp.data.MyModelX', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             identifier: 'uuid'
+ *         }
+ *     });
+ *
+ *     Ext.define('MyApp.data.MyModelY', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             identifier: 'uuid'
+ *         }
+ *     });
+ *
+ * This allows all models using this class to share a commonly configured instance.
+ *
+ * # Using Version 1 ("Sequential") UUID's
+ *
+ * If a server can provide a proper timestamp and a "cryptographic quality random number"
+ * (as described in RFC 4122), the shared instance can be configured as follows:
+ *
+ *     Ext.data.identifier.Uuid.Global.reconfigure({
+ *         version: 1,
+ *         clockSeq: clock, // 14 random bits
+ *         salt: salt,      // 48 secure random bits (the Node field)
+ *         timestamp: ts    // timestamp per Section 4.1.4
+ *     });
+ *
+ *     // or these values can be split into 32-bit chunks:
+ *
+ *     Ext.data.identifier.Uuid.Global.reconfigure({
+ *         version: 1,
+ *         clockSeq: clock,
+ *         salt: { lo: saltLow32, hi: saltHigh32 },
+ *         timestamp: { lo: timestampLow32, hi: timestamptHigh32 }
+ *     });
+ *
+ * This approach improves the generator's uniqueness by providing a valid timestamp and
+ * higher quality random data. Version 1 UUID's should not be used unless this information
+ * can be provided by a server and care should be taken to avoid caching of this data.
+ *
+ * See [http://www.ietf.org/rfc/rfc4122.txt](http://www.ietf.org/rfc/rfc4122.txt) for details.
+ */
+Ext.define('Ext.data.identifier.Uuid', {
+    extend: 'Ext.data.identifier.Simple',
+
+    alias: 'data.identifier.uuid',
+
+    isUnique: true,
+
+    config: {
+        /**
+         * The id for this generator instance. By default all model instances share the same
+         * UUID generator instance. By specifying an id other then 'uuid', a unique generator instance
+         * will be created for the Model.
+         */
+        id: undefined,
+
+        /**
+         * @property {Number/Object} salt
+         * When created, this value is a 48-bit number. For computation, this value is split
+         * into 32-bit parts and stored in an object with `hi` and `lo` properties.
+         */
+        salt: null,
+
+        /**
+         * @property {Number/Object} timestamp
+         * When created, this value is a 60-bit number. For computation, this value is split
+         * into 32-bit parts and stored in an object with `hi` and `lo` properties.
+         */
+        timestamp: null,
+
+        /**
+         * @cfg {Number} version
+         * The Version of UUID. Supported values are:
+         *
+         *  * 1 : Time-based, "sequential" UUID.
+         *  * 4 : Pseudo-random UUID.
+         *
+         * The default is 4.
+         */
+        version: 4
+    },
+
+    applyId: function(id) {
+        if (id === undefined) {
+            return Ext.data.identifier.Uuid.Global;
+        }
+        return id;
+    },
+
+    constructor: function() {
+        var me = this;
+        me.callParent(arguments);
+        me.parts = [];
+        me.init();
+    },
+
+    /**
+     * Reconfigures this generator given new config properties.
+     */
+    reconfigure: function(config) {
+        this.setConfig(config);
+        this.init();
+    },
+
+    generate: function () {
+        var me = this,
+            parts = me.parts,
+            version = me.getVersion(),
+            salt = me.getSalt(),
+            time = me.getTimestamp();
+
+        /*
+           The magic decoder ring (derived from RFC 4122 Section 4.2.2):
+
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+           |                          time_low                             |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+           |           time_mid            |  ver  |        time_hi        |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+           |res|  clock_hi |   clock_low   |    salt 0   |M|     salt 1    |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+           |                         salt (2-5)                            |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                     time_mid      clock_hi (low 6 bits)
+            time_low     | time_hi |clock_lo
+                |        |     |   || salt[0]
+                |        |     |   ||   | salt[1..5]
+                v        v     v   vv   v v
+                0badf00d-aced-1def-b123-dfad0badbeef
+                              ^    ^     ^
+                        version    |     multicast (low bit)
+                                   |
+                                reserved (upper 2 bits)
+        */
+        parts[0] = me.toHex(time.lo, 8);
+        parts[1] = me.toHex(time.hi & 0xFFFF, 4);
+        parts[2] = me.toHex(((time.hi >>> 16) & 0xFFF) | (version << 12), 4);
+        parts[3] = me.toHex(0x80 | ((me.clockSeq >>> 8) & 0x3F), 2) +
+                   me.toHex(me.clockSeq & 0xFF, 2);
+        parts[4] = me.toHex(salt.hi, 4) + me.toHex(salt.lo, 8);
+
+        if (version == 4) {
+            me.init(); // just regenerate all the random values...
+        } else {
+            // sequentially increment the timestamp...
+            ++time.lo;
+            if (time.lo >= me.twoPow32) { // if (overflow)
+                time.lo = 0;
+                ++time.hi;
+            }
+        }
+
+        return parts.join('-').toLowerCase();
+    },
+
+    /**
+     * @private
+     */
+    init: function () {
+        var me = this,
+            salt = me.getSalt(),
+            time = me.getTimestamp();
+
+        if (me.getVersion() == 4) {
+            // See RFC 4122 (Secion 4.4)
+            //   o  If the state was unavailable (e.g., non-existent or corrupted),
+            //      or the saved node ID is different than the current node ID,
+            //      generate a random clock sequence value.
+            me.clockSeq = me.rand(0, me.twoPow14-1);
+
+            if (!salt) {
+                salt = {};
+                me.setSalt(salt);
+            }
+
+            if (!time) {
+                time = {};
+                me.setTimestamp(time);
+            }
+
+            // See RFC 4122 (Secion 4.4)
+            salt.lo = me.rand(0, me.twoPow32-1);
+            salt.hi = me.rand(0, me.twoPow16-1);
+            time.lo = me.rand(0, me.twoPow32-1);
+            time.hi = me.rand(0, me.twoPow28-1);
+        } else {
+            // this is run only once per-instance
+            me.setSalt(me.split(me.getSalt()));
+            me.setTimestamp(me.split(me.getTimestamp()));
+
+            // Set multicast bit: "the least significant bit of the first octet of the
+            // node ID" (nodeId = salt for this implementation):
+            me.getSalt().hi |= 0x100;
+        }
+    },
+
+    /**
+     * Some private values used in methods on this class.
+     * @private
+     */
+    twoPow14: Math.pow(2, 14),
+    twoPow16: Math.pow(2, 16),
+    twoPow28: Math.pow(2, 28),
+    twoPow32: Math.pow(2, 32),
+
+    /**
+     * Converts a value into a hexadecimal value. Also allows for a maximum length
+     * of the returned value.
+     * @param value
+     * @param length
+     * @private
+     */
+    toHex: function(value, length) {
+        var ret = value.toString(16);
+        if (ret.length > length) {
+            ret = ret.substring(ret.length - length); // right-most digits
+        } else if (ret.length < length) {
+            ret = Ext.String.leftPad(ret, length, '0');
+        }
+        return ret;
+    },
+
+    /**
+     * Generates a random value with between a low and high.
+     * @param lo
+     * @param hi
+     * @private
+     */
+    rand: function(lo, hi) {
+        var v = Math.random() * (hi - lo + 1);
+        return Math.floor(v) + lo;
+    },
+
+    /**
+     * Splits a number into a low and high value.
+     * @param bignum
+     * @private
+     */
+    split: function(bignum) {
+        if (typeof(bignum) == 'number') {
+            var hi = Math.floor(bignum / this.twoPow32);
+            return {
+                lo: Math.floor(bignum - hi * this.twoPow32),
+                hi: hi
+            };
+        }
+        return bignum;
+    }
+}, function() {
+    this.Global = new this({
+        id: 'uuid'
+    });
+});
+
+/**
  * @author Ed Spencer
  *
  * WebStorageProxy is simply a superclass for the {@link Ext.data.proxy.LocalStorage LocalStorage} proxy. It uses the
@@ -67397,6 +68293,7 @@ Ext.define('motioncalc.util.Conversions', {
 		var i = 0;
 		store.each(function()
 		{
+//			console.log(this.get("unitFrom"),this.get("unitType"), ' | ',unitsFrom, unitType);
 			if(this.get("unitFrom") == unitsFrom && this.get("unitType")==unitType){
 				intX=i;
 			}
@@ -67427,6 +68324,166 @@ Ext.define('motioncalc.util.Conversions', {
 	}
 });
 
+Ext.define('motioncalc.view.Units', {
+    extend: 'Ext.form.FormPanel',
+    xtype: 'unitscard',
+	id:'unitsID',
+    requires: [
+        'Ext.form.FieldSet',
+	'Ext.field.Number',
+	'motioncalc.util.Conversions'
+    ],
+
+    config: {
+        iconCls: 'sign_leftright',
+        title: 'Units',
+        items: [
+            {
+                docked: 'top',
+                xtype: 'toolbar',
+                title: 'UNIT CONVERTER',
+		items: [
+			{
+				xtype: 'button',
+				id: 'buttonUnitsResult',
+				text: 'result',
+				disabled: true
+			},
+			{
+				xtype: 'spacer',
+			},
+			{
+				xtype: 'button',
+				id: 'buttonAddToInertia',
+				text: '+ Inertia Calc',
+				disabled: true
+			}
+		]
+
+            },
+		{
+		xtype: 'selectfield',
+		name : 'selectForInertia',
+		id: 'selectForInertia',
+		hidden: 'true',
+		},
+		{
+			xtype: 'hiddenfield',
+			name: 'unitsResultStatus',
+			id: 'unitsResultStatus',
+			value: 4,
+			listeners: {
+				change: function(){
+					var 	resultStatus = Ext.getCmp('unitsResultStatus').getValue(),
+						button = Ext.getCmp('buttonUnitsResult'),
+						disabled = true;
+					if(resultStatus == 1)disabled = false;
+					button.setDisabled(disabled);
+//					console.log(disabled);
+				}
+			}
+		},
+		{
+			xtype: 'fieldset',
+			items: [
+				    {
+					xtype: 'selectfield',
+					name : 'measurementType',
+					label: 'Measurement Type',
+					id: 'unitsType',
+					listeners:{
+			
+					change: function(selectbox,newValue,oldValue)
+					    {
+						var resultStatus = Ext.getCmp('unitsResultStatus');			
+						if(resultStatus.getValue()==4)return;
+						resultStatus.setValue(3);
+						Ext.getCmp('unitsAmount').setValue(0);
+						Ext.getCmp('unitsAnswer').set('html','').hide();
+						Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
+						Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
+						resultStatus.setValue(0);
+					    }
+				       	}
+				    },
+				    {
+					xtype: 'selectfield',
+					name : 'unitsFrom',
+					id: 'unitsFrom',
+					label: 'Unit',
+					dataType: 'unit-types',
+				    },
+				    {
+					xtype: 'numberfield',
+					name : 'unitsAmount',
+					id: 'unitsAmount',
+					label: 'Amount',
+				    },
+				    {
+					xtype: 'selectfield',
+					name : 'convertTo',
+					id: 'unitsTo',
+					dataType: 'unit-types',
+					label: 'Convert To',
+				    },
+			]
+		},		
+	    {
+		xtype: 'container',
+		name : 'unitsAnswer',
+		id: 'unitsAnswer',
+		hidden: true
+	    }
+        ]
+    },
+	initialize: function(){
+		function sendToUnitsConvert(){
+			var resultStatus = Ext.getCmp('unitsResultStatus');
+			if(resultStatus.getValue()==3 || resultStatus.getValue()==4)return;
+			var unitsAmount,unitsAnswer,unitsFrom,unitsTo,returnedValue;
+			unitsAmount = Ext.getCmp('unitsAmount');
+			unitsAnswer = Ext.getCmp('unitsAnswer');
+			unitsFrom = Ext.getCmp('unitsFrom');
+			unitsTo = Ext.getCmp('unitsTo');
+			unitsType = Ext.getCmp('unitsType');
+			unitsAnswer.hide();
+			returnedValue = motioncalc.app.conversionFunctions.unitsConvert(unitsAmount.get('value'),unitsFrom.get('value'),unitsTo.get('value'),unitsType.get('value'),true);
+			unitsAnswer.set('html',returnedValue);
+			resultStatus.setValue(1);
+			unitsAnswer.show({type :"slide",direction : "right", duration : 500});
+			motioncalc.app.setAppState(getFieldList(),1);
+		}
+
+		function getFieldList(){
+			var fieldList;
+			fieldList = ['unitsType','unitsTo','unitsFrom','unitsAmount'];
+			return fieldList;
+		}
+		
+		Ext.getCmp('unitsType').setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
+		var theType = motioncalc.app.getGlobalSetting('unitsType','_AppState');
+		theType = theType == null ? 'Area': theType;
+		Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(theType));
+		Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(theType));
+
+
+		Ext.Array.each(Ext.ComponentQuery.query('selectfield[dataType="unit-types"]'),function(){
+				this.on({
+					change: function(){sendToUnitsConvert();}
+				});
+		});
+
+		Ext.getCmp('unitsAmount').on({
+			blur: function(){sendToUnitsConvert();}
+		});
+		motioncalc.app.getAppState(getFieldList());
+		this.on({
+			activate: function(){sendToUnitsConvert();}
+		});
+		Ext.getCmp('unitsResultStatus').setValue(0);
+	}
+});
+
 Ext.define('motioncalc.view.Inertia', {
     extend: 'Ext.form.FormPanel',
     xtype: 'inertiacard',
@@ -67446,8 +68503,15 @@ Ext.define('motioncalc.view.Inertia', {
             {
                 docked: 'top',
                 xtype: 'toolbar',
-                title: 'Inertia',
+                title: 'INERTIA CALC',
 		items: [
+			{
+				xtype:'button', 
+				name:'buttonInertiaSolution', 
+				id:'buttonInertiaSolution', 
+				text:'result',
+				disabled:false,
+			},
 			{xtype: 'spacer'},
 			{
 				xtype:'button', 
@@ -67476,101 +68540,359 @@ Ext.define('motioncalc.view.Inertia', {
 		id: 'inertiaMaterialsClickCount',
 		value: 0
 	    },
-	    {
-		xtype: 'selectfield',
-		name : 'inertiaMaterials',
-		id: 'inertiaMaterials',
-		store: '_MaterialDensities',
-		displayField: 'name',
-		valueField: 'density',
-		hidden: true
-	    },
-	    {
-		xtype: 'selectfield',
-		name : 'inertiaShape',
-		label: 'Shape',
-		id: 'inertiaShape',
-		options: [{value:"cylinder",text:"Cylinder"},{value:"parallelepiped",text:"Parallelepiped"},{value:"sphericalShell",text:"Spherical Shell"},{value:"sphere",text:"Sphere"},{value:"slenderRod",text:"Slender Rod"},{value:"tetrahedron",text:"Tetrahedron"}],
-	    },
-	    {
-		xtype: 'numberfield',
-		name : 'inertiaDensity',
-		value: 0,
-		id: 'inertiaDensity',
-		label: 'Density',
-		readonly: true
-	    },
-	    {
-		xtype: 'numberfield',
-		name : 'inertiaMass',
-		value: 0,
-		id: 'inertiaMass',
-		label: 'Mass',
-		readonly: false
-	    },
-	    {
-		xtype: 'numberfield',
-		name : 'inertiaHeight',
-		value: 0,
-		dataType: 'linear-distance',
-		id: 'inertiaHeight',
-		label: 'Height',
-		hidden: true
-	    },
-	    {
-		xtype: 'numberfield',
-		name : 'inertiaLength',
-		value: 0,
-		dataType: 'linear-distance',
-		id: 'inertiaLength',
-		label: 'Length',
-		hidden: true
-	    },
-	    {
-		xtype: 'numberfield',
-		name : 'inertiaWidth',
-		value: 0,
-		dataType: 'linear-distance',
-		id: 'inertiaWidth',
-		label: 'Width',
-		hidden: true
-	    },
-	    {
-		xtype: 'numberfield',
-		name : 'outsideDiameter',
-		value: 0,
-		dataType: 'linear-distance',
-		id: 'outsideDiameter',
-		label: 'Outside Diameter',
-	    },
-	    {
-		xtype: 'numberfield',
-		name : 'insideDiameter',
-		value: 0,
-		dataType: 'linear-distance',
-		id: 'insideDiameter',
-		label: 'Inside Diameter',
-	    },
-	    {
-		xtype: 'numberfield',
-		name : 'radius',
-		value: 0,
-		dataType: 'linear-distance',
-		id: 'radius',
-		label: 'Radius',
-	    },
-	    {
-		xtype: 'textfield',
+		{
+			xtype: 'fieldset',
+			items: [
+			    {
+				xtype: 'selectfield',
+				name : 'inertiaMaterials',
+				id: 'inertiaMaterials',
+				store: '_MaterialDensities',
+				displayField: 'name',
+				valueField: 'name',
+				hidden: true
+			    },
+			    {
+				xtype: 'selectfield',
+				name : 'inertiaShape',
+				label: 'Shape',
+				id: 'inertiaShape',
+				options: [{value:"cylinder",text:"Cylinder"},{value:"parallelepiped",text:"Parallelepiped"},{value:"sphericalShell",text:"Spherical Shell"},{value:"sphere",text:"Sphere"},{value:"slenderRod",text:"Slender Rod"},{value:"tetrahedron",text:"Tetrahedron"}],
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'inertiaDensity',
+				value: 0,
+				id: 'inertiaDensity',
+				cls: ['convert-for-it'],
+				label: 'Density',
+				disabled: true
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'inertiaMass',
+				value: 0,
+				id: 'inertiaMass',
+				cls: 'convert-for-it',
+				label: 'Mass',
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'inertiaHeight',
+				value: 0,
+				dataType: 'linear-distance',
+				id: 'inertiaHeight',
+				label: 'Height',
+				hidden: true
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'inertiaLength',
+				value: 0,
+				dataType: 'linear-distance',
+				id: 'inertiaLength',
+				label: 'Length',
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'inertiaWidth',
+				value: 0,
+				dataType: 'linear-distance',
+				id: 'inertiaWidth',
+				label: 'Width',
+				hidden: true
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'outsideDiameter',
+				value: 0,
+				dataType: 'linear-distance',
+				id: 'outsideDiameter',
+				label: 'Outside Diameter',
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'insideDiameter',
+				value: 0,
+				dataType: 'linear-distance',
+				id: 'insideDiameter',
+				label: 'Inside Diameter',
+			    },
+			    {
+				xtype: 'numberfield',
+				name : 'radius',
+				value: 0,
+				dataType: 'linear-distance',
+				id: 'radius',
+				label: 'Radius',
+				hidden: true
+			    },
+		]
+	},
+	{
+		xtype: 'container',
 		name : 'inertiaAnswer',
 		id: 'inertiaAnswer',
-		value: 0,
-		label: '=',
-		readOnly: true,
-	    }
+	},
         ]
     }
 });
 
+
+Ext.define('motioncalc.view.About', {
+	extend: 'Ext.Container',
+	xtype: 'aboutcard',
+	requires: [
+		],
+//	controllers: ['AddMaterial'],
+	config: {
+		title: 'ABOUT',
+		isEnabled: false,
+		items: [
+		    {
+			docked: 'top',
+			xtype: 'toolbar',
+			title: 'ABOUT RMC',
+			id: 'AboutRMC',
+			items: [
+				{
+					xtype:'button', 
+					name:'buttonAboutInfo', 
+					id:'buttonAboutInfo', 
+					text:'info',
+					disabled:false,
+					listeners: {
+						tap: function(){
+							Ext.getCmp('aboutItems').showPicker();
+						}
+					}
+				},
+				{xtype: 'spacer'},
+				{
+					xtype:'button', 
+					name:'buttonAboutShare', 
+					id:'buttonAboutShare', 
+					text:'share',
+					disabled:false,
+					listeners: {
+						tap: function(){
+							Ext.getCmp('aboutSocialShares').showPicker();
+						}
+					}
+				}
+			]
+		    },
+		    	{
+				xtype: 'container',
+				id: 'aboutAbout',
+				html: 'version: 1.0.0 | &copy;2013',
+				style: 'margin: 20px auto; height:460px; width: 320px; padding: 30px; color: #999999; font-size: .75em; background:url(resources/startup/motioncalc/robotstart320.png) no-repeat;',
+				hidden: true					
+			},
+		    	{
+				xtype: 'container',
+				id: 'aboutUnits',
+				html: '<embed style="width:100%;height:100%;" src="app/content/units.html"/>',
+				style: '',
+				hidden: true
+			},
+		    	{
+				xtype: 'container',
+				id: 'aboutInertia',
+				html: 'inertia Txt',
+				style: '',
+				hidden: true					
+			},
+		    	{
+				xtype: 'container',
+				id: 'aboutSettings',
+				html: 'settings Txt',
+				style: '',
+				hidden: true					
+			},
+		    	{
+				xtype: 'container',
+				id: 'aboutWelcome',
+				html: 'welcome Txt',
+				style: '',
+			},
+			{
+				xtype: 'selectfield',
+				name : 'aboutItems',
+				id: 'aboutItems',
+				options: [{text:'Version info',value:'aboutAbout'},{text:'Units Converter',value:'aboutUnits'},{text:'Inertia Calculator',value:'aboutInertia'},{text:'Global Settings',value:'aboutSettings'},{text:'Welcome Memo',value:'aboutWelcome'}],
+				hidden: true,
+			},
+			{
+				xtype:'hiddenfield',
+				name: 'aboutActiveField',
+				id: 'aboutActiveField',
+				value: 'aboutWelcome'
+			},
+			{
+				xtype: 'selectfield',
+				name : 'aboutSocialShares',
+				id: 'aboutSocialShares',
+				store: '_ShareOptions',
+				displayField: 'title',
+				valueField: 'fc',
+				hidden: true
+			},
+		]
+	},
+	getFieldList: function(){
+		var fieldList = ['aboutActiveField'];
+		return fieldList;
+	},
+	initialize: function(){ 
+		function getFieldList(){
+			var fieldList = ['aboutActiveField'];
+			return fieldList;
+		}
+		function hideShow(){
+			var allItems = Ext.getCmp('aboutItems')
+			activeItem = Ext.getCmp('aboutActiveField').getValue(),
+			items = allItems.getOptions(),
+			count = items.length;
+			for(var i = 0; i < count; i++){
+				Ext.getCmp(items[i].value).hide();
+			}
+//			console.log(Ext.getCmp('aboutActiveField').getValue(),activeItem);
+			Ext.getCmp(activeItem).show();
+			Ext.getCmp('aboutActiveField').setValue(activeItem);
+		}
+		var 	aboutItems = Ext.getCmp('aboutItems'),
+			activeItem; 
+		motioncalc.app.getAppState(this.getFieldList());
+		activeItem = Ext.getCmp('aboutActiveField').getValue();
+		aboutItems.setValue(activeItem);
+		hideShow();
+		Ext.getCmp('aboutItems').on({
+			change: function(){
+				Ext.getCmp('aboutActiveField').setValue(Ext.getCmp('aboutItems').getValue());
+				hideShow();
+				motioncalc.app.setAppState(getFieldList(),6);
+			}
+		});
+		Ext.getCmp('aboutSocialShares').on({
+			change: function(){
+				var txt ='Get%20with%20it!%20Get%20Robot%20Maker%20Calculator';
+				Ext.getCmp('aboutSocialShares').getValue()(txt,'about');			
+			}
+			
+		});
+		this.on({
+			activate: function(){motioncalc.app.setAppState(getFieldList(),6);}
+		});
+ 	}
+});
+
+
+Ext.define('motioncalc.store.HomeIcons', {
+    extend: 'Ext.data.Store',
+
+    config: {
+        fields: ['title', 'xtype'],
+        data: [
+            { title: 'Unit Converter', xtype: 'unitscard', id: 'UnitsCard' },
+            { title: 'Inertia Calculator', xtype: 'inertiacard', id: 'InertiaCard' },
+            { title: 'Global Settings',      xtype: 'settingscard', id: 'SettingsCard' },
+            { title: 'About RMC',      xtype: 'aboutcard', id: 'AboutCard' }
+        ]
+    }
+});
+
+Ext.define('motioncalc.view.HomeIcons', {
+	extend: 'Ext.navigation.View',
+	id: 'homeIconsID',
+	xtype: 'homeicons',
+		requires: [
+		'Ext.dataview.List',
+	],
+	config: {
+		iconCls: 'home',
+		title: 'Home',
+		items: [{
+				title: 'ROBOT MAKER CALCULATOR',
+				xtype: 'list',
+				itemTpl: '{title}',
+				id: '_homeIcons',
+				store: 'HomeIcons',
+				listeners: {
+					itemtap: function(list,index,item,e){
+						var nextPage = index == 3 ? 6 : index+1;
+//						console.log(list,index,item,e);
+						motioncalc.app.mainView.setActiveItem(nextPage);
+					},					
+			}
+		}]
+	},
+	isActivated: false
+});
+
+Ext.define('motioncalc.controller.HomeIcons', {
+	extend : 'Ext.app.Controller',
+	config: {
+		  	stores : ['HomeIcons'],
+			views : ['motioncalc.view.HomeIcons'],
+			refs : {
+				homeIcons: '#homeIconsID',
+			},
+			control: {
+				homeIcons: {
+					activate: function(){
+						var item;
+						item = Ext.getCmp('homeIconsID');
+						if(!item.isActivated)item.isActivated=true;
+						else motioncalc.app.setAppState(null,0);
+					}
+				}
+			},			
+	}
+});
+
+Ext.define('motioncalc.model.GlobalSettings', {
+	extend: 'Ext.data.Model',
+	requires: ['Ext.data.proxy.LocalStorage','Ext.data.identifier.Uuid'],
+	config: {
+		identifier: 'uuid',
+		fields: ['id', 'value'],
+		proxy: {
+		    type: 'localstorage',
+		    id  : '_GlobalSettings'
+		}
+	}
+});
+
+Ext.define('motioncalc.store.GlobalSettings', {
+    extend: 'Ext.data.Store',
+    config: {
+	storeId:'_GlobalSettings',
+	model: 'motioncalc.model.GlobalSettings',
+	autoLoad: true
+    }
+});
+
+Ext.define('motioncalc.controller.GlobalSettings', {
+ extend : 'Ext.app.Controller',
+ 
+ config: {
+	stores : ['GlobalSettings'],
+	models : ['GlobalSettings'],
+	views : ['motioncalc.view.Inertia'],
+	refs : {
+		globalSettings : '#globalSettingsID'
+	},
+	control: {
+		globalSettings: {
+			activate: function(){
+				motioncalc.app.setAppState(null,3);
+			}
+		}
+	}
+}
+
+});
 
 Ext.define('motioncalc.controller.Inertia', {
 	extend : 'Ext.app.Controller',
@@ -67582,14 +68904,16 @@ Ext.define('motioncalc.controller.Inertia', {
 			materials: '#inertiaMaterials',
 			shape: '#inertiaShape',
 			inertiaView: '#inertiaID',
-			numberFields: 'numberfield',
-			buttonMaterials: '#buttonMaterials'
+			numberFields: '#inertiaID numberfield',
+			buttonMaterials: '#buttonMaterials',
+			buttonInertiaSolution : '#buttonInertiaSolution'
 		},
 		control: {
 			materials: {
 				change: function(){
-					var materialDensity,density;
-					materialDensity = Ext.getCmp('inertiaMaterials').getValue();
+
+					var materialDensity,density,materialName;
+					materialDensity = Ext.getCmp('inertiaMaterials').getStore().findRecord("name", Ext.getCmp('inertiaMaterials').getValue()).get("density");
 					if(materialDensity == null || materialDensity == 0)return;
 					materialDensity = motioncalc.app.conversionFunctions.unitsConvert(materialDensity,motioncalc.app.DENSITYBASEUNITS,motioncalc.app.density,'Density');
 					density = Ext.getCmp('inertiaDensity');
@@ -67609,34 +68933,49 @@ Ext.define('motioncalc.controller.Inertia', {
 			},
 			buttonMaterials: {
 				tap: function(){Ext.getCmp('inertiaMaterials').showPicker();}
-			}
+			},
+			buttonInertiaSolution: {
+				tap: function(){
+					motioncalc.app.answerFrom = 'inertia';
+					motioncalc.app.mainView.setActiveItem(5);
+				}
+			},
 		}
 	},
+	launch: function(){
+		var convertForItems = Ext.select('div.convert-for-it .x-form-label');
+		convertForItems.each(function(el){
+			Ext.get(el.dom).on('tap',function(){
+				var 	activeCls = 'convert-active',
+					isMassValue = 0;
+				if(this.findParent('div.convert-for-it').className.indexOf(activeCls)>-1)return;
+				var 	itemId = 'inertiaDensity',
+					itemOtherId = 'inertiaMass';
+				if(this.findParent('div.convert-for-it').id==itemId){
+					itemId = 'inertiaMass';
+					itemOtherId = 'inertiaDensity';
+					isMassValue = 0;
+				}
+				else isMassValue = 1;
+				Ext.getCmp(itemId).removeCls(activeCls);
+				Ext.getCmp(itemOtherId).addCls(activeCls);
+				motioncalc.app.getController('Inertia').changeDensityMass(isMassValue == 1);
+				Ext.getCmp('isMass').setValue(isMassValue);
+			});
+		});
+	},
 	onActivate: function(){
-		//unit testing
-//		console.log('motioncalc.app.inertiaFunctions.eqnTetraIxx: ' + motioncalc.app.inertiaFunctions.eqnTetraIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnRodIxx: ' + motioncalc.app.inertiaFunctions.eqnRodIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnParallelIxx: ' + motioncalc.app.inertiaFunctions.eqnParallelIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnCylinderIxx: ' + motioncalc.app.inertiaFunctions.eqnCylinderIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnSphereIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereIxx('Ixx'));
-//		console.log('motioncalc.app.inertiaFunctions.eqnSphereShellIxx: ' + motioncalc.app.inertiaFunctions.eqnSphereShellIxx('Ixx'));
-//		console.log(Ext.getCmp('isMass').get('value')==1);
-
 		function setLabel(item,unit){
-			var tmpLbl,tmpLblSuffix,checkBox,checkBoxChecked,index;		
+			var tmpLbl,tmpLblSuffix,index;		
 			tmpLbl = item.get('label');
 			index = tmpLbl.indexOf('<')-1;
 			if(index>0)tmpLbl = tmpLbl.substring(0,index);
-			checkBox = '';
 			if(unit == null){
 				unit = motioncalc.app.linearDistance;
 				
 			}
-			else {
-				checkBoxChecked = tmpLbl.indexOf('Density')>-1?'':'checked';				
-				checkBox = '<input id="'+ tmpLbl +'-checkbox" onclick="motioncalc.app.getController(\'Inertia\').switchIsMass(this,\'' + tmpLbl + '\');" type="checkbox" '+ checkBoxChecked + ' />';
-			}
-			tmpLblSuffix = ' <span style="font-size:smaller;">(' + unit + ')</span>' + checkBox;
+			tmpLblSuffix = Ext.os.is('Phone') ? ' <br />' : ' ';
+			tmpLblSuffix = tmpLblSuffix + '<span style="font-size:smaller;">(' + unit + ')</span>';
 			
 			item.setLabel(tmpLbl + tmpLblSuffix);
 		}
@@ -67644,8 +68983,20 @@ Ext.define('motioncalc.controller.Inertia', {
 		firstActive = false;
 		inertiaActive = Ext.getCmp('inertiaActive');
 		if(inertiaActive.getValue()==0){
+			var convertActive,convertOther;
 			inertiaActive.setValue(1);
 			firstActive = true;
+			motioncalc.app.getAppState(this.getInertiaFieldList());
+			if(Ext.getCmp('isMass').getValue()==0){
+				convertActive = 'inertiaDensity';
+				convertOther = 'inertiaMass';
+			}
+			else {
+				convertActive = 'inertiaMass';
+				convertOther = 'inertiaDensity';
+			}
+			Ext.getCmp(convertOther).removeCls('convert-active');
+			Ext.getCmp(convertActive).addCls('convert-active');
 		}
 		this.setInertiaScreen(firstActive);
 		setLabel(Ext.getCmp('inertiaDensity'),motioncalc.app.density);
@@ -67662,58 +69013,48 @@ Ext.define('motioncalc.controller.Inertia', {
 		});				
 	},
 	setInertiaAnswer : function(answers){
-		var returnString,cFunctions,itemCount,mass;
+		var returnString,cFunctions,itemCount,mass,inertiaAnswer;
+		inertiaAnswer = Ext.getCmp('inertiaAnswer');
+		inertiaAnswer.hide();
 		cFunctions = motioncalc.app.conversionFunctions;
 		returnString='';
 		mass = null;
 		itemCount = answers.length;
+		returnString = '<ul>';
+		window.inertiaAnswers = [];		
 		for(var i = 0; i < itemCount; i++){
-//			console.log(answers[i][0]+'|'+answers[i][1]);
 			if(answers[i][1]!==null){
-				returnString += answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' | ' ;
-				if(answers[i][0].indexOf('Mass') > -1 && (Ext.getCmp('isMass').getValue()==0))mass = answers[i][1];
+				window.inertiaAnswers.push([answers[i][0],motioncalc.app.conversionFunctions.getValue(answers[i][1])]);
+				var 	isMassEntry = (answers[i][0].indexOf('Mass') > -1),
+					unitType = isMassEntry  ? motioncalc.app.mass : motioncalc.app.inertia;
+				returnString += '<li>' + answers[i][0] + ': ' + cFunctions.getValue(answers[i][1]) + ' <span class="unit-type">' + unitType + '</span> </li>';
+				if(isMassEntry && (Ext.getCmp('isMass').getValue()==0)){
+					mass = answers[i][1];
+				}
 			}
 		}
-		returnString = returnString.substring(0,(returnString.length-3));
-		Ext.getCmp('inertiaAnswer').setValue(returnString);
+		returnString += '</ul>';
+		inertiaAnswer.set('html',returnString);
+		inertiaAnswer.show({type :"slide",direction : "right", duration : 500});
 		if(mass !== null){
 			Ext.getCmp('inertiaMass').set('value',mass);
-//			console.log(Ext.getCmp('inertiaMass').get('value')+'|'+mass);
 		}
-	},
-	switchIsMass: function(item,label){
-	//	console.log('orginal isMass: ' + Ext.getCmp('isMass').getValue());
-		var otherLabel,otherItem,isMassValue;
-		if(label == 'Density'){
-			otherLabel = 'Mass';
-			isMassValue = item.checked ? 0 : 1;
-		}
-		else{
-			otherLabel = 'Density';
-			isMassValue = item.checked ? 1 : 0;
-		};
-		this.changeDensityMass(isMassValue == 1);
-		otherItem = Ext.getDom(otherLabel + '-checkbox')
-		if(item.checked)otherItem.checked=false
-		else otherItem.checked=true;
-		Ext.getCmp('isMass').setValue(isMassValue);
-	//	console.log(Ext.getCmp('isMass').getValue());
 	},
 	changeDensityMass: function(isMass){
 		var mass,density;
 		mass = Ext.getCmp('inertiaMass');
 		density = Ext.getCmp('inertiaDensity');
 		if(isMass){
-			mass.setReadOnly(false);
+			mass.setDisabled(false);
 			Ext.getCmp('buttonMaterials').setDisabled(true);
-			density.setReadOnly(true);
+			density.setDisabled(true);
 			density.setValue(0);
 			
 		}
 		else {
-			density.setReadOnly(false);
+			density.setDisabled(false);
 			Ext.getCmp('buttonMaterials').setDisabled(false);
-			mass.setReadOnly(true);
+			mass.setDisabled(true);
 			mass.setValue(0);
 		}
 		this.setInertiaAnswer(motioncalc.app.inertiaFunctions.inertiaCalc());
@@ -67721,7 +69062,6 @@ Ext.define('motioncalc.controller.Inertia', {
 	setInertiaScreen: function(adjustForShape,firstLaunched){
 		if(adjustForShape || firstLaunched){
 			Ext.getCmp('inertiaDensity').show();
-			if(Ext.get('Mass-checkbox') !== null)Ext.get('Mass-checkbox').show();
 			var shape,items,mass,isMass;
 			isMass = true;
 			items = [];
@@ -67746,7 +69086,6 @@ Ext.define('motioncalc.controller.Inertia', {
 		//			setInertiaDefaults(shape,2);
 					items.push(Ext.getCmp('radius'));
 					Ext.getCmp('inertiaDensity').hide();
-					Ext.get('Mass-checkbox').hide();
 					isMass = true;
 					break;
 				case 'sphere':
@@ -67758,7 +69097,6 @@ Ext.define('motioncalc.controller.Inertia', {
 		//			setInertiaDefaults(shape,2);
 					items.push(Ext.getCmp('inertiaLength'));
 					Ext.getCmp('inertiaDensity').hide();
-					Ext.get('Mass-checkbox').hide();
 					isMass = true;
 					break;
 				case 'tetrahedron':
@@ -67767,27 +69105,33 @@ Ext.define('motioncalc.controller.Inertia', {
 					items.push(Ext.getCmp('inertiaLength'));
 					items.push(Ext.getCmp('inertiaWidth'));
 					Ext.getCmp('inertiaDensity').hide();
-					Ext.get('Mass-checkbox').hide();
 					isMass = true;
 					break;				
 			}
 			this.changeDensityMass(isMass);
 			this.hideShowInertiaItems(items);
 		}
-		else{ this.setInertiaAnswer(motioncalc.app.inertiaFunctions.inertiaCalc());
+		else{
+			motioncalc.app.setAppState(this.getInertiaFieldList(),2);
+			this.setInertiaAnswer(motioncalc.app.inertiaFunctions.inertiaCalc());
 		}
-
-	}
+	},
+	getInertiaFieldList: function(){
+		var fieldList;
+		fieldList = ['isMass','inertiaShape','inertiaMass','inertiaDensity','inertiaHeight','inertiaLength','inertiaWidth','radius','insideDiameter','outsideDiameter'];
+		return fieldList;		
+	},
 });
 
 Ext.define('motioncalc.view.AddMaterial', {
 	extend: 'Ext.form.FormPanel',
 	xtype: 'addmaterialcard',
+	id: 'addMaterialID',
 	requires: [
 		'Ext.form.FieldSet',
 		'Ext.field.Select',
 		'Ext.field.Number',
-		'Ext.Button'
+		'Ext.Button',
 		],
 	controllers: ['AddMaterial'],
 	config: {
@@ -67797,14 +69141,14 @@ Ext.define('motioncalc.view.AddMaterial', {
 		    {
 			docked: 'top',
 			xtype: 'toolbar',
-			title: 'Add Material',
+			title: 'ADD MATERIAL',
 			id: 'AddMaterialTop',
 			items: [
 				{
 					xtype:'button', 
 					name:'buttonRestoreMaterials', 
 					id:'buttonRestoreMaterials', 
-					text:'restore list',
+					text:'restore',
 					disabled:false
 				},
 				{xtype: 'spacer'},
@@ -67829,7 +69173,6 @@ Ext.define('motioncalc.view.AddMaterial', {
 			    {
 				xtype: 'numberfield',
 				name : 'materialDensity',
-				value: 0,
 				id: 'materialDensity',
 				label: 'Amount'
 			    },
@@ -67855,14 +69198,14 @@ Ext.define('motioncalc.view.AddMaterial', {
 			name : 'buttonManageMaterialOne',
 			id: 'buttonManageMaterialOne',
 			text: 'Cancel',
-			style: 'width:50%;float:left;'
+			style: 'width:49%;float:left;'
 		    },
 		    {
 			xtype: 'button',
 			name : 'buttonManageMaterialTwo',
 			id: 'buttonManageMaterialTwo',
 			text: 'Save',
-			style: 'width:50%;float:left;'
+			style: 'width:49%;float:right;'
 		    },
 		    {
 			xtype: 'hiddenfield',
@@ -67870,19 +69213,24 @@ Ext.define('motioncalc.view.AddMaterial', {
 			value: 0,
 			id: 'materialOriginalValue'
 		    },
-
-
+		    {
+			xtype: 'hiddenfield',
+			name : 'manageMaterialActive',
+			value: 0,
+			id: 'manageMaterialActive'
+		    },
 		]
 	},
 	initialize: function(){
 		Ext.getCmp('materialUnitType').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density'));
+		
 	}
 });
 
 
 Ext.define('motioncalc.model.MaterialDensities', {
 	extend: 'Ext.data.Model',
-	requires: 'Ext.data.proxy.LocalStorage',
+	requires: ['Ext.data.proxy.LocalStorage','Ext.data.identifier.Uuid'],
 	config: {
 		identifier:'uuid',
 		fields: ['name', 'density'],
@@ -67895,6 +69243,7 @@ Ext.define('motioncalc.model.MaterialDensities', {
 
 Ext.define('motioncalc.store.MaterialDensities', {
 	extend: 'Ext.data.Store',
+	requires: ['Ext.data.proxy.LocalStorage','Ext.data.identifier.Uuid'],
 
 	config: {
 		storeId:'_MaterialDensities',
@@ -67910,7 +69259,7 @@ Ext.define('motioncalc.store.MaterialDensities', {
 
 Ext.define('motioncalc.controller.AddMaterial', {
 	extend : 'Ext.app.Controller',
-	requires : 'motioncalc.store.MaterialDensities',
+	requires : ['motioncalc.store.MaterialDensities'],
 	config: {
 		views : ['motioncalc.view.AddMaterial'],
 		refs : {
@@ -67918,9 +69267,25 @@ Ext.define('motioncalc.controller.AddMaterial', {
 			buttonMaterials: '#buttonManageMaterials',
 			buttonRestore: '#buttonRestoreMaterials',
 			buttonOne: '#buttonManageMaterialOne',
-			buttonTwo: '#buttonManageMaterialTwo'
+			buttonTwo: '#buttonManageMaterialTwo',
+			addMaterialView: '#addMaterialID',
+			materialName: '#materialName',
+			materialDensity: '#materialDensity',
+			materialUnitType: '#materialUnitType',
 		},
 		control: {
+			addMaterialView: {
+				activate: function(){
+					Ext.getCmp('manageMaterialActive').setValue(1);
+				}
+			},
+			materialName: {
+			},
+			materialDensity: {
+			},
+			materialUnitType: {
+			},
+
 			materials: {
 				change: function(){
 					var record, name,value,densities;
@@ -67934,10 +69299,10 @@ Ext.define('motioncalc.controller.AddMaterial', {
 					Ext.getCmp('materialName').setValue(name);
 					Ext.getCmp('materialDensity').setValue(value);
 					Ext.getCmp('materialOriginalValue').setValue(value);
-					Ext.getCmp('AddMaterialTop').setTitle('Edit Material');
+					Ext.getCmp('AddMaterialTop').setTitle('EDIT MATERIAL');
 					Ext.getCmp('materialName').setReadOnly(true);
-					Ext.getCmp('buttonManageMaterials').set('text','cancel');
-					Ext.getCmp('buttonManageMaterialOne').set('text','Remove');
+					Ext.getCmp('buttonManageMaterials').set('text','remove');
+					Ext.getCmp('buttonManageMaterials').addCls('danger-class');
 				}
 			},
 			buttonMaterials: {
@@ -67946,24 +69311,40 @@ Ext.define('motioncalc.controller.AddMaterial', {
 						Ext.getCmp('materialDensities').setValue(null);
 						Ext.getCmp('materialDensities').showPicker();
 					}
-					else motioncalc.app.mainView.setActiveItem(3);
+					else {
+						var name = Ext.getCmp('materialName').getValue();
+						Ext.Msg.confirm(							
+						   	'Remove "' + name + '"',
+							'Do you want to permanently remove "' + name + '" from the Material Densities List?',
+							function(buttonId) {
+								if (buttonId === 'yes') {
+									var 	stor = Ext.getStore('_MaterialDensities'),
+										rec = stor.findRecord('name',Ext.getCmp('materialName').getValue());
+									stor.remove(rec);
+									stor.sync();
+									motioncalc.app.mainView.setActiveItem(3);            
+								}
+							}
+						);
+					}
 				}
 			},
 			buttonRestore: {
 				tap: function(){
-					motioncalc.app.restoreMaterials(true);
-					motioncalc.app.mainView.setActiveItem(3);
+					Ext.Msg.confirm(							
+					   	'Restore List',
+						'Do you want to restore to the default Material Densities List?',
+						function(buttonId) {
+							if (buttonId === 'yes') {
+								motioncalc.app.restoreMaterials(true);
+								motioncalc.app.mainView.setActiveItem(3);
+							}
+						}
+					);				
 				}
 			},
 			buttonOne: {
 				tap: function(){
-					if(Ext.getCmp('materialOriginalValue').getValue()!=0){
-						var 	stor = Ext.getStore('_MaterialDensities'),
-							rec = stor.findRecord('name',Ext.getCmp('materialName').getValue());
-						stor.remove(rec);
-						stor.sync();
-						
-					};
 					motioncalc.app.mainView.setActiveItem(3);
 				}
 			},
@@ -67973,18 +69354,39 @@ Ext.define('motioncalc.controller.AddMaterial', {
 					name = Ext.String.capitalize(Ext.getCmp('materialName').getValue());
 					density = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('materialDensity').getValue(),Ext.getCmp('materialUnitType').getValue(),motioncalc.app.DENSITYBASEUNITS,'Density');
 					ogValue = Ext.getCmp('materialOriginalValue').getValue();
-					if(density == 0)return;
-					if(name == '')return;
-					var stor = Ext.getStore('_MaterialDensities');
-					stor.load();
-					var rec = stor.findRecord('name',name);
-					if(rec===null){
-						stor.add({name:name,density:density});
-						rec = stor.findRecord('name',name);
+					if(name == ''){
+						Ext.Msg.alert(							
+						   	'"Material Name"',
+							'Please give this material a name.'
+						);
+						return;
 					}
-					else rec.set('density',density);
-					rec.save();
-					motioncalc.app.mainView.setActiveItem(3);
+					
+					if(density == 0){
+						Ext.Msg.alert(							
+						   	'Amount',
+							'Please give this material a density value amount.'
+						);
+						return;
+					}
+					Ext.Msg.confirm(							
+					   	'Save "' + name + '"?',
+						'Do you want to save "' + name + '"?',
+						function(buttonId) {
+							if (buttonId === 'yes') {
+								var stor = Ext.getStore('_MaterialDensities');
+								stor.load();
+								var rec = stor.findRecord('name',name);
+								if(rec===null){
+									stor.add({name:name,density:density});
+									rec = stor.findRecord('name',name);
+								}
+								else rec.set('density',density);
+								rec.save();
+								motioncalc.app.mainView.setActiveItem(3);
+							}
+						}
+					);
 				}
 			}
 
@@ -67993,148 +69395,905 @@ Ext.define('motioncalc.controller.AddMaterial', {
 });
 
 
-Ext.define('motioncalc.model.GlobalSettings', {
-	extend: 'Ext.data.Model',
-	requires: 'Ext.data.proxy.LocalStorage',
-	config: {
-		fields: ['id', 'value'],
-		proxy: {
-		    type: 'localstorage',
-		    id  : '_GlobalSettings'
-		}
-	}
-});
 
-Ext.define('motioncalc.view.Units', {
-    extend: 'Ext.form.FormPanel',
-    xtype: 'unitscard',
-	id:'unitsID',
-    requires: [
-        'Ext.form.FieldSet',
-	'Ext.field.Number',
-	'motioncalc.util.Conversions'
-    ],
-
+Ext.define('motioncalc.store.ShareOptions', {
+    extend: 'Ext.data.Store',	
     config: {
-        iconCls: 'sign_leftright',
-        title: 'Units',
-        items: [
-            {
-                docked: 'top',
-                xtype: 'toolbar',
-                title: 'Unit Converter'
-            },
-	    {
-		xtype: 'selectfield',
-		name : 'measurementType',
-		label: 'Measurement Type',
-		id: 'unitsType',
-//		options: conversionFunctions.buildUnitTypeSELECT(),
-		listeners:{
-			
-		change: function(selectbox,newValue,oldValue)
-		    {
-			global_measurementTypeChange = true;
-			Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
-			global_measurementTypeChange = true;
-			Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits(newValue));
-		    }
-               	}
-	    },
-	    {
-		xtype: 'selectfield',
-		name : 'unitsFrom',
-		id: 'unitsFrom',
-		label: 'Unit',
-		dataType: 'unit-types',
-//		options: fillUnits('Area'),
-            },
-	    {
-		xtype: 'numberfield',
-		name : 'unitsAmount',
-		value: 0,
-		id: 'unitsAmount',
-		label: 'Amount',
-	    },
-	    {
-		xtype: 'selectfield',
-		name : 'convertTo',
-		id: 'unitsTo',
-		dataType: 'unit-types',
-		label: 'Convert To',
-//		options: fillUnits('Area'),
-            },
-	    {
-		xtype: 'textfield',
-		name : 'unitsAnswer',
-		id: 'unitsAnswer',
-		value: 0,
-		label: '=',
-		readOnly: true,
-	    }
-        ]
-    },
-	initialize: function(){
-		function sendToUnitsConvert(){
-			if(typeof global_measurementTypeChange ==='undefined')global_measurementTypeChange = false;
-			if(global_measurementTypeChange){
-				global_measurementTypeChange = false;			
-				return;
-			}
-			var unitsAmount,unitsAnswer,unitsFrom,unitsTo,returnedValue;
-			unitsAmount = Ext.getCmp('unitsAmount');
-			unitsAnswer = Ext.getCmp('unitsAnswer');
-			if(unitsAmount.get('value')==0){
-				unitsAnswer.set('value',0);
-				return;
-			}
-			unitsFrom = Ext.getCmp('unitsFrom');
-			unitsTo = Ext.getCmp('unitsTo');
-			unitsType = Ext.getCmp('unitsType');
-			returnedValue = motioncalc.app.conversionFunctions.unitsConvert(unitsAmount.get('value'),unitsFrom.get('value'),unitsTo.get('value'),unitsType.get('value'),true);
-			unitsAnswer.set('value',returnedValue);
-//			console.log(unitsAnswer.get('value') +' | '+returnedValue);
-		}
-
-		Ext.getCmp('unitsType').setOptions(motioncalc.app.conversionFunctions.buildUnitTypeSELECT());
-		Ext.getCmp('unitsTo').setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
-		Ext.getCmp('unitsFrom').setOptions(motioncalc.app.conversionFunctions.fillUnits('Area'));
-
-
-		Ext.Array.each(Ext.ComponentQuery.query('selectfield[dataType="unit-types"]'),function(){
-				this.on({
-					change: function(){sendToUnitsConvert();}
-				});
-		});
-
-		Ext.getCmp('unitsAmount').on({
-			blur: function(){sendToUnitsConvert();}
-		});
-		this.on({
-			activate: function(){sendToUnitsConvert();}
-		});
-
-	}
-});
-
-Ext.define('motioncalc.store.HomeIcons', {
-    extend: 'Ext.data.Store',
-
-    config: {
-        fields: ['title', 'xtype'],
+	storeId:'_ShareOptions',
+	autoLoad: true,
+        fields: ['title', 'fc'],
         data: [
-            { title: 'Units', xtype: 'unitscard', id: 'UnitsCard' },
-            { title: 'Inertia', xtype: 'inertiacard', id: 'InertiaCard' },
-            { title: 'Settings',      xtype: 'settingscard', id: 'SettingsCard' }
+		{ title: '-select one-', fc: function() {return;} },
+		{ title: 'EMAIL', fc: function(solutionStr,typeStr) {
+				var 	subject = "Robot Maker Calculator solution coming your way",			
+					mailTo,
+					sendStr = '';
+				solutionStr = typeStr.indexOf('about') > -1 ? (solutionStr + '%20http://' + motioncalc.app.siteURL) : solutionStr;
+				sendStr = 'It occured to me that you might like to know this.%0D%0A%0D%0A'+ solutionStr;
+				mailTo = 'mailto:?subject='+subject+'&body='+sendStr;
+				window.location.href = mailTo;				
+			} 
+		},
+            	{ title: 'FACEBOOK', 
+			fc: function(solutionStr,typeStr) {
+					var 	sendStr = "https://www.facebook.com/dialog/feed?",
+						shortAnswer = Ext.getCmp('shortAnswer').getValue();
+					sendStr += "app_id=138804262951767";
+					sendStr += "&link=http://"+motioncalc.app.siteURL+"";
+					sendStr += "&picture=http://"+motioncalc.app.siteURL+"/resources/icons/motioncalc/squareicon144.png";
+					sendStr += "&name=tigerBaby\'s%20Robot%20Maker%20Calculator&caption=Robot%20Maker%20Calculator%20solution%20coming%20your%20way";
+					sendStr += "&description=";
+					if(typeStr.indexOf('unit') > -1){
+						sendStr += "did%20you%20know%20that%20";
+						sendStr += shortAnswer.replace('=','is%20equal%20to');
+						sendStr +='?';
+					}
+					else if(typeStr.indexOf('about') > -1){
+						sendStr+= solutionStr + '%20http://' + motioncalc.app.siteURL;
+					}
+					else sendStr += shortAnswer;
+
+					sendStr += "&redirect_uri=http://"+motioncalc.app.siteURL+"";
+					window.location.href = sendStr;
+				} 
+		},
+		{ title: 'TWITTER', fc: function(solutionStr,typeStr) {				
+				var 	url = typeStr.indexOf('about') > - 1 ? motioncalc.app.siteURL : motioncalc.app.siteTiny,
+					sendStr = "https://twitter.com/share?url=http://" + url + "&text=",
+					txt = typeStr.indexOf('about') > - 1 ? solutionStr : Ext.getCmp('shortAnswer').getValue(),
+					tag = typeStr.indexOf('inertia') > -1 ? '' : '%23RbtMkrCalc%20';
+				sendStr += txt + '%0D%0A';
+				sendStr += tag; 
+				window.location.href = sendStr;
+			} 
+		},		
         ]
     }
 });
 
-Ext.define('motioncalc.store.GlobalSettings', {
+Ext.define('motioncalc.view.InertiaSolution', {
+	extend: 'Ext.form.FormPanel',
+	xtype: 'inertiasolutioncard',
+	id:'inertiaSolutionID',
+	requires: [
+		'Ext.Button',
+		'motioncalc.store.ShareOptions'
+		],
+	controllers: ['InertiaSolution'],
+	config: {
+		title: 'Inertia Solution',
+		isEnabled: false,
+		items: [
+		    {
+			docked: 'top',
+			xtype: 'toolbar',
+			title: 'INERTIA SOLUTION',
+			id: 'InertiaSolutionTop',
+			items: [
+				{
+					xtype:'button', 
+					name:'buttonInertiaReturn', 
+					id:'buttonInertiaReturn', 
+					text:'return',
+					disabled:false,
+					listeners: {
+						tap: function(){
+							if(motioncalc.app.answerFrom=='inertia')motioncalc.app.mainView.setActiveItem(2);
+							else motioncalc.app.mainView.setActiveItem(1);
+						}
+					}
+				},
+				{xtype: 'spacer'},
+				{
+					xtype:'button', 
+					name:'buttonSendSolution', 
+					id:'buttonSendSolution', 
+					text:'share',
+					disabled:false,
+					listeners: {
+						tap: function(){
+							Ext.getCmp('socialShares').showPicker();
+						}
+					}
+				},
+			]
+		    },
+			{
+				xtype:'container',
+				name:'inertiaSolutionWrapper',
+				id:'inertiaSolutionWrapper',
+				items: [
+					{
+						xtype:'container',
+						id: 'inertiaCanvas',
+						html:'<canvas id="shapeCanvas" style="border: 1px solid black;background:#cccccc;" height="300" weight="300"></canvas>'
+					},
+					{
+						xtype:'textareafield',
+						name:'inertiaSolutionBox',
+						id:'inertiaSolutionBox',
+					},
+				]
+			},
+			{
+				xtype:'container',
+				name:'unitsSolutionWrapper',
+				id:'unitsSolutionWrapper',
+				items: [
+					{
+						xtype:'textareafield',
+						name:'unitsSolutionBox',
+						id:'unitsSolutionBox',
+					},
+				]
+			},
+			{
+				xtype: 'selectfield',
+				name : 'socialShares',
+				id: 'socialShares',
+				store: '_ShareOptions',
+				displayField: 'title',
+				valueField: 'fc',
+				hidden: true
+			},
+			{
+				xtype: 'hiddenfield',
+				name : 'shortAnswer',
+				id: 'shortAnswer',
+			},
+		
+		]
+	},
+});
+
+
+Ext.define('motioncalc.controller.InertiaSolution', {
+	extend : 'Ext.app.Controller',
+	config: {
+		views : ['motioncalc.view.InertiaSolution'],
+		refs : {
+			inertiaView: '#inertiaSolutionID',
+			socialShares: '#socialShares',
+		},
+		control: {
+			socialShares: {
+				change: function(){
+					var 	typeStr = Ext.getCmp('InertiaSolutionTop').getTitle().getTitle().indexOf('INERTIA') > -1 ? 'inertia' : 'units';
+					solutionStr = typeStr + 'SolutionBox';
+					solutionStr = Ext.getCmp(solutionStr).getValue().replace(/\n/g,'%0D%0A');
+					Ext.getCmp('socialShares').getValue()(solutionStr,typeStr);
+				}
+			},
+			inertiaView: {
+				activate: function(){
+					switch(motioncalc.app.answerFrom){
+						case null:
+						return;
+						break;
+						case 'inertia':
+						setInertiaSolution(this);
+						break;
+						case 'units':
+						setUnitsSolution();
+						break;
+					}
+					function tagSolutionString(){
+						var solutionStr = '\n\n----------------------------------------------\n\n';
+						solutionStr += 'tigerBaby\'s Robot Maker Calculator\n';
+						solutionStr += 'http:/' + motioncalc.app.siteURL + '\n';
+						solutionStr += '\n----------------------------------------------\n\n';
+						return solutionStr;
+					}
+					function setUnitsSolution(){
+						Ext.getCmp('InertiaSolutionTop').setTitle('UNITS SOLUTION');
+						var 	type = Ext.getCmp('unitsType').getValue(),
+							unitFrom = Ext.getCmp('unitsFrom').getValue(),
+							amountFrom = Ext.getCmp('unitsAmount').getValue(),
+							unitTo = Ext.getCmp('unitsTo').getValue(),
+							amountTo = Ext.getCmp('unitsAnswer').getHtml(),
+							shortAnswer = amountFrom + ' ' + unitFrom + ' = ' + amountTo + ' ' + unitTo,
+							answer;
+						answer = 'Measurement Type: ' + type + '\n\n';
+						answer += shortAnswer;
+						answer += tagSolutionString();
+						
+						Ext.getCmp('inertiaSolutionWrapper').hide();
+						Ext.getCmp('unitsSolutionWrapper').show();
+						Ext.getCmp('unitsSolutionBox').setValue(answer);
+						Ext.getCmp('shortAnswer').setValue(shortAnswer.replace(/ /g,'%20'));
+					}
+					function setInertiaSolution(controller){
+						Ext.getCmp('InertiaSolutionTop').setTitle('INERTIA SOLUTION');
+						Ext.getCmp('inertiaSolutionWrapper').show();
+						Ext.getCmp('unitsSolutionWrapper').hide();
+						var 	shape = Ext.getCmp('inertiaShape').getValue(),
+							densityStr = Ext.getCmp('inertiaDensity').getDisabled() ? '' : 'Density: ' + motioncalc.app.conversionFunctions.getValue(Ext.getCmp('inertiaDensity').getValue()) +  motioncalc.app.density,
+							material = Ext.getCmp('inertiaMaterials').getValue(),							
+							solutionStr,
+							dimensions = [
+								['inertiaHeight','Height: '],
+								['inertiaLength','Length: ',],
+								['inertiaWidth','Width: '],
+								['outsideDiameter','OD: '],
+								['insideDiameter','ID: '],
+								['radius','Radius: '],
+							]
+							shortAnswer = 'I%20just%20solved%20a%20' + shape + '%20inertia%20problem%20using%20%23RbtMkrCalc!',
+							inertiaAnswers = [];
+						material = material.indexOf('Select One')>-1 ? '' : ' (' + material + ')';
+						densityStr += material  + '\n';
+						solutionStr = 'Shape: ' + shape + '\n' + densityStr;
+
+						for(var i = 0;i<dimensions.length;i++){
+							solutionStr+= Ext.getCmp(dimensions[i][0]).isHidden() ? '' :dimensions[i][1] + motioncalc.app.conversionFunctions.getValue(Ext.getCmp(dimensions[i][0]).getValue()) + motioncalc.app.linearDistance + '\n';
+						}				
+						solutionStr += '\n--------------------\n\n';								
+						if(typeof window.inertiaAnswers != 'undefined'){
+							for(var i=0;i<window.inertiaAnswers.length;i++){
+								var 	text = window.inertiaAnswers[i][0];
+									unitType = text.indexOf('Mass') === -1 ? motioncalc.app.inertia:motioncalc.app.mass,
+									solutionStr += window.inertiaAnswers[i][0].replace('&#180;','\'').replace('&#180;','\'') + ': '  + window.inertiaAnswers[i][1] + unitType +'\n';
+								
+								switch(text){
+									case 'Ixx':
+									text = 'xx';
+									break;
+									case 'Ix&#180;x&#180;':
+									text = 'xxPrime';
+									break;
+									case 'Iyy':
+									text = 'yy';
+									break;
+									case 'Iy&#180;y&#180;':
+									text = 'yyPrime';
+									break;
+									case 'Izz':
+									text = 'zz';
+									break;
+									case 'Mass':
+									text = 'Mass'
+									default:
+									text = null;
+									break;
+
+								}
+								if(text != null)inertiaAnswers.push([text,window.inertiaAnswers[i][1]]);
+							}
+						}
+						else inertiaAnswers.push(['',0,0]);
+					
+	//					this.animateShape(null,null,0,shape,[['yyPrime','3.783335e+101'],['yy','3.783335e+101'],['xxPrime','3.783335e+101'],['xx','3.783335e+101'],['zz','3.783335e+101']]);
+						controller.animateShape(null,null,0,shape,inertiaAnswers);										
+						solutionStr += tagSolutionString();
+						Ext.getCmp('inertiaSolutionBox').set('value',solutionStr);
+						Ext.getCmp('shortAnswer').setValue(shortAnswer);
+					}
+				}
+			},
+		}
+	},
+	animateShape: function(oX,oY,route,shape,answers){
+	function drawTitle() {
+		ctx.beginPath();
+		ctx.font = "1em Arial";
+		ctx.fillStyle = "white";
+		ctx.textAlign = 'right';
+		ctx.fillText(shape, 290, 290);
+	}
+	function drawLabels(){
+		var labels = getLabels();
+		ctx.font = "bold 1em Arial";
+		ctx.textAlign = 'left';
+		for(var i = 0;i<labels.length;i++){
+			if(labels[i][3])ctx.fillStyle = "#f4f776"
+			else ctx.fillStyle = 'black';
+			ctx.beginPath();
+			ctx.fillText(labels[i][0], labels[i][1], labels[i][2]);	
+		}		
+	}
+	function drawAnswers(){
+		var 	labels = getAnswerLabels();
+		ctx.font = "normal .75em Arial";
+		ctx.fillStyle = '#999999';
+		for(var i = 0;i<labels.length;i++){
+			var answerStr = '';
+			for(var ii = 0;ii<answers.length;ii++){
+				if(labels[i][0] == answers[ii][0])answerStr = answers[ii][1];
+			}
+			ctx.textAlign=labels[i][3];
+			ctx.beginPath();
+			ctx.fillText(answerStr, labels[i][1], labels[i][2]);	
+		}		
+	}
+	function drawDimensions(){
+		ctx.strokeStyle = 'red';
+		ctx.lineWidth = 2;
+		var lines = getDimensions();
+		
+		for(var i = 0;i<lines.length;i++){
+			drawLine(lines[i][0],lines[i][1]);
+			if(lines[i][2][0]){
+				var x1,y1,x2,y2,xy,angle;
+				angle = 5;
+				xy = lines[i][2][1]; 
+				if(xy == 3){				
+					x1 = angle;
+					y1 = angle;
+					x2 = angle;
+					y2 = angle * -1;
+				}
+				else if(xy == 4){				
+					x1 = angle*-1;
+					y1 = angle;
+					x2 = x1;
+					y2 = angle*-1;
+				}
+				else {
+					x1 = lines[i][2][1] == 0 ? 5 : 0;
+					y1 = lines[i][2][1] == 1 ? 5 : 0;
+					x2 = x1;
+					y2 = y1;					
+				}				
+				drawLine(lines[i][1],[lines[i][1][0] + x2 ,lines[i][1][1]+y2]);
+				drawLine(lines[i][1],[lines[i][1][0]+y1,lines[i][1][1]+x1]);
+				drawLine(lines[i][0],[lines[i][0][0]-x2,lines[i][0][1]-y2]);
+				drawLine(lines[i][0],[lines[i][0][0]-y1,lines[i][0][1]-x2]);
+			}
+		}
+	}
+	function drawInertia(){
+		ctx.strokeStyle = 'grey';
+		var lines = getInertiaLines();
+		
+		for(var i = 0;i<lines.length;i++){
+			drawLine(lines[i][0],lines[i][1]);
+		}		
+	}
+	function drawCircle(circleLocation,newPosition,radius,route){
+		oldPi = 0.01;
+		newPi = oldPi + (newPosition/100);
+		newPi = newPi * Math.PI;
+		ctx.beginPath();
+		ctx.arc(circleLocation[0],circleLocation[1],radius,oldPi,newPi,false);
+		ctx.stroke();
+		ctx.closePath();
+		if(typeof route != 'undefined'){		
+			setTimeout(function(){motioncalc.app.getController("InertiaSolution").animateShape(0,newPosition,route,shape,answers);},1);
+//			animateShape(0,newPosition,route,shape,answers);
+		}
+	}
+
+	function drawLine(curPos,newPos,route){
+		ctx.beginPath();
+		ctx.moveTo(curPos[0],curPos[1]);
+		ctx.lineTo(newPos[0],newPos[1]);
+		ctx.stroke();
+		ctx.closePath();
+		if(typeof route != 'undefined'){		
+			setTimeout(function(){motioncalc.app.getController("InertiaSolution").animateShape(newPos[0],newPos[1],route,shape,answers);},1);
+//			animateShape(newPos[0],newPos[1],route,shape,answers);
+		}
+	}
+	var 	canvas = document.getElementById("shapeCanvas"),
+		ctx = canvas.getContext("2d"),
+		allRoutes = getRoute(),
+		nX = null,
+		nY = null,
+		curPos = [],
+		newPos = [],
+		isNewItem = false,
+		routeType = allRoutes[route][3][0],
+		endPos = [allRoutes[route][1][0],allRoutes[route][1][1]],
+		isCircle = (routeType =='circle'),
+		firstRun = oX == null ? true : false;
+		if(oY == null)ctx.clearRect(0, 0, canvas.width, canvas.height);
+		
+		nX = (oY == null && isCircle) ? 0 : null;
+		oX = oX == null ? allRoutes[route][0][0] : oX;
+		oY = oY == null ? allRoutes[route][0][1] : oY;
+		nX = nX == null ? oX + allRoutes[route][2][0] : nX;
+		nY = (isCircle) ? 0 : oY + allRoutes[route][2][1];
+		curPos = [oX,oY];
+		newPos = [nX,nY];
+//		for building only
+//		canvas.onmousemove = function(e){if(clicked)console.log(e.offsetX + ' | ' + e.offsetY);};
+	if(isCircle && !firstRun){
+		newPos[0]=oY;
+	}
+	
+	switch(routeType)
+		{
+			case 'diag':
+				isNewItem = (newPos[allRoutes[route][3][1]] == endPos[allRoutes[route][3][1]]);
+			break;
+			case 'circle':
+				isNewItem = (newPos[0] == endPos[0] && newPos[1] == endPos[1]);
+			break;
+			default: 
+				isNewItem = (newPos[0] == endPos[0] && newPos[1] == endPos[1]);
+			break;
+		}
+	if(isNewItem){
+		route++;
+		if(typeof allRoutes[route] == 'undefined'){
+			drawTitle();
+			drawInertia();
+			drawDimensions();
+			drawLabels();
+			drawAnswers();
+			return;
+		}
+		isCircle = (allRoutes[route][3][0]=='circle');
+		if(!isCircle){
+			curPos[0] = allRoutes[route][0][0];
+			curPos[1] = allRoutes[route][0][1];
+			newPos[0] = curPos[0] + allRoutes[route][2][0];
+			newPos[1] = curPos[1] + allRoutes[route][2][1];
+		}
+	}
+
+	if(isCircle){
+		curPos[0] = allRoutes[route][0][0];
+		curPos[1] = allRoutes[route][0][1];
+		newPos[0] = (isNewItem || firstRun) ? 0 : oY + 1;
+		newPos[1] = allRoutes[route][1][1];
+	}
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = 'white';
+	if(isCircle)drawCircle(curPos,newPos[0],allRoutes[route][2][0],route);
+	else drawLine(curPos,newPos,route);
+
+	function getDimensions(){
+		switch(shape)
+		{
+			case 'cylinder':
+			return	[
+//					start position, end position, arrow angle info
+					[[165,258],[22,115],[true,1]],
+					[[202,160],[269,160],[false,null]],
+					[[202,243],[269,243],[false,null]],
+					[[258,170],[258,236],[true,4]],
+					[[202,180],[238,180],[false,null]],
+					[[202,220],[238,220],[false,null]],
+					[[226,186],[226,214],[true,4]],
+				];
+				break;
+			case 'parallelepiped':
+			return	[
+//					start position, end position, arrow angle info
+					[[92,208],[64,153],[true,1]],
+					[[202,220],[122,220],[true,3]],
+					[[64,87],[64,138],[true,4]],
+				];
+				break;
+			case 'sphericalShell':
+			return	[
+//					start position, end position, arrow angle info
+					[[150,150],[207,133],[false,null]],
+				];
+				break;
+			case 'sphere':
+			return	[
+//					start position, end position, arrow angle info
+					[[150,150],[256,116],[false,null]],
+				];
+				break;
+			case 'slenderRod':
+			return	[
+//					start position, end position, arrow angle info
+					[[209,251],[27,69],[true,1]],
+				];
+				break;
+			case 'tetrahedron':
+			return	[
+//					start position, end position, arrow angle info
+					[[268,200],[268,38],[false,null]],
+					[[260,40],[130,40],[true,3]],
+					[[93,60],[93,190],[true,4]],
+					[[175,266],[117,222],[true,1]],
+				];
+				break;				
+		}
+	}
+	function getAnswerLabels(){
+		switch(shape)
+		{
+			case 'cylinder':
+				return [
+//					answer,x,y,align
+					['yyPrime',103,13,'left'],
+					['yy',157,29,'left'],
+					['xxPrime',191,67,'right'],
+					['xx',245,126,'right'],
+					['zz',261,275,'right'],
+				];
+				break;
+			case 'parallelepiped':
+				return [
+//					answer,x,y,align
+					['yyPrime',101,21,'right'],
+					['yy',135,19,'left'],
+					['xxPrime',235,82,'right'],
+					['xx',290,148,'right'],
+					['zz',223,259,'right'],
+				];
+				break;
+			case 'sphericalShell':
+				return [
+//					answer,x,y,align
+					['yy',143,18,'right'],
+					['xx',30,146,'left'],
+					['zz',252,263,'right'],
+				];
+				break;
+			case 'sphere':
+				return [
+//					answer,x,y,align
+					['yy',143,18,'right'],
+					['xx',30,146,'left'],
+					['zz',252,263,'right'],
+				];
+				break;
+			case 'slenderRod':
+				return [
+//					answer,x,y,align
+					['yyPrime',60,18,'left'],
+					['yy',162,100,'left'],
+					['xxPrime',106,43,'left'],
+					['xx',194,158,'left'],
+					['zz',262,273,'right'],
+				];
+				break;
+			case 'tetrahedron':
+				return [
+//					answer,x,y,align
+					['yy',278,213,'right'],
+					['xx',95,245,'right'],
+					['zz',114,19,'right'],
+				];
+				break;				
+		}
+	}
+
+	function getLabels(){
+		switch(shape)
+		{
+			case 'cylinder':
+				return [
+//					text, x, y, isAnswer
+					['L',80,200,false],
+					['OD',265,207,false],
+					['ID',235,207,false],
+					['Y\'',80,20,true],
+					['Y',140,28,true],
+					['X\'',196,72,true],
+					['X',252,133,true],
+					['Z',254,262,true],
+				];
+				break;
+			case 'parallelepiped':
+				return [
+//					text, x, y, isAnswer
+					['L',59,197,false],
+					['H',41,117,false],
+					['W',154,240,false],
+					['Y\'',90,43,true],
+					['Y',130,39,true],
+					['X\'',225,105,true],
+					['X',230,130,true],
+					['Z',230,260,true],
+
+
+				];
+				break;
+			case 'sphericalShell':
+				return [
+//					text, x, y, isAnswer
+					['R',224,139,false],
+					['Y',150,20,true],
+					['X',12,150,true],
+					['Z',258,264,true],
+				];
+				break;
+			case 'sphere':
+				return [
+//					text, x, y, isAnswer
+					['R',272,119,false],
+					['Y',150,20,true],
+					['X',12,150,true],
+					['Z',258,264,true],
+				];
+				break;
+			case 'slenderRod':
+				return [
+//					text, x, y, isAnswer
+					['L',93,181,false],
+					['Y',145,101,true],
+					['Y\'',39,18,true],
+					['X',205,145,true],
+					['X\'',83,43,true],
+					['Z',267,273,true],
+				];
+				break;
+			case 'tetrahedron':
+				return [
+//					text, x, y, isAnswer
+					['L',130,263,false],
+					['W',198,29,false],
+					['H',72,123,false],
+					['X',65,229,true],
+					['Y',285,213,true],
+					['Z',121,19,true],
+				];
+				break;				
+		}
+	}
+
+	function getInertiaLines(){
+		switch(shape)
+		{
+			case 'cylinder':
+				return [
+//					start position, end position
+					[[70,10],[70,170]],
+					[[10,70],[185,70]],
+					[[130,13],[130,240]],
+					[[239,130],[10,130]],
+					[[250,250],[119,119]],
+				];
+				break;
+			case 'parallelepiped':
+				return [
+//					start position, end position
+					[[115,120],[230,244]],
+					[[119,131],[222,131]],
+					[[125,36],[125,147]],
+					[[111,42],[111,119]],
+					[[101,109],[222,109]],
+
+				];
+				break;
+			case 'sphericalShell':
+				return [
+//					start position, end position
+					[[150,150],[150,30]],
+					[[150,150],[30,150]],
+					[[150,150],[250,250]],
+
+				];
+				break;
+			case 'sphere':
+				return [
+//					start position, end position
+					[[150,150],[150,30]],
+					[[150,150],[30,150]],
+					[[150,150],[250,250]],
+				];
+				break;
+			case 'slenderRod':
+				return [
+//					start position, end position
+					[[40,40],[70,40]],
+					[[40,40],[40,20]],
+					[[250,250],[260,260]],
+					[[116,143],[196,143]],
+					[[143,150],[143,106]],
+//					[[150,150],[250,250]],
+				];
+				break;
+			case 'tetrahedron':
+				return [
+//					start position, end position
+					[[121,44],[121,22]],
+					[[269,199],[289,199]],
+					[[120,200],[77,220]],
+				];
+				break;				
+		}
+	}
+	function getRoute(){
+		switch(shape)
+		{
+			case 'cylinder':
+				return [
+//					start position, end position, radius/back-forward, type
+					[[200,200],[200,0],[40,null],['circle',null]],
+					[[200,200],[200,0],[20,null],['circle',null]],
+					[[225,169],[71,39],[-1,-1],['diag',1]],
+					[[71,71],[200,0],[40,null],['circle',null]],
+					[[172,230],[43,99],[-1,-1],['diag',0]],
+				];
+				break;
+			case 'parallelepiped':
+				return [
+//					start position, end position, radius/back-forward, type
+					[[206,136],[110,136],[-1,0],['straight',0]],
+					[[110,136],[110,200],[0,1],['straight',0]],
+					[[110,200],[206,200],[1,0],['straight',0]],
+					[[206,200],[206,136],[0,-1],['straight',0]],
+					[[206,136],[140,80],[-1,-1],['diag',1]],
+					[[152,81],[76,81],[-1,0],['straight',0]],
+					[[76,81],[110,140],[1,1.7],['diag',0]],
+					[[77,84],[77,140],[0,1],['straight',0]],
+					[[77,140],[111,201],[1,1.8],['diag',0]],
+				];
+				break;
+			case 'sphericalShell':
+				return [
+//					start position, end position, radius/back-forward, type
+					[[150,150],[200,0],[110,null],['circle',null]],
+					[[150,150],[200,0],[60,null],['circle',null]],
+				];
+				break;
+			case 'sphere':
+				return [
+//					start position, end position, radius/back-forward, type
+					[[150,150],[200,0],[110,null],['circle',null]],
+				];
+				break;
+			case 'slenderRod':
+				return [
+//					start position, end position, radius/back-forward, type
+					[[40,40],[250,250],[1,1],['diag',0]],
+				];
+				break;
+			case 'tetrahedron':
+				return [
+//					start position, end position, radius/back-forward, type
+					[[121,40],[121,200],[0,1],['straight',0]],
+					[[121,200],[205,248],[1,.75],['diag',0]],
+					[[204,261],[262,197],[1,-1],['diag',1]],
+					[[267,199],[121,40],[-.93,-1],['diag',1]],
+				];
+				break;				
+		}		
+	}
+
+}
+
+});
+
+Ext.define('motioncalc.controller.Units', {
+	extend : 'Ext.app.Controller',
+	config: {
+		views : ['motioncalc.view.Units'],
+		refs : {
+			buttonResult: '#buttonUnitsResult',
+			buttonAdd: '#buttonAddToInertia',
+			selectForInertia: '#selectForInertia',
+			unitsView : '#unitsID',
+			type : '#unitsType'
+		},
+		control: {
+//			unitsView: {
+//				activate: function(){console.log('d');}
+//			},
+			type:	{
+				change: function(){
+					var 	typeVal = Ext.getCmp('unitsType').getValue(),
+						buttonAdd = Ext.getCmp('buttonAddToInertia'),
+						isDisabled = true;
+					switch(typeVal){
+						case "Density":
+						isDisabled = false;
+						break;
+						case "Mass":
+						isDisabled = false;
+						break;
+						case "Linear distance":
+						isDisabled = false;
+						break;
+					}
+					buttonAdd.setDisabled(isDisabled);
+				}				
+			},
+			selectForInertia:	{
+				change: function(){
+					var selectField,inertiaField;
+					selectField = Ext.getCmp('selectForInertia');
+					if(selectField.getValue() == 0)return;
+					inertiaField = Ext.getCmp(selectField.getValue());
+					this.setInertiaAndGo('Linear distance',inertiaField,motioncalc.app.linearDistance);
+					selectField.setValue(0);
+				}				
+			},
+			buttonResult: {
+				tap: function(){
+					motioncalc.app.answerFrom = 'units';
+					motioncalc.app.mainView.setActiveItem(5);
+				}
+			},
+			buttonAdd: {
+				tap: function(){
+					function errMsg(){
+						Ext.Msg.alert(							
+						   	'Inertia Calculator',
+							'Cannot update the Inertia Calculator ' + typeVal + ' field because the calculator is not set for ' + typeVal + ' calculation.'
+						);
+					}
+						var 	typeVal = Ext.getCmp('unitsType').getValue(),
+							inertiaType,inertiaField;
+						switch(typeVal){
+							case "Density":
+							inertiaType = motioncalc.app.density;	
+							inertiaField = Ext.getCmp('inertiaDensity');
+							if(inertiaField.getDisabled() !== false){
+								errMsg();
+								return;	
+							}
+							return this.setInertiaAndGo(typeVal,inertiaField,inertiaType);
+							break;
+							case "Mass":
+							inertiaType = motioncalc.app.mass;	
+							inertiaField = Ext.getCmp('inertiaMass');
+							if(inertiaField.getDisabled() == true){
+								errMsg();
+								return;	
+							}
+							return this.setInertiaAndGo(typeVal,inertiaField,inertiaType);
+							break;
+							case "Linear distance":
+							toType = motioncalc.app.linearDistance;
+							var 	selectForInertia = Ext.getCmp('selectForInertia'),
+								options = [{text:'-select inertia field-',value:0}],
+								inertiaFields = [
+									{text:'Height',value:'inertiaHeight'},
+									{text:'Length',value:'inertiaLength'},
+									{text:'Width',value:'inertiaWidth'},
+									{text:'Radius',value:'radius'},
+									{text:'OutsideDiameter',value:'outsideDiameter'},
+									{text:'InsideDiameter',value:'insideDiameter'}
+								],
+								fieldCount = inertiaFields.length,
+								fieldName;
+							for(var i = 0;i<fieldCount;i++){
+								theField = Ext.getCmp(inertiaFields[i].value);
+								if(!theField.isHidden())options.push({text:inertiaFields[i].text,value:inertiaFields[i].value});
+							}
+							selectForInertia.setOptions(options);
+							selectForInertia.showPicker();
+							return;
+							break;
+						}
+				}
+			}
+		},
+	},
+	setInertiaAndGo: function(typeVal,inertiaField,inertiaType){
+		var 	fromAmount = Ext.getCmp('unitsAmount').getValue(),
+			fromType = Ext.getCmp('unitsFrom').getValue(),
+			toType = Ext.getCmp('unitsTo').getValue(),
+			toAmount, inertiaAmount;
+//		console.log('before to',fromAmount,fromType,toType,typeVal);
+		toAmount = motioncalc.app.conversionFunctions.unitsConvert(fromAmount,fromType,toType,typeVal,false);
+//		console.log('after to',fromAmount,fromType,toType,typeVal);
+		inertiaAmount = motioncalc.app.conversionFunctions.unitsConvert(toAmount,toType,inertiaType,typeVal,false);					
+		inertiaField.set('value',inertiaAmount);
+		motioncalc.app.mainView.setActiveItem(2);
+	},
+});
+
+
+
+
+Ext.define('motioncalc.model.AppState', {
+	extend: 'Ext.data.Model',
+	requires: ['Ext.data.proxy.LocalStorage','Ext.data.identifier.Uuid'],
+	config: {
+		identifier: 'uuid',
+		fields: ['id', 'value'],
+		proxy: {
+		    type: 'localstorage',
+		    id  : '_AppState'
+		}
+	}
+});
+
+Ext.define('motioncalc.store.AppState', {
     extend: 'Ext.data.Store',
     config: {
-	storeId:'_GlobalSettings',
-	model: 'motioncalc.model.GlobalSettings',
+	storeId:'_AppState',
+	model: 'motioncalc.model.AppState',
 	autoLoad: true
     }
 });
@@ -69111,33 +71270,10 @@ Ext.define('motioncalc.store.OriginalMaterialDensities', {
     }
 });
 
-Ext.define('motioncalc.view.HomeIcons', {
-	extend: 'Ext.navigation.View',
-	xtype: 'homeicons',
-		requires: [
-		'Ext.dataview.List',
-	],
-	config: {
-		iconCls: 'home',
-		title: 'Home',
-		items: [{
-				title: 'Home',
-				xtype: 'list',
-				itemTpl: '{title}',
-				id: '_homeIcons',
-				store: 'HomeIcons',
-				listeners: {
-					itemtap: function(list,index,item,e){
-						motioncalc.app.mainView.setActiveItem(index+1);
-					}
-			}
-		}]
-	}
-});
-
 Ext.define('motioncalc.view.GlobalSettings', {
 	extend: 'Ext.form.FormPanel',
 	xtype: 'globalsettingscard',
+	id: 'globalSettingsID',
 	requires: [
 		'Ext.form.FieldSet',
 		'Ext.field.Select',
@@ -69152,7 +71288,7 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		    {
 			docked: 'top',
 			xtype: 'toolbar',
-			title: 'Global Settings',
+			title: 'GLOBAL SETTINGS',
 			items: [
 				{xtype: 'spacer'},
 				{
@@ -69169,9 +71305,9 @@ Ext.define('motioncalc.view.GlobalSettings', {
 							Ext.getCmp('materialDensity').setValue(0);
 							Ext.getCmp('materialOriginalValue').setValue(null);
 							Ext.getCmp('materialName').setReadOnly(false);
-							Ext.getCmp('AddMaterialTop').setTitle('Add Material');
-							Ext.getCmp('buttonManageMaterialOne').set('text','Cancel');
+							Ext.getCmp('AddMaterialTop').setTitle('ADD MATERIAL');
 							Ext.getCmp('buttonManageMaterials').set('text','edit material');
+							Ext.getCmp('buttonManageMaterials').removeCls('danger-class');
 							motioncalc.app.mainView.setActiveItem(pane);
 						}
 					}
@@ -69202,15 +71338,14 @@ Ext.define('motioncalc.view.GlobalSettings', {
 			    {
 				xtype: 'selectfield',
 				name : 'significantDigits',
+				id: 'significantDigits',
 				label: 'Significant Digits',
 				options: [{text:'1',value:'1'},{text:'2',value:'2'},{text:'3',value:'3'},{text:'4',value:'4'},{text:'5',value:'5'},{text:'6',value:'6'},{text:'7',value:'7'}],
 				listeners:{
-					initialize:function(){
-						this.setValue(motioncalc.app.significantDigits);
-					},
 				change: function(selectbox,newValue,oldValue)
 				    {
-					if(newValue === oldValue)return;        
+					if(newValue === oldValue)return; 
+//					console.log(selectbox,newValue,oldValue);       
 					motioncalc.app.significantDigits = newValue;
 					motioncalc.app.setGlobalSetting('SignificantDigits',newValue);
 				    }
@@ -69280,7 +71415,8 @@ Ext.define('motioncalc.view.GlobalSettings', {
 		]
 	},
 	initialize: function(){
-			Ext.getCmp('_mass').setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass')).setValue(motioncalc.app.mass);;
+			Ext.getCmp('significantDigits').setValue(motioncalc.app.significantDigits);
+			Ext.getCmp('_mass').setOptions(motioncalc.app.conversionFunctions.fillUnits('Mass')).setValue(motioncalc.app.mass);
 			Ext.getCmp('linear-distance').setOptions(motioncalc.app.conversionFunctions.fillUnits('Linear distance')).setValue(motioncalc.app.linearDistance);
 			Ext.getCmp('_inertia').setOptions(motioncalc.app.conversionFunctions.fillUnits('Inertia')).setValue(motioncalc.app.inertia);
 			Ext.getCmp('_density').setOptions(motioncalc.app.conversionFunctions.fillUnits('Density')).setValue(motioncalc.app.density);
@@ -69296,7 +71432,9 @@ Ext.define('motioncalc.view.Main', {
         'motioncalc.view.Units',
         'motioncalc.view.Inertia',
 	'motioncalc.view.GlobalSettings',
-	'motioncalc.view.AddMaterial'
+	'motioncalc.view.AddMaterial',
+	'motioncalc.view.InertiaSolution',
+	'motioncalc.view.About',
     ],
 
     config: {
@@ -69305,16 +71443,19 @@ Ext.define('motioncalc.view.Main', {
             docked: 'bottom',
             layout: {
                 pack: 'center'
-            }
+            },
         },
         items: [
             { xtype: 'homeicons' },
             { xtype: 'unitscard' },
             { xtype: 'inertiacard' },
             { xtype: 'globalsettingscard' },
-            { xtype: 'addmaterialcard', hidden: true }
-        ]
-    }
+            { xtype: 'addmaterialcard', hidden: true },
+            { xtype: 'inertiasolutioncard', hidden: true },
+            { xtype: 'aboutcard', hidden: true }
+        ],
+    },
+	
 });
 
 Ext.define('motioncalc.util.Inertia', {
@@ -69357,7 +71498,7 @@ inertiaCalc: function(){
 			Izz = this.eqnParallelIxx('Izz');
 			IxxPrime = this.eqnParallelIxx('IxxPrime');
 			IyyPrime = this.eqnParallelIxx('IyyPrime');
-			mass = this.eqnCylinderIxx('mass');
+			mass = this.eqnParallelIxx('mass');
 			break;
 		case 'slenderRod':
 			Ixx = this.eqnRodIxx('Ixx');
@@ -69375,8 +71516,8 @@ inertiaCalc: function(){
 	returnArray.push(['Ixx',Ixx]);
 	returnArray.push(['Iyy',Iyy]);
 	returnArray.push(['Izz',Izz]);
-	returnArray.push(['IxxPrime',IxxPrime]);
-	returnArray.push(['IyyPrime',IyyPrime]);
+	returnArray.push(['Ix&#180;x&#180;',IxxPrime]);
+	returnArray.push(['Iy&#180;y&#180;',IyyPrime]);
 	returnArray.push(['Mass',mass]);
 	return returnArray;
 },
@@ -69455,7 +71596,7 @@ eqnParallelIxx: function(field){
 	sngW = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaWidth').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
 	sngH = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaHeight').get('value'), motioncalc.app.linearDistance, motioncalc.app.LDBASEUNITS,'Linear distance');
 
-	if (Ext.getCmp('isMass').value==1){
+	if (Ext.getCmp('isMass').get('value')==1){
 		sngMass = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaMass').get('value'), motioncalc.app.mass,motioncalc.app.MASSBASEUNITS, 'Mass');
 	}
 	else{
@@ -69485,7 +71626,9 @@ eqnParallelIxx: function(field){
 		case 'IyyPrime':
 			//sngI = sngMass / 12# * sngH ^ 2 + sngMass / 3# * sngL ^ 2
 			Ixx=(sngMass/12) * (Math.pow(sngH,2)) +((sngMass/3)*Math.pow(sngL,2));
+			break;
 		case 'mass':
+//			console.log(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');
 			return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');	
 	}
 								
@@ -69509,16 +71652,13 @@ eqnCylinderIxx: function(field){
 	}
 	else{
 		sngDensity = motioncalc.app.conversionFunctions.unitsConvert(Ext.getCmp('inertiaDensity').getValue(), motioncalc.app.density, motioncalc.app.DENSITYBASEUNITS,'Density');
-//		console.log(Ext.getCmp('inertiaDensity').getValue() + '|' + motioncalc.app.density + '|' + motioncalc.app.DENSITYBASEUNITS);
 		sngMass=sngDensity * motioncalc.app.PI * (Math.pow(sngOR,2)-Math.pow(sngIR,2)) * sngL;
-//		console.log(sngDensity + '|' + motioncalc.app.PI + '|' + (Math.pow(sngOR,2)-Math.pow(sngIR,2)) + '|' + sngL);
 	}	
 	switch(field)
 	{
 		case 'Ixx':
 			//sngI = sngMass * ((sngOR ^ 2 + sngIR ^ 2) / 4# + sngL ^ 2 / 12#)
 			Ixx=sngMass * ((Math.pow(sngOR,2)+Math.pow(sngIR,2))/4+Math.pow(sngL,2)/12);
-//			console.log(sngMass + '|' + motioncalc.app.MASSBASEUNITS + '|' + motioncalc.app.mass);
 //			Ext.getCmp('inertiaMass').set('value',motioncalc.app.conversionFunctions.unitsConvert(sngMass, motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass'));
 			break;
 		case 'Iyy':
@@ -69538,8 +71678,9 @@ eqnCylinderIxx: function(field){
 			break;
 		case 'mass':
 			//sngI = sngMass / 3# * sngL ^ 2 + sngMass / 4# * (sngOR ^ 2 + sngIR ^ 2)
+//			console.log(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');
 			return motioncalc.app.conversionFunctions.unitsConvert(sngMass,motioncalc.app.MASSBASEUNITS, motioncalc.app.mass, 'Mass');	
-	}
+	}	
 	return motioncalc.app.conversionFunctions.unitsConvert(Ixx, motioncalc.app.INERTIABASEUNITS, motioncalc.app.inertia, 'Inertia');
 
 },
@@ -69587,19 +71728,20 @@ Ext.application({
 
     requires: [
         'Ext.MessageBox',
+	'Ext.Anim',
 	'motioncalc.util.Conversions',
 	'motioncalc.util.Inertia'
     ],
 
     views: ['Main'],
-    stores: ['HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
-    models: ['GlobalSettings','MaterialDensities'],
-    controllers: ['Inertia','AddMaterial'],
+    stores: ['ShareOptions','AppState','HomeIcons','GlobalSettings','Conversions','MaterialDensities','OriginalMaterialDensities'],
+    models: ['AppState','GlobalSettings','MaterialDensities'],
+    controllers: ['HomeIcons','GlobalSettings','Inertia','AddMaterial','InertiaSolution','Units'],
 mainView: null,
 
 //global vars
 decimalStyle: 1,
-significantDigits: 1,
+significantDigits: 7,
 density: 'g/cm³',
 mass: 'carat',
 linearDistance: 'angstrom',
@@ -69610,30 +71752,35 @@ MASSBASEUNITS : "kg",
 INERTIABASEUNITS : "kg-m²",
 PI : 3.141593,
 
+answerFrom: null,
+siteURL: 'tigerbaby.me/motioncalc',
+siteTiny: 'tiny.cc/f7d3rw',
+
 conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
     icon: {
-        '57': 'resources/icons/Icon.png',
-        '72': 'resources/icons/Icon~ipad.png',
-        '114': 'resources/icons/Icon@2x.png',
-        '144': 'resources/icons/Icon~ipad@2x.png'
+        '57': 'resources/icons/motioncalc/squareicon57.png',
+        '72': 'resources/icons/motioncalc/squareicon72.png',
+        '114': 'resources/icons/motioncalc/squareicon114.png',
+        '144': 'resources/icons/motioncalc/squareicon144.png'
     },
     isIconPrecomposed: true,
 
     startupImage: {
-        '320x460': 'resources/startup/320x460.jpg',
-        '640x920': 'resources/startup/640x920.png',
-        '768x1004': 'resources/startup/768x1004.png',
-        '748x1024': 'resources/startup/748x1024.png',
-        '1536x2008': 'resources/startup/1536x2008.png',
-        '1496x2048': 'resources/startup/1496x2048.png'
+        '320x460': 'resources/startup/motioncalc/robotstart320.png',
+        '640x920': 'resources/startup/motioncalc/robotstart640.png',
+        '768x1004': 'resources/startup/motioncalc/robotstart768.png',
+        '748x1024': 'resources/startup/motioncalc/robotstart748.png',
+        '1536x2008': 'resources/startup/motioncalc/robotstart1536.png',
+        '1496x2048': 'resources/startup/motioncalc/robotstart1496.png'
     },
 
     launch: function() {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
+	Ext.DomHelper.append(document.body,{tag: 'a', id:'tigerBabyButton', href:'http://www.tigerbaby.me/robot-maker-calculator',target:'_blank' });
 	//set global vars
-	var decimalStyle, significantDigits,density,mass,linearDistance,inertia;
+	var decimalStyle, significantDigits,density,mass,linearDistance,inertia,activeItem;
 	decimalStyle = motioncalc.app.getGlobalSetting('DecimalStyle');
 	significantDigits = motioncalc.app.getGlobalSetting('SignificantDigits');
 	density = motioncalc.app.getGlobalSetting('Density');
@@ -69652,8 +71799,36 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 	
         // Initialize the main view
 	motioncalc.app.mainView = Ext.create('motioncalc.view.Main');
+//	console.log('launch',this.getGlobalSetting('activeItem','_AppState'));
+	activeItem = this.getGlobalSetting('activeItem','_AppState');
+	if(activeItem == null)motioncalc.app.mainView.setActiveItem(6);
+	else motioncalc.app.mainView.setActiveItem(this.getGlobalSetting('activeItem','_AppState'));
 	Ext.Viewport.add(motioncalc.app.mainView);
-	motioncalc.app.mainView.setActiveItem(4);
+	var isPhone = Ext.os.is('Phone');
+//	console.log(isPhone);
+	if(isPhone){
+		var allFormLabels = Ext.select('div.x-form-label');
+		allFormLabels.each(function(el){
+			Ext.get(el.dom).on('tap',function(){
+				var 	txt = this.dom.innerText,
+					txtEnd = txt.indexOf('\n')-1;				
+					txtEnd = txtEnd > -1 ? txtEnd : txt.length;
+//				console.log(txtEnd);
+				if(txtEnd<14)return;
+				var anim, fromW,toW;
+				fromW = '30%';
+				toW = '40%';
+				anim = Ext.create('Ext.Anim',{
+					autoclear:false,
+					from:{'min-width':fromW},
+					to:{'min-width':toW},
+					duration:750,
+				});
+	//			console.log(fromW +'|'+ toW);
+				anim.run(this);						
+			});
+		});
+	}
     },
 
     onUpdated: function() {
@@ -69684,22 +71859,42 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 			});
 		}
 	},
-	getGlobalSetting: function(id){
+	getGlobalSetting: function(id,store){
+//		console.log(id,store);
 		var rec,val;
-		rec = Ext.getStore('_GlobalSettings').getById(id);
+		store = (typeof store == 'undefined') ? '_GlobalSettings' : store; 
+		rec = Ext.getStore(store).getById(id);
 		val = rec===null?rec:rec.get('value');
 		return val;
 	},
-	setGlobalSetting: function(id,newValue){	
-		var stor = Ext.getStore('_GlobalSettings');
-		stor.load();
-		var rec = stor.getById(id);
+	setGlobalSetting: function(id,newValue,store){	
+//		console.log('setglobal',id,newValue,store);
+		store = (typeof store == 'undefined') ? Ext.getStore('_GlobalSettings') : Ext.getStore(store); 
+		store.load();
+		var rec = store.getById(id);
 		if(rec===null){
-			stor.add({id:id,value:newValue});
-			rec = stor.getById(id);
+			store.add({id:id,value:newValue});
+			rec = store.getById(id);
 		}
 		else rec.set('value',newValue);
 		rec.save();
+	},
+	getAppState: function(fieldList){
+		var x = 0;
+		for(record in fieldList){
+//			console.log(motioncalc.app.getGlobalSetting(fieldList[record],'_AppState'));
+			var fieldName,fieldValue;
+			fieldName = fieldList[record];
+			fieldValue = motioncalc.app.getGlobalSetting(fieldName,'_AppState');
+			if(fieldValue != null)Ext.getCmp(fieldName).setValue(fieldValue);
+		}
+	},
+	setAppState: function(fieldList,activeItem){
+//		console.log('setappstate',fieldList,activeItem);
+		for(record in fieldList){
+			motioncalc.app.setGlobalSetting(fieldList[record],Ext.getCmp(fieldList[record]).getValue(),'_AppState');
+		}
+		motioncalc.app.setGlobalSetting('activeItem',activeItem,'_AppState');
 	}
 });
 
