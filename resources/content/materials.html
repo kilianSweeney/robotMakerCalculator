@@ -1,0 +1,20 @@
+<h1>Managing Materials</h1>
+<h2>Let's give materials their deserved weight and volume.</h2>
+<p>The Robot Maker Calculator comes with a list of material density values, everything from alcohol to zirconium. You can add new material density values or edit the existing items. Your list is cached so it will be available to you offline or whenever you return to the Robot Maker Calculator. You can always restore the list to its original state by tapping the "restore" button. These density values can be applied to the inertia calculator using the "materials" button on that page. Manage materials from the Global Settings page using the "+/- material" button at the top of the page.</p>
+<h2>Add Material</h2>
+<ol class="settings-list">
+	<li><span>Material Name:</span> Type in a name for your new material density value. The name is how you'll select it from the list.</li>
+	<li><span>Amount:</span> Type in the density value for this new material. When your new material is saved it will reflect this amount based on the unit type below it.</li>
+	<li><span>Unit Type:</span> Select the density unit type tied to the amount field. This value (amount of unit type) will be stored when you hit the save button.</li>
+</ol>
+<h2>Edit Material</h2>
+<p>To select an existing material for editing click on the "edit material" button.</p>
+<ol class="settings-list">
+	<li><span>Material Name:</span> Reflects the name of the material associated with this density value. You cannot edit the name of an existing material.</li>
+	<li><span>Amount:</span> You can update the density value of an existing material. When your new material is saved it will reflect this amount based on the unit type below it.</li>
+	<li><span>Unit Type:</span> Select the density unit type tied to the amount field. This value (amount of unit type) will be stored when you hit the save button.</li>
+	<li><span>"remove" button:</span> You can completely remove a material from the list using the "remove" button at the top of the page.</li>
+</ol>
+
+<h2>Integration with the inertia calculator</h2>
+<p>You can select the density value for a given inertia calculation from the materials list. Use the "materials" button at the top of the inertia calculator page. This will populate the density field. The button is only active if the inertia calculator is enabled for a density-based calculation (toggle between mass and density by tapping on the respective label). Read <a href="javascript:Ext.getCmp('aboutItems').setValue('aboutInertia');" title="Using the inertia calculator">using the inertia calculator</a>.</p>

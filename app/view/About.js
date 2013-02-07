@@ -48,11 +48,10 @@ Ext.define('motioncalc.view.About', {
 				name: 'aboutPages',
 				id: 'aboutPages',
 				items: [
-					{
+				    	{
 						xtype: 'container',
-						id: 'aboutAbout',
-						html: '<div style="margin: 20px auto; height:460px; width: 320px; padding: 30px; color: #999999; font-size: .75em; background:url(resources/startup/motioncalc/robotstart320.png) no-repeat;">version: 1.0.0 | &copy;2013</div><p>&nbsp;</p>',
-						hidden: true					
+						id: 'aboutWelcome',
+						html: 'welcome! loading...',
 					},
 				    	{
 						xtype: 'container',
@@ -76,20 +75,27 @@ Ext.define('motioncalc.view.About', {
 					},
 				    	{
 						xtype: 'container',
-						id: 'aboutWelcome',
-						html: 'welcome! loading...',
-					},
-				    	{
-						xtype: 'container',
 						id: 'aboutMaterials',
 						html: 'materials loading...',
+					},
+					{
+						xtype: 'container',
+						id: 'aboutWiki',
+						html: 'Wiki Links loading...',
+						hidden: true					
+					},
+					{
+						xtype: 'container',
+						id: 'aboutAbout',
+						html: '<div class="about-version">version: 1.0.0 | &copy;2013</div><p>&nbsp;</p>',
+						hidden: true					
 					},
 
 					{
 						xtype: 'selectfield',
 						name : 'aboutItems',
 						id: 'aboutItems',
-						options: [{text:'Units Converter',value:'aboutUnits'},{text:'Inertia Calculator',value:'aboutInertia'},{text:'Global Settings',value:'aboutSettings'},{text:'Managing Materials',value:'aboutMaterials'},{text:'Version info',value:'aboutAbout'},{text:'Welcome Memo',value:'aboutWelcome'}],
+						options: [{text:'Welcome Memo',value:'aboutWelcome'},{text:'Units Converter',value:'aboutUnits'},{text:'Inertia Calculator',value:'aboutInertia'},{text:'Global Settings',value:'aboutSettings'},{text:'Managing Materials',value:'aboutMaterials'},{text:'Wiki Links',value:'aboutWiki'},{text:'Version info',value:'aboutAbout'},],
 						hidden: true,
 					},
 				]
@@ -145,7 +151,7 @@ Ext.define('motioncalc.view.About', {
 					}
 				});
 			}
-			var 	pages = [{url:'units.html',id:'aboutUnits'},{url:'inertia.html',id:'aboutInertia'},{url:'welcome.html',id:'aboutWelcome'}];
+			var 	pages = [{url:'welcome.html',id:'aboutWelcome'},{url:'units.html',id:'aboutUnits'},{url:'inertia.html',id:'aboutInertia'},{url:'settings.html',id:'aboutSettings'},{url:'materials.html',id:'aboutMaterials'},{url:'wiki.html',id:'aboutWiki'}];
 			for(i in pages){
 				getIt(pages[i].url,pages[i].id);
 //				console.log(pages[i].url,pages[i].id);
