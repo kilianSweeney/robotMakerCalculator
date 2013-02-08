@@ -88,8 +88,8 @@ $answer-color: #c23f2d;
 #aboutPages { padding: 20px; }
 #aboutPages h1 { font-size: 1.6em; letter-spacing: .12em; }
 #aboutPages h2 { font-size: 1.3em; padding: 10px 0; color: #c23f2d; letter-spacing: .05em; }
-.x-phone #aboutPages h1 { font-size: 1.3em; }
-.x-phone #aboutPages h2 { font-size: 1.1em; }
+.x-phone #aboutPages h1 { font-size: 1.2em; letter-spacing: .09em; }
+.x-phone #aboutPages h2 { font-size: 1.05em; letter-spacing: .02em; }
 #aboutPages ul { margin-left: 20px; margin-top: 10px; }
 #aboutPages ol { margin: 10px 20px;  }
 #aboutPages ol li { list-style: decimal ; }
@@ -99,8 +99,9 @@ $answer-color: #c23f2d;
 #aboutPages p { margin:5px 0; }
 #aboutPages p img { color:#36648B; margin-left: 10px; width: 30%; }
 .x-phone #aboutPages p img { width: 50%; }
-#aboutPages textarea { margin: 10px; padding: 10px; width: 215px; height: 85px; overflow: hidden;}
-#aboutPages textarea.inertia-page { height: 305px;}
+#aboutPages textarea { margin: 10px; padding: 10px; width: 250px; height: 85px; line-height:1.5em; font-size: .9em; overflow: hidden;}
+.x-phone #aboutPages textarea { margin: 5px; padding: 5px; line-height:1em; }
+#aboutPages textarea.inertia-page { height: 325px;}
 .about-version{ margin: 20px auto; height:460px; width: 320px; padding: 30px; color: #999999; font-size: .75em; background:url(../startup/motioncalc/robotstart320.png) no-repeat; }
-.x-phone .about-version{ margin: 0px auto; height: 163px; width: 143px; padding: 0 5px; background-image: url(../icons/motioncalc/squareicon144.png); background-position: bottom; }
+.x-phone .about-version{ margin: 0px auto; height: 165px; width: 143px; padding: 0; background-image: url(../icons/motioncalc/squareicon144.png); background-position: bottom; }
 

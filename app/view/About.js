@@ -48,40 +48,41 @@ Ext.define('motioncalc.view.About', {
 				name: 'aboutPages',
 				id: 'aboutPages',
 				items: [
+					//for ease of editing the html source files for these html strings are in resources/content
 				    	{
 						xtype: 'container',
 						id: 'aboutWelcome',
-						html: 'welcome! loading...',
+						html: '<h1>Robot Maker Calculator</h1><h2>Book mark it. Add it to your home screen.</h2><p><!--	<img align="right" src="resources/icons/motioncalc/squareicon57.png" title="RMC-BOT" alt="Robot Maker Calculator"/>-->	<img align="right" src="resources/startup/motioncalc/robotstart320.png" title="RMC-BOT" alt="Robot Maker Calculator"/>	Robot Maker Calculator is an HTML5 web app built on the Sencha Touch 2.1 javascript framework. RMC uses HTML5\'s localstorage feature to store all pertinent data on your device. This means RMC will work even when you\'re offline. So bookmark Robot Maker Calculator; add it to your home screen; and let\'s get to calculating!</p></p><ul>	<li><a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutUnits\');" title="Units Converter Information">Using the Units Converter</a></li>	<li><a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutInertia\');" title="Inertia Calculator Information">Using the Inertia Calculator</a></li>	<li><a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutSettings\');" title="Global Settings Information">Configuring Settings</a></li>	<li><a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutMaterials\');" title="Managing Materials Information">Managing Materials</a></li>	<li><a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutAbout\');" title="Version Information">Version Information</a></li></ul>',
 					},
 				    	{
 						xtype: 'container',
 						id: 'aboutUnits',
-						html: 'units loading...',
+						html: '<h1>Units Converter</h1><h2>Convert seconds to days, days to years, lbs to kilos and a whole lot more with the units converter.</h2><ol><li>Choose a measurement type such as "Mass."</li><li>Then choose a unit type such as "lbs."</li><li>Enter an amount such as 195.</li><li>And finally choose another unit type such as "slug."</li></ol><textarea readonly >Measurement Type: Mass\n176.4 lb = 5.482682 slug</textarea><p>There, now you know how many slugs Barack Obama weighs.</p><p>&nbsp;</p><p>The answer is at the bottom of the unit converter screen. It can also be found by tapping on the "result" button. That will take you to the Solution page where you can copy and paste the solution or share it with other apps and people using the "share" button.</p><h2>Integration with the inertia calculator</h2><p>If you are in an inertia calculator measurement type (i.e. density, mass, or "linear distance") then the "+ inertia" button will be active. You can push the value over to the inertia calculator. Be sure to set up the inertia calculator for the correct equation.</p><h2>Integration with the global settings</h2><p>All your solutions are governed by the global settings where you can select your decimal style (US vs Eur) and significant digits (e.g. original number = 176.366667, sig dig = 1 then number = 176, sig dig = 2 then number = 176.4, sig dig = 7 number = 176.36667).</p><p>The unit type settings are where you set the unit types for the fields on the inertia calculator. All of the dimension fields (radius, length, height, etc...) use the "linear distance" global setting. You can use the units converter to push values for non-default "linear distance" unit types. Read more about global settings <a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutSettings\');" title="Global Settings">here</a>. </p>',
 						hidden: true
 					},
 				    	{
 						xtype: 'container',
 						id: 'aboutInertia',
-						html: 'inertia loading...',
+						html: '<h1>Inertia Calculator</h1><h2>From spinning figure skaters to the design of rotary parts, everything\'s got a moment of inertia - right?</h2><ol><li>Select a shape for which to calculate.</li><li>Choose to either do a calculation based on density or mass by tapping on the respective label.</li><li>Then enter the dimensions of the object.</li></ol><textarea class="inertia-page" readonly >Shape: cylinder\n\nLength: 74in\nOD: 25in\nID: 24in\n\n--------------------\n\nIxx: 20lb-ft-s²\nIyy: 20lb-ft-s²\nIzz: 5.7lb-ft-s²\nIx\'x\': 72lb-ft-s²\nIy\'y\': 72lb-ft-s²\nMass: 1.8e+2lb\n</textarea><p>There, now you know the inertia values of a cylinder roughly Barack Obama\'s weight and height.</p><p>&nbsp;</p><p>The answer is at the bottom of the inertia calculator screen. It updates each time you change a value. It can also be found by tapping on the "result" button. That will take you to the Solution page where you can copy and paste the solution or share it with other apps and people using the "share" button.</p><h2>Integration with the Material Densities list</h2><p>If you are calculating for mass (i.e. you\'ve selected to enter the density value), you can select the density value of many known materials by tapping on the "materials" button and selecting a material from the list. You can add your own materials to this list. Read <a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutMaterials\');" title="Managing Materials">Managing Materials</a> for more info.</p><h2>Integration with the units converter</h2><p>All the dimension fields use the same "linear distance" unit type. This can be a calculation obstacle if, let\'s say, you know the length in feet but the width in inches. You can jump over to the units calculator and enter your length there in feet, then use the "+ inertia" button to move the value over to the length field on the inertia calculator.</p><h2>Integration with the global settings</h2><p>All your solutions are governed by the global settings where you can select your decimal style (US vs Eur) and significant digits (e.g. original number = 176.366667, sig dig = 1 then number = 176, sig dig = 2 then number = 176.4, sig dig = 7 number = 176.36667).</p><p>The unit type settings are where you set the unit types for the fields on the inertia calculator. All of the dimension fields (radius, length, height, etc...) use the "linear distance" global setting. You can use the units converter to push values for non-default "linear distance" unit types. Read more about global settings <a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutSettings\');" title="Global Settings">here</a>. </p>',
 						style: '',
 						hidden: true					
 					},
 				    	{
 						xtype: 'container',
 						id: 'aboutSettings',
-						html: 'settings loading...',
+						html: '<h1>Global Settings</h1><h2>Set up Robot Maker Calculator the way you want it.</h2><p>Changing any setting automatically updates the entire application so that when you go back to the inertia calculator or the units converter the solutions and unit types will all be updated and calculated for. Your settings are cached so that they will be there for you offline or whenever you come back to Robot Maker Calculator.</p><ol class="settings-list"><li><span>Decimal Style:</span> You want that fractional separation with a comma (EUR) or a decimal (US)? (e.g. Barack Obama weighs 176.4 in the United States, and 176,4 in Europe)</li><li><span>Significant Digits:</span> How many numbers do you need to see anyway? (e.g. original number = 176.366667, sig dig = 1 then number = 176, sig dig = 2 then number = 176.4, sig dig = 7 number = 176.36667)</li><li><span>Density:</span> Select the unit type for the inertia calculator density field.</li><li><span>Mass:</span> Select the unit type for the inertia calculator mass field.</li><li><span>Linear Distance:</span> Select the unit type for all the linear distance fields on the inertia calculator. The linear distance fields include length, height, width, radius, outside diameter, and inside diameter. All the linear distance fields will be calculated from the same unit type. You can push values from the units converter to the inertia calculator for values based on other linear distance unit types (read more about converter/calculator integration on the <a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutUnits\');" title="Using the Units Converter">Units Converter</a> and <a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutInertia\');" title="Using the inertia calculator">Inertia Calculator</a> info pages.</li><li><span>Inertia:</span> Select the inertia unit type for the inertia calculator. All inertia values will be given in this unit type.</li><li><span>"+/- material" button:</span> Add to or edit the material density list. Read <a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutMaterials\');" title="Managing Materials">Managing Materials</a>.</li></ol>',
 						style: '',
 						hidden: true					
 					},
 				    	{
 						xtype: 'container',
 						id: 'aboutMaterials',
-						html: 'materials loading...',
+						html: '<h1>Managing Materials</h1><h2>Let\'s give materials their deserved weight and volume.</h2><p>The Robot Maker Calculator comes with a list of material density values, everything from alcohol to zirconium. You can add new material density values or edit the existing items. Your list is cached so it will be available to you offline or whenever you return to the Robot Maker Calculator. You can always restore the list to its original state by tapping the "restore" button. These density values can be applied to the inertia calculator using the "materials" button on that page. Manage materials from the Global Settings page using the "+/- material" button at the top of the page.</p><h2>Add Material</h2><ol class="settings-list">	<li><span>Material Name:</span> Type in a name for your new material density value. The name is how you\'ll select it from the list.</li>	<li><span>Amount:</span> Type in the density value for this new material. When your new material is saved it will reflect this amount based on the unit type below it.</li>	<li><span>Unit Type:</span> Select the density unit type tied to the amount field. This value (amount of unit type) will be stored when you hit the save button.</li></ol><h2>Edit Material</h2><p>To select an existing material for editing click on the "edit material" button.</p><ol class="settings-list">	<li><span>Material Name:</span> Reflects the name of the material associated with this density value. You cannot edit the name of an existing material.</li>	<li><span>Amount:</span> You can update the density value of an existing material. When your new material is saved it will reflect this amount based on the unit type below it.</li>	<li><span>Unit Type:</span> Select the density unit type tied to the amount field. This value (amount of unit type) will be stored when you hit the save button.</li>	<li><span>"remove" button:</span> You can completely remove a material from the list using the "remove" button at the top of the page.</li></ol><h2>Integration with the inertia calculator</h2><p>You can select the density value for a given inertia calculation from the materials list. Use the "materials" button at the top of the inertia calculator page. This will populate the density field. The button is only active if the inertia calculator is enabled for a density-based calculation (toggle between mass and density by tapping on the respective label). Read <a href="javascript:Ext.getCmp(\'aboutItems\').setValue(\'aboutInertia\');" title="Using the inertia calculator">using the inertia calculator</a>.</p>',
 					},
 					{
 						xtype: 'container',
 						id: 'aboutWiki',
-						html: 'Wiki Links loading...',
+						html: '<h1>Wikipedia Links</h1><h2>Learn more about the moment of inertia, density, mass and all things physics!</h2><ol class="settings-list">	<li>Why does a figure skater spin faster when she pulls in her arms? She\'s reducing her <a title="Moment of inertia on Wikipedia" target="_blank" href="http://en.wikipedia.org/wiki/Moment_of_inertia">moment of inertia</a>.</li>	<li>Did you know that the word "eureka" entered the vocab because of a <a title="Density on Wikipedia" target="_blank" href="http://en.wikipedia.org/wiki/Density#History">density calculation observation</a>?.</li>	<li><a title="Mass on Wikipedia" target="_blank" href="http://en.wikipedia.org/wiki/Mass">Mass</a> "...is the quantitative measure of an object\'s resistance to acceleration."</li>	<li><em>"There shall be one measure of wine throughout our whole realm, and one measure of ale and one measure of corn--namely, the London quart;--and one width of dyed and russet and hauberk cloths--namely, two ells below the selvage..."</em> - <a title="Units of Measurement on Wikipedia" target="_blank" href="http://en.wikipedia.org/wiki/Units_of_measurement#History">so sayeth the Magna Carta</a></li></ol>',
 						hidden: true					
 					},
 					{
@@ -151,11 +152,11 @@ Ext.define('motioncalc.view.About', {
 					}
 				});
 			}
-			var 	pages = [{url:'welcome.html',id:'aboutWelcome'},{url:'units.html',id:'aboutUnits'},{url:'inertia.html',id:'aboutInertia'},{url:'settings.html',id:'aboutSettings'},{url:'materials.html',id:'aboutMaterials'},{url:'wiki.html',id:'aboutWiki'}];
-			for(i in pages){
-				getIt(pages[i].url,pages[i].id);
-//				console.log(pages[i].url,pages[i].id);
-			}			
+//			var 	pages = [{url:'welcome.html',id:'aboutWelcome'},{url:'units.html',id:'aboutUnits'},{url:'inertia.html',id:'aboutInertia'},{url:'settings.html',id:'aboutSettings'},{url:'materials.html',id:'aboutMaterials'},{url:'wiki.html',id:'aboutWiki'}];
+//			for(i in pages){
+//				getIt(pages[i].url,pages[i].id);
+////				console.log(pages[i].url,pages[i].id);
+//			}			
 		}
 		var 	aboutItems = Ext.getCmp('aboutItems'),
 			activeItem; 
@@ -180,7 +181,7 @@ Ext.define('motioncalc.view.About', {
 		this.on({
 			activate: function(){motioncalc.app.setAppState(getFieldList(),6);}
 		});
-		getPages();
+//		getPages();
  	}
 });
 

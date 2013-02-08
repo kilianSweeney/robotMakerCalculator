@@ -6,7 +6,7 @@
 	Robot Maker Calculator is an HTML5 web app built on the Sencha Touch 2.1 javascript framework. RMC uses HTML5's localstorage feature to store all pertinent data on your device. This means RMC will work even when you're offline. So bookmark Robot Maker Calculator; add it to your home screen; and let's get to calculating!</p>
 </p>
 <ul>
-	<li><a href="javascript:Ext.getCmp('aboutItems').setValue('aboutUnits');" title="Units Convertor Information">Using the Units Convertor</a></li>
+	<li><a href="javascript:Ext.getCmp('aboutItems').setValue('aboutUnits');" title="Units Converter Information">Using the Units Converter</a></li>
 	<li><a href="javascript:Ext.getCmp('aboutItems').setValue('aboutInertia');" title="Inertia Calculator Information">Using the Inertia Calculator</a></li>
 	<li><a href="javascript:Ext.getCmp('aboutItems').setValue('aboutSettings');" title="Global Settings Information">Configuring Settings</a></li>
 	<li><a href="javascript:Ext.getCmp('aboutItems').setValue('aboutMaterials');" title="Managing Materials Information">Managing Materials</a></li>
