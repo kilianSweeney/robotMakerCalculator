@@ -35,8 +35,9 @@ INERTIABASEUNITS : "kg-m²",
 PI : 3.141593,
 
 answerFrom: null,
-siteURL: 'tigerbaby.me/motioncalc',
-siteTiny: 'tiny.cc/f7d3rw',
+siteURL: 'tigerbaby.me/robot-maker-calc-v1',
+siteTiny: 'bit.ly/WzAPnr',
+siteLanding: 'tigerbaby.me/robot-maker-calculator',
 
 conversionFunctions: Ext.create('motioncalc.util.Conversions'),
 inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
@@ -60,7 +61,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
     launch: function() {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
-	Ext.DomHelper.append(document.body,{tag: 'a', id:'tigerBabyButton', href:'http://www.tigerbaby.me/robot-maker-calculator',target:'_blank' });
+	Ext.DomHelper.append(document.body,{tag: 'a', id:'tigerBabyButton', href:'http://' + motioncalc.app.siteLanding,target:'_blank' });
 	//set global vars
 	var decimalStyle, significantDigits,density,mass,linearDistance,inertia,activeItem;
 	decimalStyle = motioncalc.app.getGlobalSetting('DecimalStyle');
@@ -162,7 +163,7 @@ inertiaFunctions: Ext.create('motioncalc.util.Inertia'),
 		rec.save();
 	},
 	getAppState: function(fieldList){
-		var x = 10;
+		var x = 2;
 		for(record in fieldList){
 //			console.log(motioncalc.app.getGlobalSetting(fieldList[record],'_AppState'));
 			var fieldName,fieldValue;

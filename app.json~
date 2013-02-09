@@ -76,7 +76,7 @@
          * List of items in the CACHE MANIFEST section
          */
         "cache": [
-            "index.html"
+            "index.html","resources/startup/motioncalc/robotstart320.png",
         ],
         /**
          * List of items in the NETWORK section

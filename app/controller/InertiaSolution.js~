@@ -31,7 +31,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 					function tagSolutionString(){
 						var solutionStr = '\n\n----------------------------------------------\n\n';
 						solutionStr += 'tigerBaby\'s Robot Maker Calculator\n';
-						solutionStr += 'http:/' + motioncalc.app.siteURL + '\n';
+						solutionStr += 'http:/' + motioncalc.app.siteLanding + '\n';
 						solutionStr += '\n----------------------------------------------\n\n';
 						return solutionStr;
 					}
@@ -112,7 +112,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 								if(text != null)answers.push([text,window.inertiaAnswers[i][1]]);
 							}
 						}
-						elseanswers.push(['',0,0]);
+						else answers.push(['',0,0]);
 					
 	//					this.animateShape(null,null,0,shape,[['yyPrime','3.783335e+101'],['yy','3.783335e+101'],['xxPrime','3.783335e+101'],['xx','3.783335e+101'],['zz','3.783335e+101']]);
 						controller.animateShape(null,null,0,shape,answers);										

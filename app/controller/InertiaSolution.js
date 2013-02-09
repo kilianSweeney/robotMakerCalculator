@@ -31,7 +31,7 @@ Ext.define('motioncalc.controller.InertiaSolution', {
 					function tagSolutionString(){
 						var solutionStr = '\n\n----------------------------------------------\n\n';
 						solutionStr += 'tigerBaby\'s Robot Maker Calculator\n';
-						solutionStr += 'http:/' + motioncalc.app.siteURL + '\n';
+						solutionStr += 'http://' + motioncalc.app.siteLanding + '\n';
 						solutionStr += '\n----------------------------------------------\n\n';
 						return solutionStr;
 					}
