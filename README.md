@@ -1,1 +1,1 @@
-# This is my README
+This is the code for an app I built several years ago for a Sencha Touch sponsored competition. It is an engineer's calculator allowing for a wide variety of mathmetical computations an engineer would need in the building of a robot. Originally I built this app in java for the Blackberry device platform.
